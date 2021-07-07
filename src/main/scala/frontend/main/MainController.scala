@@ -5,15 +5,16 @@ import frontend.exit.ExitController
 import javafx.scene.Parent
 import javafx.{scene => jfxs}
 import scalafx.Includes._
-import scalafx.application.{JFXApp3, Platform}
+import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.control.Button
-import scalafx.stage.Stage
+import scalafx.stage.{Stage, WindowEvent}
 import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
 
 import java.net.URL
 import java.io.File
+import java.rmi.UnexpectedException
 
 trait MainInterface {
   def open(): Unit
@@ -40,14 +41,8 @@ class MainController(selectBtn: Button, cropBtn: Button)
   override def saveAs(): Unit = ???
 
   // todo - check if there is unsaved work somehow
-  // todo - connect this and 'x' button
-  override def close(): Unit = ExitController.close(stage) match {
-    case "Save" => println("Save")
-    case "Save As..." => println("SaveAs")
-    case "Cancel" => println("Cancel")
-    case "OK" => println("OK")
-    case _ => println("WTF")
-  }
+  override def close(): Unit = ExitController.fireEvent(stage)
+
 }
 
 object MainControllerApp extends JFXApp3 {
@@ -57,12 +52,15 @@ object MainControllerApp extends JFXApp3 {
 
     loader.load()
     val root: Parent = loader.getRoot[jfxs.Parent]
-    val controller: MainInterface = loader.getController[MainInterface]
+    val mainController: MainInterface = loader.getController[MainInterface]
 
     stage = new JFXApp3.PrimaryStage() {
       title = "FPhotoshop"
       scene = new Scene(root)
+      filterEvent(WindowEvent.WindowCloseRequest) {
+        event: WindowEvent => ExitController.handleExitEvent(stage, event)
+      }
     }
-    controller.setStage(stage)
+    mainController.setStage(stage)
   }
 }
