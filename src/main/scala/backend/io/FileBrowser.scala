@@ -1,6 +1,6 @@
 package backend.io
 
-import scalafx.stage.{FileChooser, Stage, Window}
+import scalafx.stage.{FileChooser, Stage}
 
 import java.io.File
 

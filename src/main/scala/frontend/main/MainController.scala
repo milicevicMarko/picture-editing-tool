@@ -14,7 +14,6 @@ import scalafxml.core.{DependenciesByType, FXMLLoader}
 
 import java.net.URL
 import java.io.File
-import java.rmi.UnexpectedException
 
 trait MainInterface {
   def open(): Unit
