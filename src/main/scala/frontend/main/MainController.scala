@@ -1,12 +1,13 @@
 package frontend.main
 
 import backend.io.FileBrowser
+import frontend.exit.ExitController
 import javafx.scene.Parent
 import javafx.{scene => jfxs}
 import scalafx.Includes._
 import scalafx.application.{JFXApp3, Platform}
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, Label}
+import scalafx.scene.control.Button
 import scalafx.stage.Stage
 import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
@@ -23,7 +24,7 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(selectBtn: Button, cropBtn: Button, footerLb: Label)
+class MainController(selectBtn: Button, cropBtn: Button)
   extends MainInterface {
   var stage: Option[Stage] = None
 
@@ -38,8 +39,15 @@ class MainController(selectBtn: Button, cropBtn: Button, footerLb: Label)
 
   override def saveAs(): Unit = ???
 
-  override def close(): Unit = Platform.exit()
-
+  // todo - check if there is unsaved work somehow
+  // todo - connect this and 'x' button
+  override def close(): Unit = ExitController.close(stage) match {
+    case "Save" => println("Save")
+    case "Save As..." => println("SaveAs")
+    case "Cancel" => println("Cancel")
+    case "OK" => println("OK")
+    case _ => println("WTF")
+  }
 }
 
 object MainControllerApp extends JFXApp3 {
@@ -48,9 +56,7 @@ object MainControllerApp extends JFXApp3 {
     val loader = new FXMLLoader(url, new DependenciesByType(Map()))
 
     loader.load()
-
     val root: Parent = loader.getRoot[jfxs.Parent]
-
     val controller: MainInterface = loader.getController[MainInterface]
 
     stage = new JFXApp3.PrimaryStage() {
