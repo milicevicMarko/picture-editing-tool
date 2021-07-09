@@ -17,12 +17,12 @@ object FileBrowser extends Constants {
 
   private def openFileThroughBrowser(ti: String, stage: Stage): File = new FileChooser {
     title = ti
-    initialDirectory = InitialFile
+    initialDirectory = currentDirectory
   }.showOpenDialog(stage)
 
   def importFile(stage: Option[Stage]): File = {
     val imported = openFileThroughBrowser(ImportTitle, stage.getOrElse(throw new ExceptionInInitializerError))
-    currentDirectory = imported
+    if (imported != null) currentDirectory = new File(imported.getPath+"/..")
     imported
   }
 
