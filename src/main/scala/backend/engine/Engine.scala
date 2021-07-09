@@ -4,12 +4,18 @@ import scalafx.scene.image.{ImageView, WritableImage}
 import scalafx.scene.layout.StackPane
 
 import java.awt.image.BufferedImage
+import java.io.File
 
-class Engine {
+object Engine {
   var image: Option[BufferedImage] = None
+  var imageFile: Option[File] = None
+
+  def setImageFile(file: File): Unit = imageFile = Some(file)
+  def getImageFile: File = imageFile.getOrElse(throw new IllegalStateException())
 
   def setImage(image: BufferedImage): Unit = this.image = Option(image)
-  def getImage: Option[BufferedImage] = this.image
+  def getImage: BufferedImage = this.image.getOrElse(throw new IllegalStateException())
+  def getImageOption: Option[BufferedImage] = this.image
 
   def pictureTest(): Unit = {
     println("Started test")

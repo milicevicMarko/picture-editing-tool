@@ -1,30 +1,34 @@
 package backend.io
 
+import scalafx.stage.FileChooser.ExtensionFilter
 import scalafx.stage.{FileChooser, Stage}
 
 import java.io.File
 
 trait Constants {
-  val Extensions: List[String] = List("*", ".txt", ".JPG", ".JPEG", ".PNG")
-  val ImportTitle = "Import File"
+  val Extensions: Seq[String] = Seq("*.jpg", "*.jpeg", "*.png")
+  val PictureExtensionFilter: ExtensionFilter = new ExtensionFilter("Picture", Extensions)
+  val ImportTitle = "Open File"
+  val ExportTitle = "Save File"
   def DesktopPath: String = System.getProperty("user.home") + "/Desktop"
-  val InitialFile: File = new File(DesktopPath)
+  def getDirectoryFromFile(file: File): File = new File(file.getPath + "/..")
+  val InitialDirectory: File = new File(DesktopPath)
 }
 
-// todo - this file should have only file chooser code!
 object FileBrowser extends Constants {
-  var currentDirectory: File = InitialFile
+  var currentFile: File = InitialDirectory
+  def getCurrentDirectory: File = getDirectoryFromFile(currentFile)
+  def getCurrentFile: File = currentFile
 
-  private def openFileThroughBrowser(ti: String, stage: Stage): File = new FileChooser {
-    title = ti
-    initialDirectory = currentDirectory
-  }.showOpenDialog(stage)
-
-  def importFile(stage: Option[Stage]): File = {
-    val imported = openFileThroughBrowser(ImportTitle, stage.getOrElse(throw new ExceptionInInitializerError))
-    if (imported != null) currentDirectory = new File(imported.getPath+"/..")
-    imported
+  def openFileChooser(isImport: Boolean = true, stage: Stage): File = {
+    val fileChooser = new FileChooser {
+      title = if (isImport) ImportTitle else ExportTitle
+      initialDirectory = InitialDirectory
+    }
+    fileChooser.extensionFilters.addAll(PictureExtensionFilter)
+    val file = if (isImport) fileChooser.showOpenDialog(stage) else fileChooser.showSaveDialog(stage)
+    if (file != null) currentFile = file
+    file
   }
 
-  def getCurrentDirectory: File = currentDirectory
 }

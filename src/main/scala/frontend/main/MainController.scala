@@ -1,7 +1,7 @@
 package frontend.main
 
 import backend.engine.Engine
-import backend.io.{FileBrowser, FileExport, FileImport}
+import backend.io.{FileExport, FileImport}
 import frontend.exit.ExitController
 import javafx.scene.Parent
 import javafx.{scene => jfxs}
@@ -25,6 +25,7 @@ trait MainInterface {
   def close(): Unit
   def testMe(): Unit
   def setStage(stage: Stage)
+  def getStage: Stage
   def updateImage()
 }
 
@@ -32,9 +33,10 @@ trait MainInterface {
 class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: Slider, openOnStack: Button)
   extends MainInterface {
   var stage: Option[Stage] = None
-  val engine = new Engine
 
   override def setStage(stage: Stage): Unit = this.stage = Some(stage)
+
+  override def getStage: Stage = stage.getOrElse(throw new IllegalStateException())
 
   def showImageHideButton(): Unit = {
     def hideButtonOnStack(): Unit = {
@@ -49,32 +51,30 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
     showImage()
   }
 
-  override def open(): Unit = FileBrowser.importFile(stage) match {
+  override def open(): Unit = FileImport.importFile(getStage) match {
     case f: File =>
-      engine.setImage(FileImport.loadPicture(f))
+      Engine.setImageFile(f)
+      Engine.setImage(FileImport.loadImage(f))
       showImageHideButton()
       updateImage()
     case _ => println("Canceled")
   }
 
-  override def save(): Unit = engine.getImage match {
-    case Some(bi) => FileExport.saveFile(bi, "jpg")
-    case _ => println("Nothing to save")
-  }
+  override def save(): Unit = FileExport.tryToSave(None)
 
-  override def saveAs(): Unit = ???
+  override def saveAs(): Unit = FileExport.tryToSave(stage)
 
   // todo - check if there is unsaved work somehow
-  override def close(): Unit = ExitController.fireEvent(stage)
+  override def close(): Unit = getStage.fireEvent(new WindowEvent(getStage, WindowEvent.WindowCloseRequest))
 
-  override def testMe(): Unit = engine.getImage match {
-    case Some(bi) =>
-      engine.pictureTest()
+  override def testMe(): Unit = Engine.getImageOption match {
+    case Some(_) =>
+      Engine.pictureTest()
       updateImage()
-    case _ => println("Nothing to test")
+    case None => println("Nothing to test")
   }
 
-  override def updateImage(): Unit = engine.updateImage(shownImage, centerPane)
+  override def updateImage(): Unit = Engine.updateImage(shownImage, centerPane)
 }
 
 object MainControllerApp extends JFXApp3 {

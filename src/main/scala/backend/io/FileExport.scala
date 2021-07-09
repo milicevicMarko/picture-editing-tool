@@ -1,13 +1,29 @@
 package backend.io
 
-import java.awt.image.BufferedImage
+import backend.engine.Engine
+import scalafx.stage.Stage
+
+
 import java.io.File
 import javax.imageio.ImageIO
 
 object FileExport {
-  def saveFile(picture: BufferedImage, format: String): Boolean =
-    saveFile(picture, format, FileBrowser.getCurrentDirectory)
 
-  def saveFile(picture: BufferedImage, format: String, fileExported: File): Boolean =
-    ImageIO.write(picture, format, fileExported)
+  def tryToSave(stageOption: Option[Stage]): Unit = Engine.getImageOption match {
+    case Some(_) => saveFile(stageOption)
+    case None => println("Nothing to save")
+  }
+
+  def saveFile(stageOption: Option[Stage]): Boolean = stageOption match {
+    case Some(stage) => saveFile(FileBrowser.openFileChooser(isImport = false, stage))
+    case None => saveFile(FileBrowser.getCurrentFile)
+  }
+
+  private def saveFile(fileExported: File): Boolean = {
+    if (fileExported != null && Engine.getImageFile.getName.nonEmpty)
+      ImageIO.write(Engine.getImage, Engine.getImageFile.getName.split('.').toList.tail.head, fileExported)
+    else
+      println("Save canceled"); false
+  }
+
 }
