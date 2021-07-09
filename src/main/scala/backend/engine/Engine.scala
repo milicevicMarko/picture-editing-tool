@@ -1,6 +1,7 @@
 package backend.engine
 
 import scalafx.scene.image.{ImageView, WritableImage}
+import scalafx.scene.layout.StackPane
 
 import java.awt.image.BufferedImage
 
@@ -30,6 +31,18 @@ class Engine {
 
     setImage(out)
     println("Finished test")
+  }
+
+  def updateImage(imageView: ImageView, pane: StackPane): Unit = {
+    updateSize(imageView, pane)
+    convertImageToFx(imageView)
+  }
+
+  def updateSize(imageView: ImageView, pane: StackPane): Unit = {
+    val img = image.getOrElse(throw new IllegalArgumentException)
+    imageView.setPreserveRatio(true)
+    if (img.getWidth() >= img.getHeight()) imageView.setFitWidth(pane.getWidth - 100)
+    if (img.getWidth() <= img.getHeight()) imageView.setFitHeight(pane.getHeight - 100)
   }
 
   def convertImageToFx(imageView: ImageView): Unit = {
