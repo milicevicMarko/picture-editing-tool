@@ -1,6 +1,7 @@
 package frontend.main
 
-import backend.io.FileBrowser
+import backend.engine.Engine
+import backend.io.{FileBrowser, FileExport, FileImport}
 import frontend.exit.ExitController
 import javafx.scene.Parent
 import javafx.{scene => jfxs}
@@ -12,6 +13,7 @@ import scalafx.stage.{Stage, WindowEvent}
 import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
 
+import java.awt.image.BufferedImage
 import java.net.URL
 import java.io.File
 
@@ -20,6 +22,7 @@ trait MainInterface {
   def save(): Unit
   def saveAs(): Unit
   def close(): Unit
+  def test(): Unit
   def setStage(stage: Stage)
 }
 
@@ -27,21 +30,26 @@ trait MainInterface {
 class MainController(selectBtn: Button, cropBtn: Button)
   extends MainInterface {
   var stage: Option[Stage] = None
+  val engine = new Engine()
 
   override def setStage(stage: Stage): Unit = this.stage = Some(stage)
 
   override def open(): Unit = FileBrowser.importFile(stage) match {
-    case f: File => println(f.toString)
+    case f: File => engine.setImage(FileImport.loadPicture(f))// FileImport.loadPicture(f)
     case _ => println("Canceled")
   }
 
-  override def save(): Unit = ???
+  override def save(): Unit = engine.getImage match {
+    case Some(bi) => FileExport.saveFile(bi, "jpg")
+    case _ => println("Nothing to save")
+  }
 
   override def saveAs(): Unit = ???
 
   // todo - check if there is unsaved work somehow
   override def close(): Unit = ExitController.fireEvent(stage)
 
+  override def test(): Unit = engine.pictureTest()
 }
 
 object MainControllerApp extends JFXApp3 {

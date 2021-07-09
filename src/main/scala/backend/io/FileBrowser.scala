@@ -4,18 +4,27 @@ import scalafx.stage.{FileChooser, Stage}
 
 import java.io.File
 
-object FileBrowser {
-  val extensions: List[String] = List("*", ".txt")
-  val importTitle = "Import File"
-  private def getDesktopPath = System.getProperty("user.home") + "/Desktop"
+trait Constants {
+  val Extensions: List[String] = List("*", ".txt", ".JPG", ".JPEG", ".PNG")
+  val ImportTitle = "Import File"
+  def DesktopPath: String = System.getProperty("user.home") + "/Desktop"
+  val InitialFile: File = new File(DesktopPath)
+}
 
-  def openFileThroughBrowser(ti: String, stage: Stage): File = new FileChooser {
+// todo - this file should have only file chooser code!
+object FileBrowser extends Constants {
+  var currentDirectory: File = InitialFile
+
+  private def openFileThroughBrowser(ti: String, stage: Stage): File = new FileChooser {
     title = ti
-    initialDirectory = new File(getDesktopPath)
+    initialDirectory = InitialFile
   }.showOpenDialog(stage)
 
-  def importFile(stage: Option[Stage]): File = stage match {
-    case Some(s) => openFileThroughBrowser(importTitle, s)
-    case None => throw new ExceptionInInitializerError()
+  def importFile(stage: Option[Stage]): File = {
+    val imported = openFileThroughBrowser(ImportTitle, stage.getOrElse(throw new ExceptionInInitializerError))
+    currentDirectory = imported
+    imported
   }
+
+  def getCurrentDirectory: File = currentDirectory
 }

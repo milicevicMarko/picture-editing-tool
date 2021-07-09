@@ -20,8 +20,8 @@
           <Menu mnemonicParsing="false" text="File">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#open" text="Open..." />
-                  <MenuItem mnemonicParsing="false" text="Save" />
-                  <MenuItem mnemonicParsing="false" text="Save As..." />
+                  <MenuItem mnemonicParsing="false" onAction="#save" text="Save" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveAs" text="Save As..." />
                   <MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
             </items>
           </Menu>
@@ -69,6 +69,11 @@
                      </image>
                   </ImageView>
                </graphic>
+               <padding>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </padding>
+            </Button>
+            <Button fx:id="cropBtn1" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="39.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#test" prefHeight="25.0" prefWidth="25.0" text="T" textAlignment="JUSTIFY">
                <padding>
                   <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                </padding>
