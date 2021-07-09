@@ -48,6 +48,9 @@
             </items>
           </Menu>
         </menus>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
       </MenuBar>
    </top>
    <right>
@@ -104,6 +107,30 @@
                      </padding>
                   </Button>
                   <Button fx:id="cropBtn1" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="39.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#testMe" prefHeight="25.0" prefWidth="25.0" text="T" textAlignment="JUSTIFY">
+                     <padding>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </padding>
+                  </Button>
+                  <Button alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#rotateRight" prefHeight="25.0" prefWidth="25.0" textAlignment="JUSTIFY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/rotating-arrow-to-the-right.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <padding>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </padding>
+                  </Button>
+                  <Button alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="39.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#rotateLeft" prefHeight="25.0" prefWidth="25.0" textAlignment="JUSTIFY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/rotate-left-circular-arrow-interface-symbol.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
                      <padding>
                         <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                      </padding>

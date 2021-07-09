@@ -39,6 +39,11 @@ object Engine {
     println("Finished test")
   }
 
+  def rotateImage(imageView: ImageView, isRight: Boolean): Unit = {
+    val degrees = if (isRight) 90 else -90
+    imageView.setRotate(imageView.getRotate + degrees)
+  }
+
   def updateImage(imageView: ImageView, pane: StackPane): Unit = {
     updateSize(imageView, pane)
     convertImageToFx(imageView)

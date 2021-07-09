@@ -23,6 +23,8 @@ trait MainInterface {
   def save(): Unit
   def saveAs(): Unit
   def close(): Unit
+  def rotateRight(): Unit
+  def rotateLeft(): Unit
   def testMe(): Unit
   def setStage(stage: Stage)
   def getStage: Stage
@@ -75,6 +77,15 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
   }
 
   override def updateImage(): Unit = Engine.updateImage(shownImage, centerPane)
+  override def rotateRight(): Unit = rotate(true)
+  override def rotateLeft(): Unit = rotate(false)
+  def rotate(isRight: Boolean): Unit = {
+    if (!shownImage.isDisabled) {
+      Engine.rotateImage(shownImage, isRight)
+      updateImage()
+    }
+    else println("Nothing to rotate")
+  }
 }
 
 object MainControllerApp extends JFXApp3 {
