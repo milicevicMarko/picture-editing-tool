@@ -39,14 +39,6 @@
         </menus>
       </MenuBar>
    </top>
-   <center>
-      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-        <tabs>
-            <Tab text="New Tab" />
-            <Tab text="+" />
-        </tabs>
-      </TabPane>
-   </center>
    <left>
       <ToolBar orientation="VERTICAL" prefHeight="363.0" prefWidth="35.0" BorderPane.alignment="CENTER">
         <items>
@@ -73,7 +65,7 @@
                   <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                </padding>
             </Button>
-            <Button fx:id="cropBtn1" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="39.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#test" prefHeight="25.0" prefWidth="25.0" text="T" textAlignment="JUSTIFY">
+            <Button fx:id="cropBtn1" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="39.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#testMe" prefHeight="25.0" prefWidth="25.0" text="T" textAlignment="JUSTIFY">
                <padding>
                   <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                </padding>
@@ -96,4 +88,15 @@
         </items>
       </SplitPane>
    </right>
+   <center>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <ImageView fx:id="shownImage" fitHeight="150.0" fitWidth="200.0" layoutX="443.0" layoutY="307.0" pickOnBounds="true" preserveRatio="true" >
+             <image>
+                 <Image url="@icons/selection.png" />
+             </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+   </center>
 </BorderPane>

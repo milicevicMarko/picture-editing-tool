@@ -9,11 +9,11 @@ import scalafx.Includes._
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.control.Button
+import scalafx.scene.image.ImageView
 import scalafx.stage.{Stage, WindowEvent}
 import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
 
-import java.awt.image.BufferedImage
 import java.net.URL
 import java.io.File
 
@@ -22,12 +22,13 @@ trait MainInterface {
   def save(): Unit
   def saveAs(): Unit
   def close(): Unit
-  def test(): Unit
+  def testMe(): Unit
   def setStage(stage: Stage)
+  def updateImage()
 }
 
 @sfxml
-class MainController(selectBtn: Button, cropBtn: Button)
+class MainController(selectBtn: Button, cropBtn: Button, shownImage: ImageView)
   extends MainInterface {
   var stage: Option[Stage] = None
   val engine = new Engine()
@@ -35,7 +36,7 @@ class MainController(selectBtn: Button, cropBtn: Button)
   override def setStage(stage: Stage): Unit = this.stage = Some(stage)
 
   override def open(): Unit = FileBrowser.importFile(stage) match {
-    case f: File => engine.setImage(FileImport.loadPicture(f))// FileImport.loadPicture(f)
+    case f: File => engine.setImage(FileImport.loadPicture(f)); updateImage()
     case _ => println("Canceled")
   }
 
@@ -49,7 +50,12 @@ class MainController(selectBtn: Button, cropBtn: Button)
   // todo - check if there is unsaved work somehow
   override def close(): Unit = ExitController.fireEvent(stage)
 
-  override def test(): Unit = engine.pictureTest()
+  override def testMe(): Unit = {
+    engine.pictureTest()
+    updateImage()
+  }
+
+  override def updateImage(): Unit = engine.convertImageToFx(shownImage)
 }
 
 object MainControllerApp extends JFXApp3 {
