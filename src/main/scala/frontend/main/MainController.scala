@@ -67,9 +67,11 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
   // todo - check if there is unsaved work somehow
   override def close(): Unit = ExitController.fireEvent(stage)
 
-  override def testMe(): Unit = {
-    engine.pictureTest()
-    updateImage()
+  override def testMe(): Unit = engine.getImage match {
+    case Some(bi) =>
+      engine.pictureTest()
+      updateImage()
+    case _ => println("Nothing to test")
   }
 
   override def updateImage(): Unit = engine.updateImage(shownImage, centerPane)
