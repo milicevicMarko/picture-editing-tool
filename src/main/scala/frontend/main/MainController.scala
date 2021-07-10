@@ -2,13 +2,15 @@ package frontend.main
 
 import backend.engine.Engine
 import backend.io.{FileExport, FileImport}
+import backend.layers.{LayerCard, LayerManager}
 import frontend.exit.ExitController
+import frontend.layers.LayerCardView
 import javafx.scene.Parent
 import javafx.{scene => jfxs}
 import scalafx.Includes._
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, Slider}
+import scalafx.scene.control.{Button, ListView, Slider}
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.StackPane
 import scalafx.stage.{Stage, WindowEvent}
@@ -26,15 +28,18 @@ trait MainInterface {
   def rotateRight(): Unit
   def rotateLeft(): Unit
   def testMe(): Unit
+  def layerTest(): Unit
   def setStage(stage: Stage)
   def getStage: Stage
   def updateImage()
 }
 
 @sfxml
-class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: Slider, openOnStack: Button)
+class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: Slider, openOnStack: Button, layers: ListView[LayerCardView])
   extends MainInterface {
+  // todo learn how to avoid vars
   var stage: Option[Stage] = None
+  var layerManager: LayerManager = new LayerManager(layers)
 
   override def setStage(stage: Stage): Unit = this.stage = Some(stage)
 
@@ -86,6 +91,8 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
     }
     else println("Nothing to rotate")
   }
+
+  override def layerTest(): Unit = layerManager = layerManager.addCard(new LayerCard("This is a new one")) //  LayerManager.getInstance(layers).addCard(new LayerCard("This is a new one"))//
 }
 
 object MainControllerApp extends JFXApp3 {
