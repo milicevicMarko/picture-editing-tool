@@ -3,32 +3,20 @@ package backend.layers
 import frontend.layers.LayerCardView
 import scalafx.scene.control.ListView
 
-import scala.annotation.tailrec
+import scala.collection.mutable.ListBuffer
 
-class LayerManager(layerListView: ListView[LayerCardView], layerList: LayerList) {
-  def this(layerListView: ListView[LayerCardView]) = this(layerListView, new LayerList(Nil))
+class LayerManager(listView: ListView[LayerCardView]) {
+  val layerList: ListBuffer[LayerCard] = new ListBuffer[LayerCard]
 
-  def addCard(card: LayerCard): LayerManager = {
-    val newManager = new LayerManager(layerListView, layerList add card)
-    layerListView.getItems.add(card.view)
-    newManager
+  def addCard(card: LayerCard): Unit = {
+    layerList += card
+    showCards()
   }
+
+  def addCard(cardName: String): Unit = addCard(new LayerCard(cardName + layerList.size))
 
   def showCards(): Unit = {
-    @tailrec
-    def showCards(cards: List[LayerCard]): Unit = cards match {
-      case c::cs => layerListView.getItems.add(c.view); showCards(cs)
-      case Nil => println("Finished iterating trough cards")
-    }
-    layerListView.getItems.clear()
-    showCards(layerList.toList)
+    listView.getItems.clear()
+    layerList.foreach(c=> listView.getItems.add(c.view))
   }
 }
-// todo maybe create a factory that return always a new instance, copying existing
-//object LayerManager {
-//  var instance: Option[LayerManager] = None
-//  def getInstance(listView: ListView[LayerCardView]): LayerManager = instance match {
-//    case None => instance = Some(new LayerManager(listView)); instance.get
-//    case Some(_) => instance.get
-//  }
-//}
