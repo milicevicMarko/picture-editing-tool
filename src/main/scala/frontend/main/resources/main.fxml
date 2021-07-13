@@ -56,7 +56,7 @@
       </MenuBar>
    </top>
    <right>
-      <SplitPane dividerPositions="0.3" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+      <SplitPane dividerPositions="0.3" orientation="VERTICAL" prefHeight="763.0" prefWidth="267.0" BorderPane.alignment="CENTER">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
             <VBox>

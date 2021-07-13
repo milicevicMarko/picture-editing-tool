@@ -1,9 +1,11 @@
 package backend.layers
 
 import frontend.layers.LayerCardView
+import frontend.utils.UIUtils
 
-class LayerCard (name: String) {
-  val view: LayerCardView = new LayerCardView(this)
+import java.awt.image.BufferedImage
 
+class LayerCard (name: String, img: BufferedImage) {
+  val view: LayerCardView = new LayerCardView(this, UIUtils.createImageViewFromImage(img))
   override def toString: String = name
 }

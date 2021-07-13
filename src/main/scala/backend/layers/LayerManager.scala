@@ -3,6 +3,7 @@ package backend.layers
 import frontend.layers.LayerCardView
 import scalafx.scene.control.ListView
 
+import java.awt.image.BufferedImage
 import scala.collection.mutable.ListBuffer
 
 class LayerManager(listView: ListView[LayerCardView]) {
@@ -13,7 +14,7 @@ class LayerManager(listView: ListView[LayerCardView]) {
     showCards()
   }
 
-  def addCard(cardName: String): Unit = addCard(new LayerCard(cardName + layerList.size))
+  def addCard(cardName: String, img: BufferedImage): Unit = addCard(new LayerCard(cardName + layerList.size, img))
 
   def showCards(): Unit = {
     listView.getItems.clear()

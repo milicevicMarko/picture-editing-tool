@@ -1,6 +1,7 @@
 package backend.engine
 
-import scalafx.scene.image.{ImageView, WritableImage}
+import frontend.utils.UIUtils
+import scalafx.scene.image.ImageView
 import scalafx.scene.layout.StackPane
 
 import java.awt.image.BufferedImage
@@ -46,7 +47,7 @@ object Engine {
 
   def updateImage(imageView: ImageView, pane: StackPane): Unit = {
     updateSize(imageView, pane)
-    convertImageToFx(imageView)
+    UIUtils.convertImageToImageView(image.get, imageView)
   }
 
   def updateSize(imageView: ImageView, pane: StackPane): Unit = {
@@ -55,15 +56,4 @@ object Engine {
     if (img.getWidth() >= img.getHeight()) imageView.setFitWidth(pane.getWidth - 100)
     if (img.getWidth() <= img.getHeight()) imageView.setFitHeight(pane.getHeight - 100)
   }
-
-  def convertImageToFx(imageView: ImageView): Unit = {
-    val img = image.get
-    val wrImg: WritableImage = new WritableImage(img.getWidth, img.getHeight)
-    val pxImg = wrImg.getPixelWriter
-    for (x <- 0 until img.getWidth)
-      for (y <- 0 until img.getHeight)
-        pxImg.setArgb(x, y, img.getRGB(x, y))
-    imageView.setImage(new ImageView(wrImg).getImage)
-  }
-
 }

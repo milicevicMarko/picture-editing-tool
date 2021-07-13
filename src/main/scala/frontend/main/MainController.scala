@@ -92,8 +92,10 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
     else println("Nothing to rotate")
   }
 
-  override def layerTest(): Unit = layerManager.addCard("Layer_")
-
+  override def layerTest(): Unit = {
+    layerManager.addCard("Layer_", Engine.getImage)
+    LayerCardView.update(layers)
+  }
 }
 
 object MainControllerApp extends JFXApp3 {
