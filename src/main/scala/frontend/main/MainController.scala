@@ -2,7 +2,7 @@ package frontend.main
 
 import backend.engine.Engine
 import backend.io.{FileExport, FileImport}
-import backend.layers.{LayerCard, LayerManager}
+import backend.layers.{LayerCard, LayerManager, LayerManager2, LayerManager4}
 import frontend.exit.ExitController
 import frontend.layers.LayerCardView
 import javafx.scene.Parent
@@ -92,7 +92,8 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
     else println("Nothing to rotate")
   }
 
-  override def layerTest(): Unit = layerManager = layerManager.addCard(new LayerCard("This is a new one")) //  LayerManager.getInstance(layers).addCard(new LayerCard("This is a new one"))//
+  override def layerTest(): Unit = layerManager.addCard("Layer_")
+
 }
 
 object MainControllerApp extends JFXApp3 {
