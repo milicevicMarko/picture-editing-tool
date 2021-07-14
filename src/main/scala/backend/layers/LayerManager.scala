@@ -1,14 +1,15 @@
 package backend.layers
 
 import backend.engine.Engine.image
+import backend.io.FileImport
 import frontend.layers.LayerCardView
 import frontend.utils.UIUtils
 import scalafx.scene.control.ListView
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.StackPane
 
-import java.awt.image.BufferedImage
 import scala.collection.mutable.ListBuffer
+import java.io.File
 
 class LayerManager(listView: ListView[LayerCardView]) {
   val layerList: ListBuffer[LayerCard] = new ListBuffer[LayerCard]
@@ -18,23 +19,16 @@ class LayerManager(listView: ListView[LayerCardView]) {
     showCards()
   }
 
-  def addCard(cardName: String, img: BufferedImage): Unit = addCard(new LayerCard(cardName + layerList.size, img))
+  def addCard(cardName: String, file: File): Unit = addCard(new LayerCard(cardName + layerList.size, file))
 
   def showCards(): Unit = {
     listView.getItems.clear()
     layerList.foreach(c=> listView.getItems.add(c.view))
     LayerCardView.update(listView)
   }
+}
 
-  def updateImage(imageView: ImageView, pane: StackPane): Unit = {
-    updateSize(imageView, pane)
-    UIUtils.convertImageToImageView(image.get, imageView)
-  }
-
-  def updateSize(imageView: ImageView, pane: StackPane): Unit = {
-    val img = image.getOrElse(throw new IllegalArgumentException)
-    imageView.setPreserveRatio(true)
-    if (img.getWidth() >= img.getHeight()) imageView.setFitWidth(pane.getWidth - 100)
-    if (img.getWidth() <= img.getHeight()) imageView.setFitHeight(pane.getHeight - 100)
-  }
+object LayerManager {
+  val layerBuffer: ListBuffer[Image] = new ListBuffer[Image]
+  def addNewLayer(): Unit = layerBuffer.addOne(new Image())
 }

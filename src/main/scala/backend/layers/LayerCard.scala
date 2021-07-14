@@ -7,9 +7,10 @@ import frontend.utils.UIUtils
 import java.awt.image.BufferedImage
 import java.io.File
 
-class LayerCard (name: String, img: BufferedImage, imgFile: File) {
+case class LayerCard (name: String, img: BufferedImage, imgFile: File) {
   def this(name: String, f: File) = this(name, FileImport.loadImage(f), f)
 
   val view: LayerCardView = new LayerCardView(this, UIUtils.createThumbnailImageViewFromImage(img))
+  def getImg: BufferedImage = img
   override def toString: String = name
 }

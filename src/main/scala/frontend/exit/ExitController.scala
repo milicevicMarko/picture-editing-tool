@@ -1,6 +1,7 @@
 package frontend.exit
 
 import backend.io.FileExport
+import frontend.main.MainControllerApp
 import javafx.scene.control
 import scalafx.scene.control.{Alert, ButtonType}
 import scalafx.scene.control.Alert.AlertType
@@ -24,9 +25,9 @@ trait ExitController{
 
 object ExitController extends ExitController {
 
-  def handleExitEvent(stage: Stage, event: WindowEvent): Unit = exit(stage) match {
+  def handleExitEvent(event: WindowEvent): Unit = exit(MainControllerApp.stage) match {
     case SaveText => FileExport.tryToSave(None); println("Save and Exit")
-    case SaveAsText => FileExport.tryToSave(Option(stage)); println("Save As and Exit")
+    case SaveAsText => FileExport.tryToSave(Option(MainControllerApp.stage)); println("Save As and Exit")
     case CancelText => event.consume(); println("Cancel")
     case OkText => println("Exit")
     case _ => throw new UnknownError

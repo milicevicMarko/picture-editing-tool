@@ -58,14 +58,16 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
     showImage()
   }
 
-  override def open(): Unit = FileImport.importFile(getStage) match {
-    case f: File =>
-      val layerCard = new LayerCard("layer", f)
-      layerManager.addCard(layerCard)
-      showImageHideButton()
-      updateImage()
-    case _ => println("Canceled")
-  }
+  override def open(): Unit = LayerManager.addNewLayer()
+
+  // FileImport.importFile(getStage) match {
+  //    case f: File =>
+  //      val layerCard = new LayerCard("layer", f)
+  //      layerManager.addCard(layerCard)
+  //      showImageHideButton()
+  //      updateImage()
+  //    case _ => println("Canceled")
+  //  }
 
   override def save(): Unit = FileExport.tryToSave(None)
 
@@ -82,8 +84,10 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
   }
 
   override def updateImage(): Unit = Engine.updateImage(shownImage, centerPane)
+
   override def rotateRight(): Unit = rotate(true)
   override def rotateLeft(): Unit = rotate(false)
+
   def rotate(isRight: Boolean): Unit = {
     if (!shownImage.isDisabled) {
       Engine.rotateImage(shownImage, isRight)
@@ -93,8 +97,8 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
   }
 
   override def layerTest(): Unit = {
-    layerManager.addCard("Layer_", Engine.getImage)
-    LayerCardView.update(layers)
+//    layerManager.addCard("Layer_", Engine.getImage)
+//    LayerCardView.update(layers)
   }
 }
 
@@ -111,7 +115,7 @@ object MainControllerApp extends JFXApp3 {
       title = "FPhotoshop"
       scene = new Scene(root)
       filterEvent(WindowEvent.WindowCloseRequest) {
-        event: WindowEvent => ExitController.handleExitEvent(stage, event)
+        event: WindowEvent => ExitController.handleExitEvent(event)
       }
     }
 

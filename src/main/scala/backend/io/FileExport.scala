@@ -15,7 +15,7 @@ object FileExport {
   }
 
   def saveFile(stageOption: Option[Stage]): Boolean = stageOption match {
-    case Some(stage) => saveFile(FileBrowser.openFileChooser(isImport = false, stage))
+    case Some(stage) => saveFile(FileBrowser.chooseFileExport())
     case None => saveFile(FileBrowser.getCurrentFile)
   }
 
