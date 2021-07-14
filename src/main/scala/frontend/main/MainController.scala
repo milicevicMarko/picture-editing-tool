@@ -2,7 +2,7 @@ package frontend.main
 
 import backend.engine.Engine
 import backend.io.{FileExport, FileImport}
-import backend.layers.LayerManager
+import backend.layers.{LayerCard, LayerManager}
 import frontend.exit.ExitController
 import frontend.layers.LayerCardView
 import javafx.scene.Parent
@@ -39,7 +39,7 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
   extends MainInterface {
   // todo learn how to avoid vars
   var stage: Option[Stage] = None
-  var layerManager: LayerManager = new LayerManager(layers)
+  val layerManager: LayerManager = new LayerManager(layers)
 
   override def setStage(stage: Stage): Unit = this.stage = Some(stage)
 
@@ -60,9 +60,8 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
 
   override def open(): Unit = FileImport.importFile(getStage) match {
     case f: File =>
-      Engine.setImageFile(f)
-      Engine.setImage(FileImport.loadImage(f))
-      layerManager.addCard("Layer_", Engine.getImage)
+      val layerCard = new LayerCard("layer", f)
+      layerManager.addCard(layerCard)
       showImageHideButton()
       updateImage()
     case _ => println("Canceled")
