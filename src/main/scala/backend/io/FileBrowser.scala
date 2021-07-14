@@ -10,7 +10,7 @@ trait Constants {
   val PictureExtensionFilter: ExtensionFilter = new ExtensionFilter("Picture", Extensions)
   val ImportTitle = "Open File"
   val ExportTitle = "Save File"
-  def DesktopPath: String = System.getProperty("user.home") + "/Desktop"
+  def DesktopPath: String = System.getProperty("user.home")
   def getDirectoryFromFile(file: File): File = new File(file.getPath + "/..")
   val InitialDirectory: File = new File(DesktopPath)
 }
