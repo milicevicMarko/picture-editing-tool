@@ -6,6 +6,6 @@ import frontend.utils.UIUtils
 import java.awt.image.BufferedImage
 
 class LayerCard (name: String, img: BufferedImage) {
-  val view: LayerCardView = new LayerCardView(this, UIUtils.createImageViewFromImage(img))
+  val view: LayerCardView = new LayerCardView(this, UIUtils.createThumbnailImageViewFromImage(img))
   override def toString: String = name
 }

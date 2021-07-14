@@ -62,6 +62,7 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
     case f: File =>
       Engine.setImageFile(f)
       Engine.setImage(FileImport.loadImage(f))
+      layerManager.addCard("Layer_", Engine.getImage)
       showImageHideButton()
       updateImage()
     case _ => println("Canceled")

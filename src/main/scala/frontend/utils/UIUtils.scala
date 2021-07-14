@@ -14,9 +14,18 @@ object UIUtils {
     imageView.setImage(new ImageView(wrImg).getImage)
   }
 
+  def createThumbnailImageViewFromImage(img: BufferedImage): ImageView = fixThumbnailFit(createImageViewFromImage(img))
+
   def createImageViewFromImage(img: BufferedImage): ImageView = {
     val imageView: ImageView = new ImageView()
     UIUtils.convertImageToImageView(img, imageView)
+    imageView
+  }
+
+  def fixThumbnailFit(imageView: ImageView, width: Int = 100, height: Int = 100, keepRatio: Boolean = true): ImageView = {
+    imageView.setFitWidth(width)
+    imageView.setFitHeight(height)
+    imageView.setPreserveRatio(keepRatio)
     imageView
   }
 }

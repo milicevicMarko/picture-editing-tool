@@ -19,5 +19,6 @@ class LayerManager(listView: ListView[LayerCardView]) {
   def showCards(): Unit = {
     listView.getItems.clear()
     layerList.foreach(c=> listView.getItems.add(c.view))
+    LayerCardView.update(listView)
   }
 }
