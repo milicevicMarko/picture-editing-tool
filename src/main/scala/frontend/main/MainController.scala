@@ -1,8 +1,8 @@
 package frontend.main
 
 import backend.engine.Engine
-import backend.io.{FileExport, FileImport}
-import backend.layers.{LayerCard, LayerManager}
+import backend.io.FileExport
+import backend.layers.LayerManager
 import frontend.exit.ExitController
 import frontend.layers.LayerCardView
 import javafx.scene.Parent
@@ -18,7 +18,6 @@ import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
 
 import java.net.URL
-import java.io.File
 
 trait MainInterface {
   def open(): Unit

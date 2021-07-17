@@ -11,31 +11,30 @@ trait Constants {
   val Extensions: Seq[String] = Seq("*.jpg", "*.jpeg", "*.png")
   val PictureExtensionFilter: ExtensionFilter = new ExtensionFilter("Picture", Extensions)
   val Title = "File Browser"
-  def DesktopPath: String = System.getProperty("user.home")
+  val DefaultPath: String = System.getProperty("user.home")
+
   def getDirectoryFromFile(file: File): File = new File(file.getPath + "/..")
-  val InitialDirectory: File = new File(DesktopPath)
 }
 
 object FileBrowser extends Constants {
-  var currentFile: File = InitialDirectory
   val primaryStage: JFXApp3.PrimaryStage = MainControllerApp.stage
-  def getCurrentDirectory: File = getDirectoryFromFile(currentFile)
-  def getCurrentFile: File = currentFile
 
-  val fileChooser: FileChooser = {
-    val fc = new FileChooser {
+  val fileChooser: FileChooser = new FileChooser {
       title = Title
-      initialDirectory = InitialDirectory
-    }
-    fc.extensionFilters.addAll(PictureExtensionFilter)
-    fc
+      initialDirectory = new File(DefaultPath)
+      extensionFilters.addAll(PictureExtensionFilter)
   }
 
-  def updateCurrentFile(file: File): File = {
-    currentFile = file
-    file
+  def chooseImportPath(): String = fileChooser.showOpenDialog(primaryStage) match {
+    case f:File => f.getPath
+    case null => ""
   }
 
-  def chooseFileImport(): File = updateCurrentFile(fileChooser.showOpenDialog(primaryStage))
-  def chooseFileExport(): File = updateCurrentFile(fileChooser.showSaveDialog(primaryStage))
+  def chooseExportPath(): String = fileChooser.showSaveDialog(primaryStage) match {
+    case f:File => f.getPath
+    case null => ""
+  }
+
+  def chooseFileImport(): File = fileChooser.showOpenDialog(primaryStage)
+  def chooseFileExport(): File = fileChooser.showSaveDialog(primaryStage)
 }

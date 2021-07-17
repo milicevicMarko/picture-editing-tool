@@ -1,13 +1,22 @@
 package backend.io
 
 import backend.engine.Engine
+import backend.layers.Image2
 import scalafx.stage.Stage
-
 
 import java.io.File
 import javax.imageio.ImageIO
 
+abstract class SaveCommand
+case class Save() extends SaveCommand
+case class SaveAs() extends SaveCommand
+
 object FileExport {
+
+  def tryToSave(saveCommand: SaveCommand)(image: Image2): Boolean = saveCommand match {
+    case Save() => ImageIO.write(image.getImage, "jpg", new File(image.getPath))
+    case SaveAs() => ImageIO.write(image.getImage, "jpg", new File(FileBrowser.chooseExportPath()))
+  }
 
   def tryToSave(stageOption: Option[Stage]): Unit = Engine.getImageOption match {
     case Some(_) => saveFile(stageOption)
@@ -15,8 +24,8 @@ object FileExport {
   }
 
   def saveFile(stageOption: Option[Stage]): Boolean = stageOption match {
-    case Some(stage) => saveFile(FileBrowser.chooseFileExport())
-    case None => saveFile(FileBrowser.getCurrentFile)
+    case Some(_) => saveFile(FileBrowser.chooseFileExport())
+    case None => ??? // saveFile(FileBrowser.getCurrentFile)
   }
 
   private def saveFile(fileExported: File): Boolean = {
@@ -25,5 +34,13 @@ object FileExport {
     else
       println("Save canceled"); false
   }
+  private def saveFile(path: String): Boolean = {
+    if (path.nonEmpty && Engine.getImageFile.getName.nonEmpty)
+      ImageIO.write(Engine.getImage, Engine.getImageFile.getName.split('.').toList.tail.head, new File(path))
+    else
+      println("Save canceled"); false
+  }
+
+
 
 }
