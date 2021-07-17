@@ -30,5 +30,5 @@ class LayerManager(listView: ListView[LayerCardView]) {
 
 object LayerManager {
   val layerBuffer: ListBuffer[Image] = new ListBuffer[Image]
-  def addNewLayer(): Unit = layerBuffer.addOne(new Image())
+//  def addNewLayer(): Unit = layerBuffer.addOne(new Image())
 }

@@ -3,16 +3,19 @@ package backend.layers
 import backend.io.FileBrowser
 import frontend.utils.UIUtils
 import scalafx.scene.layout.StackPane
-import scalafx.stage.FileChooser
 
 import scala.collection.mutable.ListBuffer
 
 object ImageManager {
   val imageBuffer: ListBuffer[Image] = new ListBuffer[Image]
 
-  var selected: Int = -1
+  var selected: Int = size
   def setSelect(s: Int): Unit = selected = s
   def getSelected: Int = selected
+
+  // todo - this returns top picture for now!
+  def getSelectedImage: Image = imageBuffer(size - 1)
+
   def size: Int = imageBuffer.size
 
   def addNewImage(): Unit = FileBrowser.chooseImportPath() match {
@@ -26,6 +29,9 @@ object ImageManager {
   def swap(image1: Image, image2: Image): Unit = {
     imageBuffer.update(image1.index, image2)
     imageBuffer.update(image2.index, image1)
+    val ind1 = image1.index
+    image1.index = image2.index
+    image1.index = ind1
   }
 
   def move(image: Image, index: Int): Unit = ???
