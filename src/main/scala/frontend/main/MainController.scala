@@ -32,11 +32,9 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(borderPane: BorderPane, centerPane: StackPane, zoomSlider: Slider, openOnStack: Button, layers: ListView[LayerCardView])
+class MainController(centerPane: StackPane,openOnStack: Button, layers: ListView[LayerCardView])
   extends MainInterface {
-  // todo learn how to avoid vars
   val stage: Stage = MainControllerApp.stage
-  val layerManager: LayerManager = new LayerManager(layers)
 
   override def open(): Unit = {
     def hideButtonOnStack(): Unit = {
@@ -44,7 +42,7 @@ class MainController(borderPane: BorderPane, centerPane: StackPane, zoomSlider: 
       openOnStack.setVisible(false)
     }
     hideButtonOnStack()
-    ImageManager.add(new Image2())
+    ImageManager.addNewImage()
     ImageManager.update(centerPane)
   }
 

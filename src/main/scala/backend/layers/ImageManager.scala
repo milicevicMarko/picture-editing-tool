@@ -1,7 +1,9 @@
 package backend.layers
 
+import backend.io.FileBrowser
 import frontend.utils.UIUtils
 import scalafx.scene.layout.StackPane
+import scalafx.stage.FileChooser
 
 import scala.collection.mutable.ListBuffer
 
@@ -12,6 +14,12 @@ object ImageManager {
   def setSelect(s: Int): Unit = selected = s
   def getSelected: Int = selected
   def size: Int = imageBuffer.size
+
+  def addNewImage(): Unit = FileBrowser.chooseImportPath() match {
+    case path: String if path.nonEmpty => add(new Image2(path))
+    case "" => println("Canceled")
+    case _ => println("Unexpected")
+  }
 
   def add(image :Image2): Unit = imageBuffer.addOne(image)
 

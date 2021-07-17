@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage
 
 class Image2 (bufferedImage: BufferedImage, path: String = "", var index: Int = 0) {
   def this(path: String) = this(FileImport.loadImage(path), path)
-  def this() = this(FileBrowser.chooseImportPath())
 
   def getImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
   def getPath: String = path
