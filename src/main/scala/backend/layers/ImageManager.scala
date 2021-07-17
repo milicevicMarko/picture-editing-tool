@@ -8,7 +8,7 @@ import scalafx.stage.FileChooser
 import scala.collection.mutable.ListBuffer
 
 object ImageManager {
-  val imageBuffer: ListBuffer[Image2] = new ListBuffer[Image2]
+  val imageBuffer: ListBuffer[Image] = new ListBuffer[Image]
 
   var selected: Int = -1
   def setSelect(s: Int): Unit = selected = s
@@ -16,21 +16,21 @@ object ImageManager {
   def size: Int = imageBuffer.size
 
   def addNewImage(): Unit = FileBrowser.chooseImportPath() match {
-    case path: String if path.nonEmpty => add(new Image2(path))
+    case path: String if path.nonEmpty => add(new Image(path))
     case "" => println("Canceled")
     case _ => println("Unexpected")
   }
 
-  def add(image :Image2): Unit = imageBuffer.addOne(image)
+  def add(image :Image): Unit = imageBuffer.addOne(image)
 
-  def swap(image1: Image2, image2: Image2): Unit = {
+  def swap(image1: Image, image2: Image): Unit = {
     imageBuffer.update(image1.index, image2)
     imageBuffer.update(image2.index, image1)
   }
 
-  def move(image: Image2, index: Int): Unit = ???
+  def move(image: Image, index: Int): Unit = ???
 
-  def remove(image: Image2): Unit = imageBuffer.remove(image.index)
+  def remove(image: Image): Unit = imageBuffer.remove(image.index)
 
   def update(pane: StackPane): Unit = {
     pane.children.clear()

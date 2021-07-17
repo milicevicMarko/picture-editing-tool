@@ -1,7 +1,7 @@
 package backend.io
 
 import backend.engine.Engine
-import backend.layers.Image2
+import backend.layers.Image
 import scalafx.stage.Stage
 
 import java.io.File
@@ -13,7 +13,7 @@ case class SaveAs() extends SaveCommand
 
 object FileExport {
 
-  def tryToSave(saveCommand: SaveCommand)(image: Image2): Boolean = saveCommand match {
+  def tryToSave(saveCommand: SaveCommand)(image: Image): Boolean = saveCommand match {
     case Save() => ImageIO.write(image.getImage, "jpg", new File(image.getPath))
     case SaveAs() => ImageIO.write(image.getImage, "jpg", new File(FileBrowser.chooseExportPath()))
   }

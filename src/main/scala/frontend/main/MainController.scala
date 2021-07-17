@@ -2,7 +2,7 @@ package frontend.main
 
 import backend.engine.Engine
 import backend.io.{FileExport, SaveAs}
-import backend.layers.{Image2, ImageManager, LayerManager}
+import backend.layers.{Image, ImageManager, LayerManager}
 import frontend.exit.ExitController
 import frontend.layers.LayerCardView
 import javafx.scene.Parent
