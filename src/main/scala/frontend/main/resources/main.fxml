@@ -7,7 +7,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.ToolBar?>
@@ -19,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="0.59" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontend.main.MainController">
+<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="0.59" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontend.main.MainController">
    <bottom>
       <Label fx:id="footerLb" text="Photoshop with Scala FX by Marko Milicevic" BorderPane.alignment="CENTER">
          <font>
@@ -72,16 +71,11 @@
       </SplitPane>
    </right>
    <center>
-      <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" BorderPane.alignment="CENTER">
-         <content>
-            <StackPane fx:id="centerPane" prefHeight="150.0" prefWidth="200.0">
-               <children>
-                  <ImageView fx:id="shownImage" disable="true" fitHeight="600.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" visible="false" />
-                  <Button fx:id="openOnStack" mnemonicParsing="false" onAction="#open" text="Open..." />
-               </children>
-            </StackPane>
-         </content>
-      </ScrollPane>
+      <StackPane fx:id="centerPane" prefHeight="500.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="openOnStack" mnemonicParsing="false" onAction="#open" text="Open..." />
+         </children>
+      </StackPane>
    </center>
    <left>
       <SplitPane dividerPositions="0.7555847568988173" orientation="VERTICAL" prefHeight="200.0" prefWidth="35.0" BorderPane.alignment="CENTER">

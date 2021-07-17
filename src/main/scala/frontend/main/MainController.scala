@@ -1,8 +1,8 @@
 package frontend.main
 
 import backend.engine.Engine
-import backend.io.FileExport
-import backend.layers.LayerManager
+import backend.io.{FileExport, SaveAs}
+import backend.layers.{Image2, ImageManager, LayerManager}
 import frontend.exit.ExitController
 import frontend.layers.LayerCardView
 import javafx.scene.Parent
@@ -12,7 +12,7 @@ import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ListView, Slider}
 import scalafx.scene.image.ImageView
-import scalafx.scene.layout.StackPane
+import scalafx.scene.layout.{BorderPane, StackPane}
 import scalafx.stage.{Stage, WindowEvent}
 import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
@@ -28,36 +28,25 @@ trait MainInterface {
   def rotateLeft(): Unit
   def testMe(): Unit
   def layerTest(): Unit
-  def setStage(stage: Stage)
-  def getStage: Stage
   def updateImage()
 }
 
 @sfxml
-class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: Slider, openOnStack: Button, layers: ListView[LayerCardView])
+class MainController(borderPane: BorderPane, centerPane: StackPane, zoomSlider: Slider, openOnStack: Button, layers: ListView[LayerCardView])
   extends MainInterface {
   // todo learn how to avoid vars
-  var stage: Option[Stage] = None
+  val stage: Stage = MainControllerApp.stage
   val layerManager: LayerManager = new LayerManager(layers)
 
-  override def setStage(stage: Stage): Unit = this.stage = Some(stage)
-
-  override def getStage: Stage = stage.getOrElse(throw new IllegalStateException())
-
-  def showImageHideButton(): Unit = {
+  override def open(): Unit = {
     def hideButtonOnStack(): Unit = {
       openOnStack.setDisable(true)
       openOnStack.setVisible(false)
     }
-    def showImage(): Unit = {
-      shownImage.setDisable(false)
-      shownImage.setVisible(true)
-    }
     hideButtonOnStack()
-    showImage()
+    ImageManager.add(new Image2())
+    ImageManager.update(centerPane)
   }
-
-  override def open(): Unit = LayerManager.addNewLayer()
 
   // FileImport.importFile(getStage) match {
   //    case f: File =>
@@ -68,12 +57,12 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
   //    case _ => println("Canceled")
   //  }
 
-  override def save(): Unit = FileExport.tryToSave(None)
+  override def save(): Unit = FileExport.tryToSave1(None)
 
-  override def saveAs(): Unit = FileExport.tryToSave(stage)
+  override def saveAs(): Unit = FileExport.tryToSave(SaveAs())(ImageManager.imageBuffer.head) // FileExport.tryToSave(stage)
 
   // todo - check if there is unsaved work somehow
-  override def close(): Unit = getStage.fireEvent(new WindowEvent(getStage, WindowEvent.WindowCloseRequest))
+  override def close(): Unit = stage.fireEvent(new WindowEvent(stage, WindowEvent.WindowCloseRequest))
 
   override def testMe(): Unit = Engine.getImageOption match {
     case Some(_) =>
@@ -82,17 +71,17 @@ class MainController(shownImage: ImageView, centerPane: StackPane, zoomSlider: S
     case None => println("Nothing to test")
   }
 
-  override def updateImage(): Unit = Engine.updateImage(shownImage, centerPane)
+  override def updateImage(): Unit = ??? // Engine.updateImage(shownImage, centerPane)
 
   override def rotateRight(): Unit = rotate(true)
   override def rotateLeft(): Unit = rotate(false)
 
   def rotate(isRight: Boolean): Unit = {
-    if (!shownImage.isDisabled) {
-      Engine.rotateImage(shownImage, isRight)
-      updateImage()
-    }
-    else println("Nothing to rotate")
+//    if (!shownImage.isDisabled) {
+//      Engine.rotateImage(shownImage, isRight)
+//      updateImage()
+//    }
+//    else println("Nothing to rotate")
   }
 
   override def layerTest(): Unit = {
@@ -117,8 +106,5 @@ object MainControllerApp extends JFXApp3 {
         event: WindowEvent => ExitController.handleExitEvent(event)
       }
     }
-
-    mainController.setStage(stage)
-
   }
 }

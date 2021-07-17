@@ -18,7 +18,7 @@ object FileExport {
     case SaveAs() => ImageIO.write(image.getImage, "jpg", new File(FileBrowser.chooseExportPath()))
   }
 
-  def tryToSave(stageOption: Option[Stage]): Unit = Engine.getImageOption match {
+  def tryToSave1(stageOption: Option[Stage]): Unit = Engine.getImageOption match {
     case Some(_) => saveFile(stageOption)
     case None => println("Nothing to save")
   }
