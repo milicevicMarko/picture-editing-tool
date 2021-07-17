@@ -15,6 +15,7 @@ object ImageManager {
 
   // todo - this returns top picture for now!
   def getSelectedImage: Image = imageBuffer(size - 1)
+  def imageAt(i: Int): Image = imageBuffer(i)
 
   def size: Int = imageBuffer.size
 
@@ -29,9 +30,10 @@ object ImageManager {
   def swap(image1: Image, image2: Image): Unit = {
     imageBuffer.update(image1.index, image2)
     imageBuffer.update(image2.index, image1)
+
     val ind1 = image1.index
     image1.index = image2.index
-    image1.index = ind1
+    image2.index = ind1
   }
 
   def move(image: Image, index: Int): Unit = ???

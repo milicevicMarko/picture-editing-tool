@@ -79,6 +79,9 @@ class MainController(centerPane: StackPane,openOnStack: Button, layers: ListView
   override def layerTest(): Unit = {
 //    layerManager.addCard("Layer_", Engine.getImage)
 //    LayerCardView.update(layers)
+    // todo - error handling
+    ImageManager.swap(ImageManager.imageAt(0), ImageManager.imageAt(1))
+    updateImage()
   }
 }
 
