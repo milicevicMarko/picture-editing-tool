@@ -2,6 +2,7 @@ package backend.layers
 
 import backend.io.FileBrowser
 
+import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 
 object ImageManager {
@@ -36,7 +37,24 @@ object ImageManager {
     image2.index = ind1
   }
 
-  def move(image: Image, index: Int): Unit = ???
+  def toTop(image: Image): Unit = move(image, 0)
+
+  def move(image: Image, index: Int): Unit = {
+    @tailrec
+    def updateList(image: Image, acc: ListBuffer[Image], remainingList: ListBuffer[Image], index: Int): ListBuffer[Image] = {
+      if (index == 0) {
+        acc.addOne(image).addAll(remainingList)
+        // todo update all indexes, easiest trough a for
+      } else {
+        // todo error
+        updateList(image, acc.addOne(remainingList.head), remainingList.tail, index - 1)
+      }
+
+    }
+    //    imageBuffer.clear()
+    // when to clear
+    imageBuffer.addAll(updateList(image, new ListBuffer[Image], imageBuffer, index))
+  }
 
   def remove(image: Image): Unit = imageBuffer.remove(image.index)
 }

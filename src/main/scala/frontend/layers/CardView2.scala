@@ -2,9 +2,11 @@ package frontend.layers
 
 import backend.layers.Image
 import javafx.scene.{control => jfxsc}
+import scalafx.scene.image.ImageView
 
 class CardView2 (image: Image) {
-  def getImage: Image = image
+  val thumbnail: ImageView = image.thumbnail
+  val name: String = image.getName
 }
 
 class CardViewCell extends jfxsc.ListCell[CardView2] {
@@ -13,9 +15,8 @@ class CardViewCell extends jfxsc.ListCell[CardView2] {
       setText(null)
       setGraphic(null)
     } else {
-      setGraphic(cv.getImage.thumbnail)
-      setText(cv.getImage.getName)
+      setGraphic(cv.thumbnail)
+      setText(cv.name)
     }
   }
 }
-

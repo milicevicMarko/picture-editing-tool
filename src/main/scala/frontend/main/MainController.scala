@@ -5,12 +5,13 @@ import backend.io.{FileExport, SaveAs}
 import backend.layers.ImageManager.imageBuffer
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
+import frontend.layers.CardListView
 import frontend.utils.UIUtils
 import javafx.scene.Parent
 import javafx.{scene => jfxs}
 import scalafx.Includes._
 import scalafx.application.JFXApp3
-import scalafx.beans.property.{BooleanProperty, ObjectProperty}
+import scalafx.beans.property.BooleanProperty
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ListView}
 import scalafx.scene.layout.StackPane
@@ -32,9 +33,10 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[Image])
+class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[String])
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
+  val cardListView: CardListView = new CardListView(layers)
 
   val b: BooleanProperty = new BooleanProperty(openOnStack, "showOpenButton", true) {
     def showOpenButton(show: Boolean): Unit = {
@@ -55,6 +57,7 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
       case Some(image) =>
         UIUtils.bindImageViewToPane(image.imageView)(centerPane)
         centerPane.children.addOne(image.imageView)
+        cardListView.add(image.getName)
       case None => println("Canceled")
     }
   }
