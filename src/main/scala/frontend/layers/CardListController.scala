@@ -6,6 +6,7 @@ import scalafxml.core.macros.sfxml
 
 trait CardListControllerInterface {
   def setData(imageView: ImageView, name: String, number: Int)
+  // todo how to delegate calls
 }
 
 @sfxml

@@ -3,7 +3,6 @@ package frontend.layers
 import backend.layers.Image
 import scalafx.scene.control.ListCell
 import scalafx.scene.image.ImageView
-import scalafx.scene.layout.AnchorPane
 import scalafxml.core.{DependenciesByType, FXMLLoader}
 
 import java.net.URL
@@ -18,7 +17,7 @@ class CardView(image: Image) extends ListCell[CardView] {
   val cardListController: CardListControllerInterface = loader.getController()
   cardListController.setData(thumbnail, name, image.index + 1)
 
-  override def toString(): String = name
+  override def toString(): String = s"Layer: ${image.index + 1} \t ${image.getName}"
 }
 //override def updateItem(cv: CardView, empty: Boolean): Unit = {
 //  if (empty || cv == null) {
