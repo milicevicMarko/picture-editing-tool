@@ -7,6 +7,7 @@ import javafx.scene.{control => jfxsc}
 import scalafx.scene.layout.AnchorPane
 
 class CardListView (listView: ListView[CardView]) {
+  // todo https://stackoverflow.com/questions/33592308/javafx-how-to-put-imageview-inside-listview
   val list: ObservableList[CardView] = FXCollections.observableArrayList()
   listView.setItems(list)
 //  listView.cellFactory = lv => new ListCell(new CardListVIewJFX2)
