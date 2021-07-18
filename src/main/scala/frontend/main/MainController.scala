@@ -10,6 +10,7 @@ import javafx.scene.Parent
 import javafx.{scene => jfxs}
 import scalafx.Includes._
 import scalafx.application.JFXApp3
+import scalafx.beans.property.{BooleanProperty, ObjectProperty}
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ListView}
 import scalafx.scene.layout.StackPane
@@ -28,33 +29,34 @@ trait MainInterface {
   def rotateLeft(): Unit
   def testMe(): Unit
   def layerTest(): Unit
-  def updateImage()
 }
 
 @sfxml
-class MainController(centerPane: StackPane,openOnStack: Button, layers: ListView[Image])
+class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[Image])
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
 
-
-  def updateImages(): Unit = {
-    centerPane.children.clear()
-    for (img <- imageBuffer) yield {
-      // todo no need to clear and readd everything, move this logic to the image creation!
-      UIUtils.bindImageViewToPane(img.imageView)(centerPane)
-      centerPane.children.add(img.imageView)
+  val b: BooleanProperty = new BooleanProperty(openOnStack, "showOpenButton", true) {
+    def showOpenButton(show: Boolean): Unit = {
+      openOnStack.setVisible(show)
+      openOnStack.setDisable(!show)
+      println(s"show $show")
     }
+
+    onChange{ (_, oldValue, newValue) => showOpenButton(newValue) }
   }
+  // todo not really working but button is under picture so not usable
+  b <== BooleanProperty(imageBuffer.isEmpty)
+
+
 
   override def open(): Unit = {
-    def hideButtonOnStack(): Unit = {
-      openOnStack.setDisable(true)
-      openOnStack.setVisible(false)
+    ImageManager.addNewImage() match {
+      case Some(image) =>
+        UIUtils.bindImageViewToPane(image.imageView)(centerPane)
+        centerPane.children.addOne(image.imageView)
+      case None => println("Canceled")
     }
-
-    hideButtonOnStack()
-    ImageManager.addNewImage()
-    updateImages()
   }
 
   // todo
@@ -70,11 +72,8 @@ class MainController(centerPane: StackPane,openOnStack: Button, layers: ListView
   override def testMe(): Unit = Engine.getImageOption match {
     case Some(_) =>
       Engine.pictureTest()
-      updateImage()
     case None => println("Nothing to test")
   }
-
-  override def updateImage(): Unit = updateImages
 
   override def rotateRight(): Unit = rotate(true)
   override def rotateLeft(): Unit = rotate(false)
@@ -82,17 +81,19 @@ class MainController(centerPane: StackPane,openOnStack: Button, layers: ListView
   def rotate(isRight: Boolean): Unit = {
     if (openOnStack.isDisabled) {
       Image.rotateImage(ImageManager.getSelectedImage, isRight)
-      updateImage()
     }
     else println("Nothing to rotate")
   }
 
+  def updateLayers(): Unit = {
+    centerPane.children.clear()
+    for (img <- imageBuffer) yield centerPane.children.add(img.imageView)
+  }
+
   override def layerTest(): Unit = {
-//    layerManager.addCard("Layer_", Engine.getImage)
-//    LayerCardView.update(layers)
     // todo - error handling
     ImageManager.swap(ImageManager.imageAt(0), ImageManager.imageAt(1))
-    updateImage()
+    updateLayers()
   }
 }
 
@@ -103,7 +104,7 @@ object MainControllerApp extends JFXApp3 {
 
     loader.load()
     val root: Parent = loader.getRoot[jfxs.Parent]
-    val mainController: MainInterface = loader.getController[MainInterface]
+    loader.getController[MainInterface]
 
     stage = new JFXApp3.PrimaryStage() {
       title = "FPhotoshop"

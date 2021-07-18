@@ -17,10 +17,12 @@ object ImageManager {
 
   def size: Int = imageBuffer.size
 
-  def addNewImage(): Unit = FileBrowser.chooseImportPath() match {
-    case path: String if path.nonEmpty => add(new Image(path))
-    case "" => println("Canceled")
-    case _ => println("Unexpected")
+  def addNewImage(): Option[Image] = FileBrowser.chooseImportPath() match {
+    case path: String if path.nonEmpty =>
+      val img = new Image(path)
+      add(img)
+      Some(img)
+    case _ => None
   }
 
   def add(image :Image): Unit = imageBuffer.addOne(image)
