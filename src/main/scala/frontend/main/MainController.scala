@@ -5,7 +5,7 @@ import backend.io.{FileExport, SaveAs}
 import backend.layers.ImageManager.imageBuffer
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
-import frontend.layers.CardListView
+import frontend.layers.{CardListView, CardView}
 import frontend.utils.UIUtils
 import javafx.scene.Parent
 import javafx.{scene => jfxs}
@@ -14,7 +14,7 @@ import scalafx.application.JFXApp3
 import scalafx.beans.property.BooleanProperty
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ListView}
-import scalafx.scene.layout.StackPane
+import scalafx.scene.layout.{StackPane, VBox}
 import scalafx.stage.{Stage, WindowEvent}
 import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
@@ -33,7 +33,7 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[String])
+class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[CardView], testVBox: VBox)
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
@@ -57,7 +57,9 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
       case Some(image) =>
         UIUtils.bindImageViewToPane(image.imageView)(centerPane)
         centerPane.children.addOne(image.imageView)
-        cardListView.add(image.getName)
+        val cv = new CardView(image)
+        cardListView.add(cv)
+        testVBox.children.addOne(cv.card)
       case None => println("Canceled")
     }
   }
