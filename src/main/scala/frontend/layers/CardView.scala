@@ -11,12 +11,14 @@ import java.net.URL
 class CardView(image: Image) extends ListCell[CardView] {
   val thumbnail: ImageView = image.thumbnail
   val name: String = image.getName
-  // todo https://stackoverflow.com/questions/47511132/javafx-custom-listview
 
   val url: URL = getClass.getResource("resources/CardList.fxml")
   val loader = new FXMLLoader(url, new DependenciesByType(Map()))
   val card: javafx.scene.layout.AnchorPane = loader.load()
   val cardListController: CardListControllerInterface = loader.getController()
+  cardListController.setData(thumbnail, name, image.index + 1)
+
+  override def toString(): String = name
 }
 //override def updateItem(cv: CardView, empty: Boolean): Unit = {
 //  if (empty || cv == null) {

@@ -14,7 +14,7 @@ import scalafx.application.JFXApp3
 import scalafx.beans.property.BooleanProperty
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ListView}
-import scalafx.scene.layout.{StackPane, VBox}
+import scalafx.scene.layout.{AnchorPane, StackPane, VBox}
 import scalafx.stage.{Stage, WindowEvent}
 import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
@@ -33,7 +33,7 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[CardView], testVBox: VBox)
+class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[AnchorPane], testVBox: VBox)
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
@@ -58,7 +58,7 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
         UIUtils.bindImageViewToPane(image.imageView)(centerPane)
         centerPane.children.addOne(image.imageView)
         val cv = new CardView(image)
-        cardListView.add(cv)
+        cardListView.add(cv.card)
         testVBox.children.addOne(cv.card)
       case None => println("Canceled")
     }
