@@ -2,9 +2,10 @@ package frontend.main
 
 import backend.engine.Engine
 import backend.io.{FileExport, SaveAs}
+import backend.layers.ImageManager.imageBuffer
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
-import frontend.layers.LayerCardView
+import frontend.utils.UIUtils
 import javafx.scene.Parent
 import javafx.{scene => jfxs}
 import scalafx.Includes._
@@ -31,9 +32,19 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(centerPane: StackPane,openOnStack: Button, layers: ListView[LayerCardView])
+class MainController(centerPane: StackPane,openOnStack: Button, layers: ListView[Image])
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
+
+
+  def updateImages(): Unit = {
+    centerPane.children.clear()
+    for (img <- imageBuffer) yield {
+      // todo no need to clear and readd everything, move this logic to the image creation!
+      UIUtils.bindImageViewToPane(img.imageView)(centerPane)
+      centerPane.children.add(img.imageView)
+    }
+  }
 
   override def open(): Unit = {
     def hideButtonOnStack(): Unit = {
@@ -43,7 +54,7 @@ class MainController(centerPane: StackPane,openOnStack: Button, layers: ListView
 
     hideButtonOnStack()
     ImageManager.addNewImage()
-    ImageManager.update(centerPane)
+    updateImages()
   }
 
   // todo
@@ -63,7 +74,7 @@ class MainController(centerPane: StackPane,openOnStack: Button, layers: ListView
     case None => println("Nothing to test")
   }
 
-  override def updateImage(): Unit = ImageManager.update(centerPane)
+  override def updateImage(): Unit = updateImages
 
   override def rotateRight(): Unit = rotate(true)
   override def rotateLeft(): Unit = rotate(false)

@@ -45,11 +45,6 @@ object Engine {
     imageView.setRotate(imageView.getRotate + degrees)
   }
 
-  def updateImage(imageView: ImageView, pane: StackPane): Unit = {
-    updateSize(imageView, pane)
-    UIUtils.convertImageToImageView(image.get, imageView)
-  }
-
   def updateSize(imageView: ImageView, pane: StackPane): Unit = {
     val img = image.getOrElse(throw new IllegalArgumentException)
     imageView.setPreserveRatio(true)

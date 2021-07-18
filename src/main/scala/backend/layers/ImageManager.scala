@@ -1,8 +1,6 @@
 package backend.layers
 
 import backend.io.FileBrowser
-import frontend.utils.UIUtils
-import scalafx.scene.layout.StackPane
 
 import scala.collection.mutable.ListBuffer
 
@@ -39,12 +37,4 @@ object ImageManager {
   def move(image: Image, index: Int): Unit = ???
 
   def remove(image: Image): Unit = imageBuffer.remove(image.index)
-
-  def update(pane: StackPane): Unit = {
-    pane.children.clear()
-    for (img <- imageBuffer) yield {
-      UIUtils.fixCenterFit(img.imageView, pane)
-      pane.children.add(img.imageView)
-    }
-  }
 }

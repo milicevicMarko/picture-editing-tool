@@ -10,7 +10,7 @@ import java.io.File
 case class LayerCard (name: String, img: BufferedImage, imgFile: File) {
   def this(name: String, f: File) = this(name, FileImport.loadImage(f), f)
 
-  val view: LayerCardView = new LayerCardView(this, UIUtils.createThumbnailImageViewFromImage(img))
+  val view: LayerCardView = new LayerCardView(this, UIUtils.imageToThumbnail(img))
   def getImg: BufferedImage = img
   override def toString: String = name
 }

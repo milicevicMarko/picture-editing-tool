@@ -5,33 +5,42 @@ import scalafx.scene.layout.Pane
 
 import java.awt.image.BufferedImage
 
+//class CenterImage extends ImageView {
+//  def this(writableImage: WritableImage) = {
+//    this()
+//    new ImageView(writableImage)
+//  }
+//  def this(bi: BufferedImage) = {
+//    val wrImg: WritableImage = new WritableImage(bi.getWidth, bi.getHeight)
+//    val pxImg = wrImg.getPixelWriter
+//    for (x <- 0 until bi.getWidth)
+//      for (y <- 0 until bi.getHeight)
+//        pxImg.setArgb(x, y, bi.getRGB(x, y))
+//    this(wrImg)
+//  }
+//}
+
 object UIUtils {
-  def createImageViewFromImage(img: BufferedImage): ImageView = {
-    val imageView: ImageView = new ImageView()
-    UIUtils.convertImageToImageView(img, imageView)
-    imageView
-  }
 
-  def createThumbnailImageViewFromImage(img: BufferedImage): ImageView = fixThumbnailFit(createImageViewFromImage(img))
+  def imageToThumbnail(bi: BufferedImage): ImageView = setThumbnailFit()(imageToImageView(bi))
 
-
-  def fixThumbnailFit(imageView: ImageView, width: Int = 100, height: Int = 100, keepRatio: Boolean = true): ImageView = {
+  def setThumbnailFit(width: Int = 100, height: Int = 100, keepRatio: Boolean = true)(imageView: ImageView): ImageView = {
     imageView.setFitWidth(width)
     imageView.setFitHeight(height)
     imageView.setPreserveRatio(keepRatio)
     imageView
   }
 
-  def convertImageToImageView(img: BufferedImage, imageView: ImageView): Unit = {
+  def imageToImageView(img: BufferedImage): ImageView = {
     val wrImg: WritableImage = new WritableImage(img.getWidth, img.getHeight)
     val pxImg = wrImg.getPixelWriter
     for (x <- 0 until img.getWidth)
       for (y <- 0 until img.getHeight)
         pxImg.setArgb(x, y, img.getRGB(x, y))
-    imageView.setImage(new ImageView(wrImg).getImage)
+    new ImageView(wrImg)
   }
 
-  def fixCenterFit(imgView: ImageView, pane: Pane, keepRatio: Boolean = true): Unit = {
+  def bindImageViewToPane(imgView: ImageView)(pane: Pane, keepRatio: Boolean = true): Unit = {
     imgView.fitWidthProperty().bind(pane.widthProperty().subtract(100))
     imgView.fitHeightProperty().bind(pane.heightProperty().subtract(100))
     imgView.setPreserveRatio(keepRatio)
