@@ -13,18 +13,9 @@ class CardView(image: Image) extends ListCell[CardView] {
 
   val url: URL = getClass.getResource("resources/CardList.fxml")
   val loader = new FXMLLoader(url, new DependenciesByType(Map()))
-  val card: javafx.scene.layout.AnchorPane = loader.load()
+  val card: javafx.scene.Node = loader.load()
   val cardListController: CardListControllerInterface = loader.getController()
   cardListController.setData(thumbnail, name, image.index + 1)
 
   override def toString(): String = s"Layer: ${image.index + 1} \t ${image.getName}"
 }
-//override def updateItem(cv: CardView, empty: Boolean): Unit = {
-//  if (empty || cv == null) {
-//  setText(null)
-//  setGraphic(null)
-//  } else {
-//  setGraphic(cv.thumbnail)
-//  setText(cv.name)
-//  }
-//  }
