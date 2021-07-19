@@ -27,6 +27,6 @@ class CardListView (listView: ListView[CardView]) {
 
   listView.getSelectionModel.selectedItemProperty().addListener(new ChangeListener[CardView] {
     override def changed(observableValue: ObservableValue[_ <: CardView], oldValue: CardView, newValue: CardView): Unit =
-      ImageManager.setSelected(List.from(listView.getSelectionModel.getSelectedItems.asScala).map(cv => cv.image))
+      ImageManager setSelected listView.getSelectionModel.getSelectedItems.asScala.map(cv => cv.image).toList
   })
 }
