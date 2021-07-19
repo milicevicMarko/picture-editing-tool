@@ -1,6 +1,5 @@
 package backend.engine
 
-import frontend.utils.UIUtils
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.StackPane
 
