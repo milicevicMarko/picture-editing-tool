@@ -1,16 +1,25 @@
 package backend.layers
 
 import backend.io.FileBrowser
+import frontend.layers.CardView
+import javafx.collections.{FXCollections, ObservableList}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 
 object ImageManager {
-  val imageBuffer: ListBuffer[Image] = new ListBuffer[Image]
+  def updateSelected(): Unit = {
+    selected = imageBuffer.filter(i => i.select).toList
+  }
 
-  var selected: Int = size
-  def setSelect(s: Int): Unit = selected = s
-  def getSelected: Int = selected
+  val imageBuffer: ListBuffer[Image] = new ListBuffer[Image]
+  val list: ObservableList[CardView] = FXCollections.observableArrayList()
+
+  // todo not really working
+  var selected: List[Image] = Nil
+  def setSelected(selected: List[Image]): Unit = this.selected = selected
+  def getSelected: List[Image] = selected
+  def select(image: Image): Unit =  if (selected.contains(image)) image::selected
 
   // todo - this returns top picture for now!
   def getSelectedImage: Image = imageBuffer(size - 1)
@@ -26,7 +35,10 @@ object ImageManager {
     case _ => None
   }
 
-  def add(image :Image): Unit = imageBuffer.addOne(image)
+  def add(image :Image): Unit = {
+    imageBuffer.addOne(image)
+    list.add(new CardView(image))
+  }
 
   def swap(image1: Image, image2: Image): Unit = {
     imageBuffer.update(image1.index, image2)
@@ -57,4 +69,8 @@ object ImageManager {
   }
 
   def remove(image: Image): Unit = imageBuffer.remove(image.index)
+
+  def rotate(isRight: Boolean): Unit = {
+    selected.foreach(img => img.rotateImage(isRight))
+  }
 }

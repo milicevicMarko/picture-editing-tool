@@ -1,13 +1,17 @@
 package frontend.layers
 
+import backend.layers.{Image, ImageManager}
 import javafx.beans.value.{ChangeListener, ObservableValue}
-import javafx.collections.{FXCollections, ObservableList}
+import javafx.collections.ObservableList
 import scalafx.scene.control.{ListCell, ListView}
 import javafx.scene.{control => jfxsc}
 
-class CardListView (listView: ListView[CardView]) {
-  val list: ObservableList[CardView] = FXCollections.observableArrayList()
+import java.util.stream.Collectors
 
+// todo how to connect to ImageManager for seamless additions
+class CardListView (listView: ListView[CardView]) {
+
+  val list: ObservableList[CardView] = ImageManager.list
   listView.setItems(list)
   listView.cellFactory = _ => {
     new ListCell(new jfxsc.ListCell[CardView]{
@@ -23,7 +27,12 @@ class CardListView (listView: ListView[CardView]) {
 
   listView.getSelectionModel.selectedItemProperty().addListener(new ChangeListener[CardView] {
     override def changed(observableValue: ObservableValue[_ <: CardView], oldValue: CardView, newValue: CardView): Unit = {
-      listView.getSelectionModel.getSelectedItems.forEach(n => println(n.name))
+       listView.getSelectionModel.getSelectedItems.forEach(n => {
+              println(n.image.name)
+         n.image.selectImage()
+       })
+      // todo not a good solution!
+      ImageManager.updateSelected()
     }
   })
 

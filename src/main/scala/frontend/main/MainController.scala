@@ -11,7 +11,6 @@ import javafx.scene.Parent
 import javafx.{scene => jfxs}
 import scalafx.Includes._
 import scalafx.application.JFXApp3
-import scalafx.beans.property.BooleanProperty
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ListView}
 import scalafx.scene.layout.{StackPane, VBox}
@@ -38,25 +37,18 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
 
-  val b: BooleanProperty = new BooleanProperty(openOnStack, "showOpenButton", true) {
-    def showOpenButton(show: Boolean): Unit = {
-      openOnStack.setVisible(show)
-      openOnStack.setDisable(!show)
-      println(s"show $show")
-    }
-
-    onChange{ (_, _, newValue) => showOpenButton(newValue) }
+  def showOpenButton(show: Boolean): Unit = {
+    openOnStack.setVisible(show)
+    openOnStack.setDisable(!show)
+    println(s"show $show")
   }
-  // todo not really working but button is under picture so not usable
-  b <==> BooleanProperty(imageBuffer.isEmpty)
 
   override def open(): Unit = {
     ImageManager.addNewImage() match {
       case Some(image) =>
         UIUtils.bindImageViewToPane(image.imageView)(centerPane)
         centerPane.children.addOne(image.imageView)
-        val cv = new CardView(image)
-        cardListView.add(cv)
+        showOpenButton(false)
       case None => println("Canceled")
     }
   }
@@ -82,7 +74,7 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
 
   def rotate(isRight: Boolean): Unit = {
     if (openOnStack.isDisabled) {
-      Image.rotateImage(ImageManager.getSelectedImage, isRight)
+      ImageManager.rotate(isRight)
     }
     else println("Nothing to rotate")
   }
