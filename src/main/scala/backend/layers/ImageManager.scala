@@ -8,18 +8,12 @@ import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 
 object ImageManager {
-  def updateSelected(): Unit = {
-    selected = imageBuffer.filter(i => i.select).toList
-  }
-
   val imageBuffer: ListBuffer[Image] = new ListBuffer[Image]
-  val list: ObservableList[CardView] = FXCollections.observableArrayList()
-
-  // todo not really working
+  val observableList: ObservableList[CardView] = FXCollections.observableArrayList()
   var selected: List[Image] = Nil
+
   def setSelected(selected: List[Image]): Unit = this.selected = selected
   def getSelected: List[Image] = selected
-  def select(image: Image): Unit =  if (selected.contains(image)) image::selected
 
   // todo - this returns top picture for now!
   def getSelectedImage: Image = imageBuffer(size - 1)
@@ -37,7 +31,12 @@ object ImageManager {
 
   def add(image :Image): Unit = {
     imageBuffer.addOne(image)
-    list.add(new CardView(image))
+    observableList.add(new CardView(image))
+  }
+
+  def swap(): Unit = selected match {
+    case x::y::xs => swap(x, y)
+    case _ => println("Did not select enough")
   }
 
   def swap(image1: Image, image2: Image): Unit = {
@@ -47,6 +46,8 @@ object ImageManager {
     val ind1 = image1.index
     image1.index = image2.index
     image2.index = ind1
+
+    // todo layer list swap
   }
 
   def toTop(image: Image): Unit = move(image, 0)
@@ -73,4 +74,5 @@ object ImageManager {
   def rotate(isRight: Boolean): Unit = {
     selected.foreach(img => img.rotateImage(isRight))
   }
+
 }

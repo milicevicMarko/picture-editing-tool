@@ -6,12 +6,12 @@ import javafx.collections.ObservableList
 import scalafx.scene.control.{ListCell, ListView}
 import javafx.scene.{control => jfxsc}
 
-import java.util.stream.Collectors
+import scala.jdk.CollectionConverters._
 
 // todo how to connect to ImageManager for seamless additions
 class CardListView (listView: ListView[CardView]) {
 
-  val list: ObservableList[CardView] = ImageManager.list
+  val list: ObservableList[CardView] = ImageManager.observableList
   listView.setItems(list)
   listView.cellFactory = _ => {
     new ListCell(new jfxsc.ListCell[CardView]{
@@ -26,15 +26,7 @@ class CardListView (listView: ListView[CardView]) {
   listView.getSelectionModel.setSelectionMode(javafx.scene.control.SelectionMode.MULTIPLE)
 
   listView.getSelectionModel.selectedItemProperty().addListener(new ChangeListener[CardView] {
-    override def changed(observableValue: ObservableValue[_ <: CardView], oldValue: CardView, newValue: CardView): Unit = {
-       listView.getSelectionModel.getSelectedItems.forEach(n => {
-              println(n.image.name)
-         n.image.selectImage()
-       })
-      // todo not a good solution!
-      ImageManager.updateSelected()
-    }
+    override def changed(observableValue: ObservableValue[_ <: CardView], oldValue: CardView, newValue: CardView): Unit =
+      ImageManager.setSelected(List.from(listView.getSelectionModel.getSelectedItems.asScala).map(cv => cv.image))
   })
-
-  def add(cv: CardView): Unit = list.add(cv)
 }

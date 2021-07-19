@@ -14,14 +14,12 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   def getImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
   def getPath: String = path
   val name: String = new File(path).getName
-  var select: Boolean = false
-
-  def selectImage(): Unit = select = !select
 
   def x: Int = getImage.getMinX
   def y: Int = getImage.getMinY
   def width: Int = getImage.getWidth
   def height: Int = getImage.getHeight
+
   // todo move thumnnail to Cardview only?
   // todo remove imageView from class, no need to store the view?
   val imageView: ImageView = UIUtils.imageToImageView(bufferedImage)

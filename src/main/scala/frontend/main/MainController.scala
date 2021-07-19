@@ -40,7 +40,6 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
   def showOpenButton(show: Boolean): Unit = {
     openOnStack.setVisible(show)
     openOnStack.setDisable(!show)
-    println(s"show $show")
   }
 
   override def open(): Unit = {
@@ -86,7 +85,7 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
 
   override def layerTest(): Unit = {
     // todo - error handling
-    ImageManager.swap(ImageManager.imageAt(0), ImageManager.imageAt(1))
+    ImageManager.swap()
     updateLayers()
   }
 }
