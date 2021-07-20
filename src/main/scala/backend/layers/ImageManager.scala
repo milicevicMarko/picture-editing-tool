@@ -3,6 +3,7 @@ package backend.layers
 import backend.io.FileBrowser
 import frontend.layers.CardView
 import javafx.collections.{FXCollections, ObservableList}
+import scalafx.scene.image.ImageView
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
@@ -19,6 +20,8 @@ object ImageManager {
   def getSelectedImage: Image = imageBuffer(size - 1)
   def imageAt(i: Int): Image = imageBuffer(i)
 
+  def allImageViews: List[ImageView] = for (img <- imageBuffer.toList) yield img.imageView
+
   def size: Int = imageBuffer.size
 
   def addNewImage(): Option[Image] = FileBrowser.chooseImportPath() match {
@@ -29,9 +32,14 @@ object ImageManager {
     case _ => None
   }
 
-  def add(image :Image): Unit = {
+  def add(paths: List[String]): List[Image] = paths.map(path => add(path))
+
+  def add(path: String): Image = add(new Image(path))
+
+  def add(image :Image): Image = {
     imageBuffer.addOne(image)
     observableList.add(new CardView(image))
+    image
   }
 
   def swap(): Unit = selected match {

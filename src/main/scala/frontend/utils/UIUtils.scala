@@ -1,7 +1,6 @@
 package frontend.utils
 
 import scalafx.scene.image.{ImageView, WritableImage}
-import scalafx.scene.layout.Pane
 
 import java.awt.image.BufferedImage
 
@@ -38,11 +37,5 @@ object UIUtils {
       for (y <- 0 until img.getHeight)
         pxImg.setArgb(x, y, img.getRGB(x, y))
     new ImageView(wrImg)
-  }
-
-  def bindImageViewToPane(imgView: ImageView)(pane: Pane, keepRatio: Boolean = true): Unit = {
-    imgView.fitWidthProperty().bind(pane.widthProperty().subtract(100))
-    imgView.fitHeightProperty().bind(pane.heightProperty().subtract(100))
-    imgView.setPreserveRatio(keepRatio)
   }
 }

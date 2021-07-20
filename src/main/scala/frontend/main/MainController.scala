@@ -1,11 +1,10 @@
 package frontend.main
 
 import backend.engine.Engine
-import backend.layers.ImageManager.imageBuffer
+import backend.io.FileBrowser
 import backend.layers.ImageManager
 import frontend.exit.ExitController
 import frontend.layers.{CardListView, CardView}
-import frontend.utils.UIUtils
 import javafx.scene.Parent
 import javafx.{scene => jfxs}
 import scalafx.Includes._
@@ -44,12 +43,9 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
 
   override def open(): Unit = {
     // todo check if import can return multiple paths, go trough path and add files
-    ImageManager.addNewImage() match {
-      case Some(image) =>
-        UIUtils.bindImageViewToPane(image.imageView)(centerPane)
-        centerPane.children.addOne(image.imageView)
-        showOpenButton(false)
-      case None => println("Canceled")
+    FileBrowser.chooseImportMultiplePath() match {
+      case paths: List[String] => ImageManager add paths map(image => image addToPane centerPane)
+      case Nil => println("Canceled")
     }
   }
 
@@ -70,12 +66,10 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
   }
 
   override def rotateRight(): Unit = ImageManager.rotate(true)
+
   override def rotateLeft(): Unit = ImageManager.rotate(false)
 
-  def updateLayers(): Unit = {
-    centerPane.children.clear()
-    for (img <- imageBuffer) yield centerPane.children.add(img.imageView)
-  }
+  def updateLayers(): Unit = centerPane.children = ImageManager.allImageViews
 
   override def swap(): Unit = {
     ImageManager.swap()

@@ -30,6 +30,11 @@ object FileBrowser extends Constants {
     case null => ""
   }
 
+  def chooseImportMultiplePath(): List[String] = fileChooser.showOpenMultipleDialog(primaryStage) match {
+    case lf: List[File] => lf.map(f => f.getPath)
+    case _ => Nil
+  }
+
   def chooseExportPath(): String = fileChooser.showSaveDialog(primaryStage) match {
     case f:File => f.getPath
     case null => ""

@@ -3,6 +3,7 @@ package backend.layers
 import backend.io.FileImport
 import frontend.utils.UIUtils
 import scalafx.scene.image.ImageView
+import scalafx.scene.layout.Pane
 
 import java.awt.image.BufferedImage
 import java.io.File
@@ -30,5 +31,17 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   def rotateImage(isRight: Boolean): Unit = {
     val degrees = if (isRight) 90 else -90
     imageView.setRotate(imageView.getRotate + degrees)
+  }
+
+  def bind(pane: Pane): Image = {
+    imageView.fitWidthProperty().bind(pane.widthProperty().subtract(100))
+    imageView.fitHeightProperty().bind(pane.heightProperty().subtract(100))
+    imageView.setPreserveRatio(true)
+    this
+  }
+
+  def addToPane(pane: Pane): Image = {
+    pane.children addOne (this bind pane).imageView
+    this
   }
 }
