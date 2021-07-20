@@ -13,7 +13,7 @@ import scalafx.Includes._
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ListView}
-import scalafx.scene.layout.{StackPane, VBox}
+import scalafx.scene.layout.{Pane, StackPane}
 import scalafx.stage.{Stage, WindowEvent}
 import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
@@ -33,7 +33,7 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[CardView], testVBox: VBox)
+class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[CardView], upperSplit: Pane)
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
