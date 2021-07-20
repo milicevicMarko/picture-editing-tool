@@ -14,8 +14,11 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="0.59" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontend.main.MainController">
@@ -55,9 +58,21 @@
       </MenuBar>
    </top>
    <right>
-      <SplitPane dividerPositions="0.32457293035479634" orientation="VERTICAL" prefHeight="763.0" prefWidth="405.0" BorderPane.alignment="CENTER">
+      <SplitPane dividerPositions="0.2720105124835742" orientation="VERTICAL" prefHeight="763.0" prefWidth="405.0" BorderPane.alignment="CENTER">
         <items>
-            <VBox fx:id="upperSplit" prefHeight="200.0" prefWidth="100.0" />
+            <GridPane>
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints maxHeight="127.0" minHeight="10.0" prefHeight="101.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="112.0" minHeight="10.0" prefHeight="103.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <HBox prefHeight="89.0" prefWidth="403.0" />
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.rowIndex="1" />
+               </children>
+            </GridPane>
             <ListView fx:id="layers" editable="true" prefHeight="512.0" prefWidth="400.0">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

@@ -1,9 +1,8 @@
 package frontend.main
 
 import backend.engine.Engine
-import backend.io.{FileExport, SaveAs}
 import backend.layers.ImageManager.imageBuffer
-import backend.layers.{Image, ImageManager}
+import backend.layers.ImageManager
 import frontend.exit.ExitController
 import frontend.layers.{CardListView, CardView}
 import frontend.utils.UIUtils
@@ -44,6 +43,7 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
   }
 
   override def open(): Unit = {
+    // todo check if import can return multiple paths, go trough path and add files
     ImageManager.addNewImage() match {
       case Some(image) =>
         UIUtils.bindImageViewToPane(image.imageView)(centerPane)
