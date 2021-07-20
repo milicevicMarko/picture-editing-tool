@@ -42,23 +42,19 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
   }
 
   override def open(): Unit = {
-    // todo check if import can return multiple paths, go trough path and add files
     FileBrowser.chooseImportMultiplePath() match {
       case paths: List[String] => ImageManager add paths map(image => image addToPane centerPane)
       case Nil => println("Canceled")
     }
   }
 
-  // todo
   override def save(): Unit = ???
 
-  // todo
   override def saveAs(): Unit = ???
 
   // todo - check if there is unsaved work somehow
   override def close(): Unit = stage.fireEvent(new WindowEvent(stage, WindowEvent.WindowCloseRequest))
 
-  // todo or not
   override def testMe(): Unit = Engine.getImageOption match {
     case Some(_) =>
       Engine.pictureTest()

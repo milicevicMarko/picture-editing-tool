@@ -22,14 +22,6 @@ object ImageManager {
 
   def size: Int = imageBuffer.size
 
-  def addNewImage(): Option[Image] = FileBrowser.chooseImportPath() match {
-    case path: String if path.nonEmpty =>
-      val img = new Image(path)
-      add(img)
-      Some(img)
-    case _ => None
-  }
-
   def add(paths: List[String]): List[Image] = paths.map(path => add(path))
 
   def add(path: String): Image = add(new Image(path))

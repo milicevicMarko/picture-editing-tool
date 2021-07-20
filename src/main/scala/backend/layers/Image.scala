@@ -23,10 +23,7 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   def width: Int = getImage.getWidth
   def height: Int = getImage.getHeight
 
-  // todo move thumnnail to Cardview only?
-  // todo remove imageView from class, no need to store the view?
   val imageView: ImageView = UIUtils.imageToImageView(bufferedImage)
-  val thumbnail: ImageView = UIUtils.imageToThumbnail(bufferedImage)
 
   def setOpacity(v: Double): Unit = imageView.setOpacity(v)
 
