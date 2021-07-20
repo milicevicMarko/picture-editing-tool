@@ -28,6 +28,7 @@ trait MainInterface {
   def rotateRight(): Unit
   def rotateLeft(): Unit
   def testMe(): Unit
+  def swap(): Unit
   def layerTest(): Unit
 }
 
@@ -53,10 +54,10 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
   }
 
   // todo
-  override def save(): Unit = FileExport.tryToSave1(None)
+  override def save(): Unit = ???
 
   // todo
-  override def saveAs(): Unit = FileExport.tryToSave(SaveAs())(ImageManager.imageBuffer.head) // FileExport.tryToSave(stage)
+  override def saveAs(): Unit = ???
 
   // todo - check if there is unsaved work somehow
   override def close(): Unit = stage.fireEvent(new WindowEvent(stage, WindowEvent.WindowCloseRequest))
@@ -68,25 +69,21 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
     case None => println("Nothing to test")
   }
 
-  override def rotateRight(): Unit = rotate(true)
-  override def rotateLeft(): Unit = rotate(false)
-
-  def rotate(isRight: Boolean): Unit = {
-    if (openOnStack.isDisabled) {
-      ImageManager.rotate(isRight)
-    }
-    else println("Nothing to rotate")
-  }
+  override def rotateRight(): Unit = ImageManager.rotate(true)
+  override def rotateLeft(): Unit = ImageManager.rotate(false)
 
   def updateLayers(): Unit = {
     centerPane.children.clear()
     for (img <- imageBuffer) yield centerPane.children.add(img.imageView)
   }
 
-  override def layerTest(): Unit = {
-    // todo - error handling
+  override def swap(): Unit = {
     ImageManager.swap()
     updateLayers()
+  }
+
+  override def layerTest(): Unit = {
+    println("Testing")
   }
 }
 
