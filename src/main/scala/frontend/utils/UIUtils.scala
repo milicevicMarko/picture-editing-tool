@@ -4,21 +4,6 @@ import scalafx.scene.image.{ImageView, WritableImage}
 
 import java.awt.image.BufferedImage
 
-//class CenterImage extends ImageView {
-//  def this(writableImage: WritableImage) = {
-//    this()
-//    new ImageView(writableImage)
-//  }
-//  def this(bi: BufferedImage) = {
-//    val wrImg: WritableImage = new WritableImage(bi.getWidth, bi.getHeight)
-//    val pxImg = wrImg.getPixelWriter
-//    for (x <- 0 until bi.getWidth)
-//      for (y <- 0 until bi.getHeight)
-//        pxImg.setArgb(x, y, bi.getRGB(x, y))
-//    this(wrImg)
-//  }
-//}
-
 object UIUtils {
 
   def imageToThumbnail(bi: BufferedImage): ImageView = setThumbnailFit()(imageToImageView(bi))

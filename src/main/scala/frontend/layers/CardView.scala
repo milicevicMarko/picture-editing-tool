@@ -21,4 +21,6 @@ class CardView(val image: Image) extends ListCell[CardView] {
       image.setOpacity(opacity)
     }
   })
+
+  def updateIndex(): Unit = cardListController.getLayerNumber.setText(s"${image.index + 1}")
 }

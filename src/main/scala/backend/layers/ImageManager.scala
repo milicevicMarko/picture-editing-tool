@@ -1,16 +1,14 @@
 package backend.layers
 
 import backend.io.FileBrowser
-import frontend.layers.CardView
-import javafx.collections.{FXCollections, ObservableList}
+import scalafx.collections.ObservableBuffer
 import scalafx.scene.image.ImageView
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 
 object ImageManager {
-  val imageBuffer: ListBuffer[Image] = new ListBuffer[Image]
-  val observableList: ObservableList[CardView] = FXCollections.observableArrayList()
+  val imageBuffer: ObservableBuffer[Image] = new ObservableBuffer[Image]
   var selected: List[Image] = Nil
 
   def setSelected(selected: List[Image]): Unit = this.selected = selected
@@ -38,7 +36,6 @@ object ImageManager {
 
   def add(image :Image): Image = {
     imageBuffer.addOne(image)
-    observableList.add(new CardView(image))
     image
   }
 
@@ -48,17 +45,16 @@ object ImageManager {
   }
 
   def swap(image1: Image, image2: Image): Unit = {
-    imageBuffer.update(image1.index, image2)
-    imageBuffer.update(image2.index, image1)
-
-    val ind1 = image1.index
-    image1.index = image2.index
-    image2.index = ind1
-
-    // todo layer list swap
+    def updateSingle(image: Image, newIndex: Int): Unit = {
+      imageBuffer.update(newIndex, image)
+      image.index = newIndex
+      image.cardView.updateIndex()
+    }
+    val index1 = image1.index
+    val index2 = image2.index
+    updateSingle(image1, index2)
+    updateSingle(image2, index1)
   }
-
-  def toTop(image: Image): Unit = move(image, 0)
 
   def move(image: Image, index: Int): Unit = {
     @tailrec
@@ -74,7 +70,6 @@ object ImageManager {
     }
     //    imageBuffer.clear()
     // when to clear
-    imageBuffer.addAll(updateList(image, new ListBuffer[Image], imageBuffer, index))
   }
 
   def remove(image: Image): Unit = imageBuffer.remove(image.index)

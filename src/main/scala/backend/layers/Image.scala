@@ -1,6 +1,7 @@
 package backend.layers
 
 import backend.io.FileImport
+import frontend.layers.CardView
 import frontend.utils.UIUtils
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.Pane
@@ -15,6 +16,7 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   def getImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
   def getPath: String = path
   val name: String = new File(path).getName
+  lazy val cardView: CardView = new CardView(this)
 
   def x: Int = getImage.getMinX
   def y: Int = getImage.getMinY

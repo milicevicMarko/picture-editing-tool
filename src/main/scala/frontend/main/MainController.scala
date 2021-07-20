@@ -2,9 +2,9 @@ package frontend.main
 
 import backend.engine.Engine
 import backend.io.FileBrowser
-import backend.layers.ImageManager
+import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
-import frontend.layers.{CardListView, CardView}
+import frontend.layers.CardListView
 import javafx.scene.Parent
 import javafx.{scene => jfxs}
 import scalafx.Includes._
@@ -31,7 +31,7 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[CardView], upperSplit: Pane)
+class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[Image], upperSplit: Pane)
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)

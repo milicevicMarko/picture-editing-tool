@@ -9,7 +9,7 @@ import scalafxml.core.macros.sfxml
 trait CardListControllerInterface {
   def setData(imageView: ImageView, name: String, number: Int)
   def getOpacitySlider: Slider
-  // todo how to delegate calls
+  def getLayerNumber: Label
 }
 
 @sfxml
@@ -28,4 +28,6 @@ class CardListController(layerNumber: Label, thumbnail: ImageView, fileName: Lab
   }
 
   override def getOpacitySlider: Slider = opacitySlider
+
+  override def getLayerNumber: Label = layerNumber
 }
