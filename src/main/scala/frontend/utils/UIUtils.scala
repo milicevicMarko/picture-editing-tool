@@ -24,3 +24,14 @@ object UIUtils {
     new ImageView(wrImg)
   }
 }
+
+object m {
+  def imageBind(pane: Int)(image: Int): Unit = {
+    println(s"$pane and $image")
+  }
+
+  def main(args: Array[String]): Unit = {
+    def f: Int => Unit = imageBind(5)
+    f(7)
+  }
+}
