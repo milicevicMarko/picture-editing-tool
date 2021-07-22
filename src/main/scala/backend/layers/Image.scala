@@ -18,6 +18,9 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   val name: String = new File(path).getName
   lazy val cardView: CardView = new CardView(this)
 
+  var isSelected: Boolean = false
+  def select(): Unit = isSelected = !isSelected
+
   def x: Int = getImage.getMinX
   def y: Int = getImage.getMinY
   def width: Int = getImage.getWidth
@@ -27,7 +30,7 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
 
   def setOpacity(v: Double): Unit = imageView.setOpacity(v)
 
-  def rotateImage(isRight: Boolean): Unit = {
+  def rotate(isRight: Boolean): Unit = {
     val degrees = if (isRight) 90 else -90
     imageView.setRotate(imageView.getRotate + degrees)
   }

@@ -1,28 +1,22 @@
 package backend.layers
 
-import backend.io.FileBrowser
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.image.ImageView
 
-import scala.annotation.tailrec
-import scala.collection.mutable.ListBuffer
-
 object ImageManager {
   val imageBuffer: ObservableBuffer[Image] = new ObservableBuffer[Image]
-  var selected: List[Image] = Nil
-
-  def setSelected(selected: List[Image]): Unit = this.selected = selected
-  def getSelected: List[Image] = selected
-
-  // todo - this returns top picture for now!
-  def getSelectedImage: Image = imageBuffer(size - 1)
-  def imageAt(i: Int): Image = imageBuffer(i)
-
-  def allImageViews: List[ImageView] = for (img <- imageBuffer.toList) yield img.imageView
 
   def size: Int = imageBuffer.size
 
-  def add(paths: List[String]): List[Image] = paths.map(path => add(path))
+  def selected: List[Image] = imageBuffer.filter(image => image.isSelected).toList
+
+  def deselectAll(): Unit = selected.foreach(i => i.select())
+
+  def imageAt(i: Int): Image = imageBuffer(i)
+
+  def allImageViews: List[ImageView] = imageBuffer.map(image => image.imageView).toList
+
+  def add(paths: List[String]): List[Image] = paths.collect(path => add(path))
 
   def add(path: String): Image = add(new Image(path))
 
@@ -48,26 +42,8 @@ object ImageManager {
     updateSingle(image2, index1)
   }
 
-  def move(image: Image, index: Int): Unit = {
-    @tailrec
-    def updateList(image: Image, acc: ListBuffer[Image], remainingList: ListBuffer[Image], index: Int): ListBuffer[Image] = {
-      if (index == 0) {
-        acc.addOne(image).addAll(remainingList)
-        // todo update all indexes, easiest trough a for
-      } else {
-        // todo error
-        updateList(image, acc.addOne(remainingList.head), remainingList.tail, index - 1)
-      }
+  def remove(): Unit = ???
 
-    }
-    //    imageBuffer.clear()
-    // when to clear
-  }
-
-  def remove(image: Image): Unit = imageBuffer.remove(image.index)
-
-  def rotate(isRight: Boolean): Unit = {
-    selected.foreach(img => img.rotateImage(isRight))
-  }
+  def rotate(isRight: Boolean): Unit = selected.foreach(img => img rotate isRight)
 
 }
