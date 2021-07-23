@@ -39,9 +39,11 @@ object ImageManager {
     }
     val index1 = image1.index
     val index2 = image2.index
+//    image1.index = index2
+//    image2.index = index1
+//    imageBuffer.sortWith(_ < _)
     updateSingle(image1, index2)
     updateSingle(image2, index1)
-    // imageBuffer.onChange()
   }
 
   def removeImage(image: Image): Unit = imageBuffer.remove(image)

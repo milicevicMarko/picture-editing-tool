@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 
 // todo create imageview Center and Thumbnail classes
-class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) {
+class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) { //} extends Ordered[Image] {
   def this(path: String) = this(FileImport.loadImage(path), path)
 
   def getImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
@@ -41,4 +41,7 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
     imageView.setPreserveRatio(true)
     this
   }
+
+  // todo keep sorted by index idk
+  // override def compare(that: Image): Int = this.index compare that.index
 }
