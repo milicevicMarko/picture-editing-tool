@@ -9,14 +9,17 @@ import scalafx.collections.ObservableBuffer
 class CardListView (listView: ListView[Image]) {
   def init(): Unit = {
     val list: ObservableBuffer[Image] = ImageManager.imageBuffer
+    var wasCTRLDown = false
     listView.setItems(list)
     listView.getSelectionModel.setSelectionMode(javafx.scene.control.SelectionMode.MULTIPLE)
 
     listView.cellFactory = _ => new ListCell(new jfxsc.ListCell[Image]{
       addEventFilter[input.MouseEvent](input.MouseEvent.MOUSE_CLICKED, e => {
+        wasCTRLDown = e.isControlDown
+        // todo
         if (!isEmpty) {
           val index = getIndex
-          // todo cannot click after swap
+          // todo missing logic for ctrling - have 2 selected, holding ctrl and isSelect should deselect, else should select
           if (getItem.isSelected) {
             listView.getSelectionModel.clearSelection(index)
           } else {
@@ -32,7 +35,6 @@ class CardListView (listView: ListView[Image]) {
         }
         e.consume()
       })
-
       override def updateItem(t: Image, b: Boolean): Unit = {
         super.updateItem(t, b)
         if (b || t == null) setGraphic(null)
