@@ -16,6 +16,7 @@ class CardListView (listView: ListView[Image]) {
       addEventFilter[input.MouseEvent](input.MouseEvent.MOUSE_CLICKED, e => {
         if (!isEmpty) {
           val index = getIndex
+          // todo cannot click after swap
           if (getItem.isSelected) {
             listView.getSelectionModel.clearSelection(index)
           } else {

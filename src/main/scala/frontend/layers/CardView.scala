@@ -1,9 +1,12 @@
 package frontend.layers
 
-import backend.layers.Image
+import backend.layers.{Image, ImageManager}
 import frontend.utils.UIUtils
 import javafx.beans.value
 import javafx.beans.value.ObservableValue
+import javafx.event.EventHandler
+import scalafx.Includes._
+import javafx.event.ActionEvent
 import scalafx.scene.control.ListCell
 import scalafx.scene.image.ImageView
 import scalafxml.core.{DependenciesByType, FXMLLoader}
@@ -21,6 +24,7 @@ class CardView(val image: Image) extends ListCell[CardView] {
         image.setOpacity(opacity)
       }
     })
+    controller.getDeleteButton.onAction = (event: ActionEvent) => ImageManager.removeImage(image)
     controller
   }
 

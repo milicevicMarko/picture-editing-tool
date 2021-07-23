@@ -5,6 +5,7 @@ import backend.io.FileBrowser
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
 import frontend.layers.CardListView
+import javafx.collections.ListChangeListener
 import javafx.scene.Parent
 import javafx.{scene => jfxs}
 import scalafx.Includes._
@@ -36,6 +37,19 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
 
+  // todo not working
+//  ImageManager.imageBuffer.addListener(new ListChangeListener[Image] {
+//    override def onChanged(change: ListChangeListener.Change[_ <: Image]): Unit = {
+//      while (change.next()) {
+//        if (change.getFrom != change.getTo && !change.wasUpdated()) {
+//          centerPane.children.clear()
+//          centerPane.children = ImageManager.allImageViews
+//        }
+//      }
+//      // todo breaks because swap actually removes than adds
+//    }
+//  })
+
   def showOpenButton(show: Boolean): Unit = {
     openOnStack.setVisible(show)
     openOnStack.setDisable(!show)
@@ -65,7 +79,10 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
 
   override def rotateLeft(): Unit = ImageManager.rotate(false)
 
-  def updateLayers(): Unit = centerPane.children = ImageManager.allImageViews
+  def updateLayers(): Unit = {
+    centerPane.children.clear()
+    centerPane.children = ImageManager.allImageViews
+  }
 
   override def swap(): Unit = {
     ImageManager.swap()
