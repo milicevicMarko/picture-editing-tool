@@ -14,7 +14,8 @@ object ImageManager {
 
   def imageAt(i: Int): Image = imageBuffer(i)
 
-  def allImageViews: List[ImageView] = imageBuffer.map(image => image.imageView).toList
+  // distinct must be added for updating list scenario
+  def allImageViews: List[ImageView] = imageBuffer.distinct.map(image => image.imageView).toList
 
   def add(paths: List[String]): List[Image] = paths.collect(path => add(path))
 

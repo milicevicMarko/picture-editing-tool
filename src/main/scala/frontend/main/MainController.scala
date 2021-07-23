@@ -37,18 +37,14 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
 
-  // todo not working
-//  ImageManager.imageBuffer.addListener(new ListChangeListener[Image] {
-//    override def onChanged(change: ListChangeListener.Change[_ <: Image]): Unit = {
-//      while (change.next()) {
-//        if (change.getFrom != change.getTo && !change.wasUpdated()) {
-//          centerPane.children.clear()
-//          centerPane.children = ImageManager.allImageViews
-//        }
-//      }
-//      // todo breaks because swap actually removes than adds
-//    }
-//  })
+  ImageManager.imageBuffer.addListener(new ListChangeListener[Image] {
+    override def onChanged(change: ListChangeListener.Change[_ <: Image]): Unit = {
+      while (change.next) {
+        if (change.wasAdded() || change.wasRemoved())
+          centerPane.children = ImageManager.allImageViews
+      }
+    }
+  })
 
   def showOpenButton(show: Boolean): Unit = {
     openOnStack.setVisible(show)
@@ -57,7 +53,7 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
 
   override def open(): Unit = {
     FileBrowser.chooseImportMultiplePath() match {
-      case paths: List[String] => ImageManager add paths map(image => image addToPane centerPane)
+      case paths: List[String] => ImageManager add paths map(image => image bind centerPane)
       case Nil => println("Canceled")
     }
   }

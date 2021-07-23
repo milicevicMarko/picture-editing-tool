@@ -41,9 +41,4 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
     imageView.setPreserveRatio(true)
     this
   }
-
-  def addToPane(pane: Pane): Image = {
-    pane.children addOne (this bind pane).imageView
-    this
-  }
 }
