@@ -12,6 +12,7 @@ import java.io.File
 // todo create imageview Center and Thumbnail classes
 class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) { //} extends Ordered[Image] {
   def this(path: String) = this(FileImport.loadImage(path), path)
+  def this(that: Image) = this(that.getImage, that.getPath) // todo name should point to copy -> such as duplicate_copy.jpg
 
   def getImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
   def getPath: String = path

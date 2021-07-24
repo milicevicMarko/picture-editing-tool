@@ -47,7 +47,12 @@ object ImageManager {
     updateSingle(image2, index1)
   }
 
-  def removeImage(image: Image): Unit = imageBuffer.remove(image)
+  def remove(image: Image): Unit = imageBuffer.remove(image)
+
+  def duplicate(image: Image): Unit = {
+    val copy = new Image(image)
+    imageBuffer.addOne(copy)
+  }
 
   def rotate(isRight: Boolean): Unit = selected.foreach(img => img rotate isRight)
 

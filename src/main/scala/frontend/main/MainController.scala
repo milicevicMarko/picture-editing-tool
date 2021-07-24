@@ -41,7 +41,7 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
     override def onChanged(change: ListChangeListener.Change[_ <: Image]): Unit = {
       while (change.next) {
         if (change.wasAdded() || change.wasRemoved())
-          centerPane.children = ImageManager.allImageViews
+          centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bind centerPane).imageView)
       }
     }
   })
@@ -53,7 +53,7 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
 
   override def open(): Unit = {
     FileBrowser.chooseImportMultiplePath() match {
-      case paths: List[String] => ImageManager add paths map(image => image bind centerPane)
+      case paths: List[String] => ImageManager add paths
       case Nil => println("Canceled")
     }
   }
