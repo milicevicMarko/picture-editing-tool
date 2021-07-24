@@ -43,7 +43,4 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
     imageView.setPreserveRatio(true)
     this
   }
-
-  // todo keep sorted by index idk
-  // override def compare(that: Image): Int = this.index compare that.index
 }

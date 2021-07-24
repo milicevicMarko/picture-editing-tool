@@ -29,6 +29,5 @@ class CardView(val image: Image) extends ListCell[CardView] {
     controller
   }
 
-  // todo how to keep 1 on top
   def updateIndex(): Unit = cardListController.getLayerNumber.setText(s"${image.index + 1}")
 }

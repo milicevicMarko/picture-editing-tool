@@ -42,14 +42,11 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
       while (change.next) {
         if (change.wasAdded() || change.wasRemoved())
           centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bind centerPane).imageView)
+        if (centerPane.children.isEmpty)
+          centerPane.children = openOnStack
       }
     }
   })
-
-  def showOpenButton(show: Boolean): Unit = {
-    openOnStack.setVisible(show)
-    openOnStack.setDisable(!show)
-  }
 
   override def open(): Unit = {
     FileBrowser.chooseImportMultiplePath() match {
