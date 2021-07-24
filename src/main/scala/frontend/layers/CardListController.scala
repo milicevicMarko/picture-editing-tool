@@ -12,11 +12,13 @@ trait CardListControllerInterface {
   def getLayerNumber: Label
   def getDuplicateButton: Button
   def getDeleteButton: Button
+  def getUpButton: Button
+  def getDownButton: Button
 }
 
 @sfxml
 class CardListController(layerNumber: Label, thumbnail: ImageView, fileName: Label, opacitySlider: Slider,
-                         opacityLabel: Label, duplicateButton: Button, deleteButton: Button) extends CardListControllerInterface {
+                         opacityLabel: Label, upButton: Button, downButton: Button, duplicateButton: Button, deleteButton: Button) extends CardListControllerInterface {
 
     opacitySlider.valueProperty().addListener(new value.ChangeListener[Number] {
       override def changed(observableValue: ObservableValue[_ <: Number], oldValue: Number, newValue: Number): Unit = {
@@ -34,7 +36,12 @@ class CardListController(layerNumber: Label, thumbnail: ImageView, fileName: Lab
 
   override def getLayerNumber: Label = layerNumber
 
+  override def getUpButton: Button = upButton
+
+  override def getDownButton: Button = downButton
+
   override def getDuplicateButton: Button = duplicateButton
 
   override def getDeleteButton: Button = deleteButton
+
 }

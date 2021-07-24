@@ -22,8 +22,10 @@ class CardView(val image: Image) extends ListCell[CardView] {
         image.setOpacity(opacity)
       }
     })
-    controller.getDeleteButton.onAction = (event: ActionEvent) => ImageManager.remove(image)
-    controller.getDuplicateButton.onAction = (event: ActionEvent) => ImageManager.duplicate(image)
+    controller.getUpButton.onAction = _ => ImageManager.moveUp(image)
+    controller.getDownButton.onAction = _ => ImageManager.moveDown(image)
+    controller.getDeleteButton.onAction = _ => ImageManager.remove(image)
+    controller.getDuplicateButton.onAction = _ => ImageManager.duplicate(image)
     controller
   }
 

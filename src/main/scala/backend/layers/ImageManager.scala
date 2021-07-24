@@ -47,6 +47,16 @@ object ImageManager {
     updateSingle(image2, index1)
   }
 
+  def moveUp(image: Image): Unit = {
+    if (image.index != 0)
+      swap(image, imageAt(image.index - 1))
+  }
+
+  def moveDown(image: Image): Unit = {
+    if (image.index != size - 1)
+      swap(image, imageAt(image.index + 1))
+  }
+
   def remove(image: Image): Unit = imageBuffer.remove(image)
 
   def duplicate(image: Image): Unit = {
