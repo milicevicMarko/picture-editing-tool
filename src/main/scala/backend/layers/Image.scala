@@ -20,6 +20,7 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
 
   var isSelected: Boolean = false
   def select(): Unit = isSelected = !isSelected
+  def select(setSelect: Boolean): Unit = isSelected = setSelect
 
   def x: Int = getImage.getMinX
   def y: Int = getImage.getMinY

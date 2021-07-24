@@ -10,7 +10,8 @@ object ImageManager {
 
   def selected: List[Image] = imageBuffer.filter(image => image.isSelected).toList
 
-  def deselectAll(): Unit = selected.foreach(i => i.select())
+  def deselectAll(): Unit = imageBuffer.foreach(i => i.select(false))
+  def selectAll(): Unit = imageBuffer.foreach(i => i.select(true))
 
   def imageAt(i: Int): Image = imageBuffer(i)
 
