@@ -9,30 +9,27 @@ import scalafx.collections.ObservableBuffer
 class CardListView (listView: ListView[Image]) {
   def init(): Unit = {
     val list: ObservableBuffer[Image] = ImageManager.imageBuffer
-    var wasCTRLDown = false
     listView.setItems(list)
     listView.getSelectionModel.setSelectionMode(javafx.scene.control.SelectionMode.MULTIPLE)
 
     listView.cellFactory = _ => new ListCell(new jfxsc.ListCell[Image]{
       addEventFilter[input.MouseEvent](input.MouseEvent.MOUSE_CLICKED, e => {
-        wasCTRLDown = e.isControlDown
-        // todo
-        if (!isEmpty) {
-          val index = getIndex
-          // todo missing logic for ctrling - have 2 selected, holding ctrl and isSelect should deselect, else should select
-          if (getItem.isSelected) {
-            listView.getSelectionModel.clearSelection(index)
-          } else {
-            listView.getSelectionModel.select(index)
-          }
-
-          if (!e.isControlDown)
-            ImageManager.deselectAll()
-          getItem.select()
-        } else {
+        def deselectAll(): Unit = {
           ImageManager.deselectAll()
           listView.getSelectionModel.clearSelection()
         }
+
+        if (isEmpty || !e.isControlDown) deselectAll()
+
+        if (!isEmpty) {
+          if (getItem.isSelected) {
+            listView.getSelectionModel.clearSelection(getIndex)
+          } else {
+            listView.getSelectionModel.select(getIndex)
+          }
+          getItem.select()
+        }
+
         e.consume()
       })
       override def updateItem(t: Image, b: Boolean): Unit = {
