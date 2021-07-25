@@ -12,7 +12,10 @@ import scalafx.Includes._
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ListView}
-import scalafx.scene.layout.{Pane, StackPane}
+import javafx.scene.input.MouseEvent
+import scalafx.event.EventType
+import scalafx.scene.layout.{AnchorPane, Pane, StackPane}
+import scalafx.scene.shape.Rectangle
 import scalafx.stage.{Stage, WindowEvent}
 import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
@@ -32,10 +35,34 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(centerPane: StackPane, openOnStack: Button, layers: ListView[Image], upperSplit: Pane)
+class MainController(selectPane: AnchorPane, selectRectangle: Rectangle, centerPane: StackPane, openOnStack: Button, layers: ListView[Image], upperSplit: Pane)
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
+
+  selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => e.getEventType match {
+    case MouseEvent.MOUSE_PRESSED =>
+      selectRectangle.visible = true
+      selectRectangle.x = e.getX
+      selectRectangle.y = e.getY
+      selectRectangle.width = 0
+      selectRectangle.height = 0
+
+    case MouseEvent.MOUSE_DRAGGED =>
+      val dx = e.getX - selectRectangle.getX
+      selectRectangle.translateX = if (dx < 0) dx else 0
+      selectRectangle.width = dx.abs
+
+      val dy = e.getY - selectRectangle.getY
+      selectRectangle.translateY = if (dy < 0) dy else 0
+      selectRectangle.height = dy.abs
+
+    case MouseEvent.MOUSE_RELEASED =>
+      // todo select pixels beneath
+      println(selectRectangle)
+      println("done")
+    case _ =>
+  })
 
   ImageManager.imageBuffer.addListener(new ListChangeListener[Image] {
     override def onChanged(change: ListChangeListener.Change[_ <: Image]): Unit = {
@@ -43,7 +70,9 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
         if (change.wasAdded() || change.wasRemoved())
           centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bind centerPane).imageView)
         if (centerPane.children.isEmpty)
-          centerPane.children = openOnStack
+          selectPane.children = openOnStack
+        else
+          selectPane.children.remove(openOnStack)
       }
     }
   })
@@ -85,6 +114,7 @@ class MainController(centerPane: StackPane, openOnStack: Button, layers: ListVie
   override def layerTest(): Unit = {
     println("Testing")
   }
+
 }
 
 object MainControllerApp extends JFXApp3 {
