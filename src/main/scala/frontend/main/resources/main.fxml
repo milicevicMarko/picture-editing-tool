@@ -9,6 +9,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -98,7 +99,10 @@
         <items>
             <ToolBar orientation="VERTICAL" prefHeight="410.0" prefWidth="35.0">
                <items>
-                  <Button fx:id="selectBtn" alignment="CENTER" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" textAlignment="JUSTIFY">
+                  <ToggleButton fx:id="selectToggleButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0">
+                     <padding>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </padding>
                      <graphic>
                         <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -106,10 +110,7 @@
                            </image>
                         </ImageView>
                      </graphic>
-                     <padding>
-                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-                     </padding>
-                  </Button>
+                  </ToggleButton>
                   <Button fx:id="cropBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" textAlignment="JUSTIFY">
                      <graphic>
                         <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
