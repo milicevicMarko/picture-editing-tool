@@ -13,9 +13,7 @@ import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ListView}
 import javafx.scene.input.MouseEvent
-import scalafx.event.EventType
 import scalafx.scene.layout.{AnchorPane, Pane, StackPane}
-import scalafx.scene.paint.Paint
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.{Stage, WindowEvent}
 import scalafxml.core.macros.sfxml
@@ -69,7 +67,10 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
     case MouseEvent.MOUSE_RELEASED =>
       // todo select pixels beneath
-      println(selectRectangle)
+      if (selectRectangle.getWidth <= 5 && selectRectangle.getHeight <= 5)
+        selectRectangles.remove(selectRectangles.size - 1)
+      else
+        println(selectRectangles.size)
       println("done")
     case _ =>
   })
