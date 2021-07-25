@@ -15,12 +15,14 @@ import scalafx.scene.control.{Button, ListView}
 import javafx.scene.input.MouseEvent
 import scalafx.event.EventType
 import scalafx.scene.layout.{AnchorPane, Pane, StackPane}
+import scalafx.scene.paint.Paint
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.{Stage, WindowEvent}
 import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
 
 import java.net.URL
+import scala.collection.mutable.ListBuffer
 
 trait MainInterface {
   def open(): Unit
@@ -35,19 +37,27 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(selectPane: AnchorPane, selectRectangle: Rectangle, centerPane: StackPane, openOnStack: Button, layers: ListView[Image], upperSplit: Pane)
+class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack: Button, layers: ListView[Image], upperSplit: Pane)
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
 
+  val selectRectangles = new ListBuffer[Rectangle]
+  def selectRectangle: Rectangle = selectRectangles.last
+
+  def newRectangle(xx: Double, yy: Double): Unit = selectRectangles.addOne(new Rectangle() {
+    opacity = 0.5
+    visible = true
+    fill = javafx.scene.paint.Color.DODGERBLUE
+    x = xx
+    y = yy
+  })
+
+  // todo whole pane moves for some reason
   selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => e.getEventType match {
     case MouseEvent.MOUSE_PRESSED =>
-      selectRectangle.visible = true
-      selectRectangle.x = e.getX
-      selectRectangle.y = e.getY
-      selectRectangle.width = 0
-      selectRectangle.height = 0
-
+      newRectangle(e.getX, e.getY)
+      selectPane.children.addOne(selectRectangle)
     case MouseEvent.MOUSE_DRAGGED =>
       val dx = e.getX - selectRectangle.getX
       selectRectangle.translateX = if (dx < 0) dx else 0
