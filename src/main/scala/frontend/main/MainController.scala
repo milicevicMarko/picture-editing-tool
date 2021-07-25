@@ -6,13 +6,15 @@ import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
 import frontend.layers.CardListView
 import javafx.collections.ListChangeListener
-import javafx.scene.Parent
+import javafx.scene.{Parent, input}
 import javafx.{scene => jfxs}
+import javafx.scene.paint.{Color => colors}
 import scalafx.Includes._
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ListView, ToggleButton}
 import javafx.scene.input.MouseEvent
+import scalafx.scene.input.MouseButton
 import scalafx.scene.layout.{AnchorPane, StackPane}
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.{Stage, WindowEvent}
@@ -44,14 +46,45 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   def selectRectangle: Rectangle = selectRectangles.last
 
   def newRectangle(xx: Double, yy: Double): Unit = selectRectangles.addOne(new Rectangle() {
-    opacity = 0.5
+    opacity = 0.3
     visible = true
-    fill = javafx.scene.paint.Color.DODGERBLUE
+    fill = colors.DODGERBLUE
     x = xx
     y = yy
   })
 
+  def deleteSelectRectangle(rect: Rectangle): Unit = {
+    selectPane.children.remove(rect)
+    selectRectangles.remove(selectRectangles.indexOf(rect))
+  }
 
+
+  val devHack = true
+  def centerPaneNonEmpty: Boolean = centerPane.children.nonEmpty || devHack
+
+  selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => if (selectToggleButton.isSelected && centerPaneNonEmpty) e.getEventType match {
+    case MouseEvent.MOUSE_PRESSED =>
+      newRectangle(e.getX, e.getY)
+      selectPane.children.addOne(selectRectangle)
+      selectRectangle.setOnMouseClicked(e => if (e.getButton == input.MouseButton.SECONDARY) deleteSelectRectangle(selectRectangle))
+    case MouseEvent.MOUSE_DRAGGED =>
+      val dx = e.getX - selectRectangle.getX
+      selectRectangle.translateX = if (dx < 0) dx else 0
+      selectRectangle.width = dx.abs
+
+      val dy = e.getY - selectRectangle.getY
+      selectRectangle.translateY = if (dy < 0) dy else 0
+      selectRectangle.height = dy.abs
+
+    case MouseEvent.MOUSE_RELEASED =>
+      // todo select pixels beneath
+      if (selectRectangle.getWidth <= 5 && selectRectangle.getHeight <= 5)
+        selectRectangles.remove(selectRectangles.size - 1)
+      else
+        println(selectRectangles.size)
+      println("done")
+    case _ =>
+  })
 
   ImageManager.imageBuffer.addListener(new ListChangeListener[Image] {
     override def onChanged(change: ListChangeListener.Change[_ <: Image]): Unit = {
@@ -104,28 +137,6 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     println("Testing")
   }
 
-  selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => if (selectToggleButton.isSelected) e.getEventType match {
-    case MouseEvent.MOUSE_PRESSED =>
-      newRectangle(e.getX, e.getY)
-      selectPane.children.addOne(selectRectangle)
-    case MouseEvent.MOUSE_DRAGGED =>
-      val dx = e.getX - selectRectangle.getX
-      selectRectangle.translateX = if (dx < 0) dx else 0
-      selectRectangle.width = dx.abs
-
-      val dy = e.getY - selectRectangle.getY
-      selectRectangle.translateY = if (dy < 0) dy else 0
-      selectRectangle.height = dy.abs
-
-    case MouseEvent.MOUSE_RELEASED =>
-      // todo select pixels beneath
-      if (selectRectangle.getWidth <= 5 && selectRectangle.getHeight <= 5)
-        selectRectangles.remove(selectRectangles.size - 1)
-      else
-        println(selectRectangles.size)
-      println("done")
-    case _ =>
-  })
 }
 
 object MainControllerApp extends JFXApp3 {
