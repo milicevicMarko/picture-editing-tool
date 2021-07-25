@@ -8,13 +8,12 @@ import frontend.layers.CardListView
 import javafx.collections.ListChangeListener
 import javafx.scene.{Parent, input}
 import javafx.{scene => jfxs}
-import javafx.scene.paint.{Color => colors}
+import javafx.scene.paint.Color
 import scalafx.Includes._
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, ListView, ToggleButton}
+import scalafx.scene.control.{Button, ColorPicker, ListView, ToggleButton}
 import javafx.scene.input.MouseEvent
-import scalafx.scene.input.MouseButton
 import scalafx.scene.layout.{AnchorPane, StackPane}
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.{Stage, WindowEvent}
@@ -34,10 +33,12 @@ trait MainInterface {
   def testMe(): Unit
   def swap(): Unit
   def layerTest(): Unit
+  def setFillColor(): Unit
+  def toggleFillColor(): Unit
 }
 
 @sfxml
-class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack: Button, layers: ListView[Image], selectToggleButton: ToggleButton)
+class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack: Button, layers: ListView[Image], selectToggleButton: ToggleButton, fillToggleButton: ToggleButton, colorBox: ColorPicker)
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
@@ -45,20 +46,35 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   val selectRectangles = new ListBuffer[Rectangle]
   def selectRectangle: Rectangle = selectRectangles.last
 
-  def newRectangle(xx: Double, yy: Double): Unit = selectRectangles.addOne(new Rectangle() {
-    opacity = 0.3
-    visible = true
-    fill = colors.DODGERBLUE
-    x = xx
-    y = yy
-  })
+  def newRectangle(xx: Double, yy: Double): Unit = {
+    val r = new Rectangle() {
+      visible = true
+      stroke = Color.BLACK
+      strokeDashArray = Seq(2d)
+      fill = Color.TRANSPARENT
+      strokeWidth = 0.5
+      x = xx
+      y = yy
+    }
+
+    r.setOnMouseClicked(e => {
+      if (e.getButton == input.MouseButton.SECONDARY) deleteSelectRectangle(r)
+      else if (e.getButton == input.MouseButton.PRIMARY && fillColor.isDefined) {
+        r.setFill(fillColor.get)
+        fillColor = None
+        r.setOpacity(1)
+        r.strokeWidth = 0
+      }
+    })
+    selectRectangles.addOne(r)
+  }
 
   def deleteSelectRectangle(rect: Rectangle): Unit = {
     selectPane.children.remove(rect)
     selectRectangles.remove(selectRectangles.indexOf(rect))
   }
 
-
+  var fillColor: Option[Color] = None
   val devHack = true
   def centerPaneNonEmpty: Boolean = centerPane.children.nonEmpty || devHack
 
@@ -66,7 +82,6 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     case MouseEvent.MOUSE_PRESSED =>
       newRectangle(e.getX, e.getY)
       selectPane.children.addOne(selectRectangle)
-      selectRectangle.setOnMouseClicked(e => if (e.getButton == input.MouseButton.SECONDARY) deleteSelectRectangle(selectRectangle))
     case MouseEvent.MOUSE_DRAGGED =>
       val dx = e.getX - selectRectangle.getX
       selectRectangle.translateX = if (dx < 0) dx else 0
@@ -85,6 +100,25 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
       println("done")
     case _ =>
   })
+
+  def toggleSelect(): Unit = {
+    if (selectToggleButton.isSelected)
+      if (fillToggleButton.isSelected) {
+        fillToggleButton.selected = false
+        toggleFillColor()
+      }
+  }
+
+  def toggleFillColor(): Unit = {
+    colorBox.setVisible(fillToggleButton.isSelected)
+    colorBox.setDisable(!fillToggleButton.isSelected)
+    if (!fillToggleButton.isSelected)
+      fillColor = None
+    else if (selectToggleButton.isSelected)
+        selectToggleButton.selected = false
+  }
+
+  def setFillColor(): Unit = fillColor = Some(colorBox.getValue)
 
   ImageManager.imageBuffer.addListener(new ListChangeListener[Image] {
     override def onChanged(change: ListChangeListener.Change[_ <: Image]): Unit = {
