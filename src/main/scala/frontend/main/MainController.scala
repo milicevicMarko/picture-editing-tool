@@ -1,6 +1,6 @@
 package frontend.main
 
-import backend.engine.Engine
+import backend.engine.Operations
 import backend.io.FileBrowser
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
@@ -147,11 +147,11 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   // todo - check if there is unsaved work somehow
   override def close(): Unit = stage.fireEvent(new WindowEvent(stage, WindowEvent.WindowCloseRequest))
 
-  override def testMe(): Unit = Engine.getImageOption match {
-    case Some(_) =>
-      Engine.pictureTest()
-    case None => println("Nothing to test")
-  }
+//    Engine.getImageOption match {
+//    case Some(_) =>
+//      Engine.pictureTest()
+//    case None => println("Nothing to test")
+//  }
 
   override def rotateRight(): Unit = ImageManager.rotate(true)
 
@@ -167,8 +167,19 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     updateLayers()
   }
 
+
+  override def testMe(): Unit = {
+    val img = ImageManager.imageBuffer.head
+    val o1 = Operations.add(0.005)
+    val img2 = o1(img)
+    ImageManager.imageBuffer.addOne(img2)
+  }
+
   override def layerTest(): Unit = {
-    println("Testing")
+    val img = ImageManager.imageBuffer.head
+    val o1 = Operations.sub(0.005)
+    val img2 = o1(img)
+    ImageManager.imageBuffer.addOne(img2)
   }
 
 }
