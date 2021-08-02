@@ -168,7 +168,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   }
 
 
-  override def testMe(): Unit = ImageManager.operate(Operations.add(0.005))
+  override def testMe(): Unit = ImageManager.operate(Operations.div(5))
 
   override def layerTest(): Unit = ImageManager.operate(Operations.sub(0.005))
     //{

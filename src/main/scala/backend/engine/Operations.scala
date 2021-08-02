@@ -27,6 +27,10 @@ object Operations {
 
   def add(value: Double): Operation = (i: RGB) => i + value
   def sub(value: Double): Operation = (i: RGB) => i - value
+  def revSub(value: Double): Operation = (i: RGB) => i -@ value
+  def mul(value: Double): Operation = (i: RGB) => i * value
+  def div(value: Double): Operation = (i: RGB) => i / value
+  def revDiv(value: Double): Operation = (i: RGB) => i /@ value
 }
 
 object a extends App {
