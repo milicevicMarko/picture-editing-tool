@@ -1,5 +1,6 @@
 package backend.layers
 
+import backend.engine.Operation
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.image.ImageView
 
@@ -66,4 +67,7 @@ object ImageManager {
 
   def rotate(isRight: Boolean): Unit = selected.foreach(img => img rotate isRight)
 
+  def operate(op: Operation): Unit = {
+    selected.foreach(image => imageBuffer.update(image.index, op(image)))
+  }
 }

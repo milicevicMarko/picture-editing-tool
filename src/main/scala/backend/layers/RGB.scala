@@ -15,9 +15,10 @@ case class RGB(red: Double, green: Double, blue: Double) {
 }
 
 object RGB {
-  private def colorToInt(c: Double): Int = (c * 255.0).toInt
-  implicit def toInt(rgb: RGB): Int = colorToInt(rgb.red) << 16 | colorToInt(rgb.green) << 8 | colorToInt(rgb.blue) << 0
-  implicit def toRGB(int: Int): RGB = RGB((int >> 16) & 0xFF, (int >> 8) & 0xFF, (int >> 0) & 0xFF)
+  private def colorToInt(c: Double)(shift: Int => Int): Int = shift((c * 255.0).toInt)
+  private def intToColor(int: Int)(shift: Int => Int): Double = (shift(int) & 0xFF) / 255.0
+  implicit def toInt(rgb: RGB): Int = colorToInt(rgb.red)(i => i << 16) | colorToInt(rgb.green)(i => i << 8) | colorToInt(rgb.blue)(i => i << 0)
+  implicit def toRGB(int: Int): RGB = RGB(intToColor(int)(i => i >> 16), intToColor(int)(i => i >> 8), intToColor(int)(i => i >> 0))
 }
 
 object M {

@@ -14,6 +14,11 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   def this(path: String) = this(FileImport.loadImage(path), path)
   def this(that: Image) = this(that.getImage, that.getPath) // todo name should point to copy -> such as duplicate_copy.jpg
 
+  def copy(): Image = {
+    val copied = new Image(getImage, path, index)
+    copied
+  }
+
   def getImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
   def getPath: String = path
   val name: String = new File(path).getName
@@ -22,11 +27,6 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   var isSelected: Boolean = false
   def select(): Unit = isSelected = !isSelected
   def select(setSelect: Boolean): Unit = isSelected = setSelect
-
-  def x: Int = getImage.getMinX
-  def y: Int = getImage.getMinY
-  def width: Int = getImage.getWidth
-  def height: Int = getImage.getHeight
 
   val imageView: ImageView = UIUtils.imageToImageView(bufferedImage)
 

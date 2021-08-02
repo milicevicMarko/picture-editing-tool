@@ -168,19 +168,16 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   }
 
 
-  override def testMe(): Unit = {
-    val img = ImageManager.imageBuffer.head
-    val o1 = Operations.add(0.005)
-    val img2 = o1(img)
-    ImageManager.imageBuffer.addOne(img2)
-  }
+  override def testMe(): Unit = ImageManager.operate(Operations.add(0.005))
 
-  override def layerTest(): Unit = {
-    val img = ImageManager.imageBuffer.head
-    val o1 = Operations.sub(0.005)
-    val img2 = o1(img)
-    ImageManager.imageBuffer.addOne(img2)
-  }
+  override def layerTest(): Unit = ImageManager.operate(Operations.sub(0.005))
+    //{
+  //    val img = ImageManager.imageBuffer.head
+  //    println(img.name)
+  //    val o1 = Operations.sub(0.005)
+  //    val img2 = o1(img)
+  //    ImageManager.imageBuffer.addOne(img2)
+  //  }
 
 }
 
