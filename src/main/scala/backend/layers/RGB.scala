@@ -12,6 +12,7 @@ case class RGB(red: Double, green: Double, blue: Double) {
   def *(const: Double): RGB = rgbOp(const)((x, y) => limit(x * y))
   def /(const: Double): RGB = rgbOp(const)((x, y) => limit(x / y))
   def /@(const: Double): RGB = rgbOp(const)((x, y) => limit(y / x))
+  def toGrey: RGB = rgbOp((red + green + blue) / 3.0)((_, y) => limit(y))
 }
 
 object RGB {

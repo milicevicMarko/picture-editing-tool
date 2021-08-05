@@ -25,10 +25,12 @@ object Operations {
 
   def add(value: Double): Operation = (i: RGB) => i + value
   def sub(value: Double): Operation = (i: RGB) => i - value
-  def revSub(value: Double): Operation = (i: RGB) => i -@ value
+  def invSub(value: Double): Operation = (i: RGB) => i -@ value
   def mul(value: Double): Operation = (i: RGB) => i * value
   def div(value: Double): Operation = (i: RGB) => i / value
-  def revDiv(value: Double): Operation = (i: RGB) => i /@ value
+  def invDiv(value: Double): Operation = (i: RGB) => i /@ value
+
+  def greyscale(): Operation = (i: RGB) => (i.toGrey)
 }
 
 object a extends App {

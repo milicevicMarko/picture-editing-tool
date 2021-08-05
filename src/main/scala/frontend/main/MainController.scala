@@ -35,10 +35,21 @@ trait MainInterface {
   def layerTest(): Unit
   def setFillColor(): Unit
   def toggleFillColor(): Unit
+
+  def addOp(): Unit
+  def subOp(): Unit
+  def invSubOp(): Unit
+  def mulOp(): Unit
+  def divOp(): Unit
+  def invDivOp(): Unit
+
+  def invertOp(): Unit
+  def greyscaleOp(): Unit
 }
 
 @sfxml
-class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack: Button, layers: ListView[Image], selectToggleButton: ToggleButton, fillToggleButton: ToggleButton, colorBox: ColorPicker)
+class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack: Button, layers: ListView[Image],
+                     selectToggleButton: ToggleButton, fillToggleButton: ToggleButton, colorBox: ColorPicker)
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
@@ -170,10 +181,26 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def testMe(): Unit = ImageManager.operate(Operations.div(5))
 
-  override def layerTest(): Unit = {
-    // refresh
-    centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
-  }
+  // refresh
+  override def layerTest(): Unit = centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
+
+  // todo do this with select and with value from text field
+  // todo art
+  override def addOp(): Unit = ImageManager.operate(Operations.add(0.005))
+
+  override def subOp(): Unit = ImageManager.operate(Operations.sub(0.005))
+
+  override def invSubOp(): Unit = ImageManager.operate(Operations.invSub(1))
+
+  override def mulOp(): Unit = ImageManager.operate(Operations.mul(0.005))
+
+  override def divOp(): Unit = ImageManager.operate(Operations.div(5))
+
+  override def invDivOp(): Unit = ImageManager.operate(Operations.invDiv(1))
+
+  override def invertOp(): Unit = ImageManager.operate(Operations.invSub(1))
+
+  override def greyscaleOp(): Unit = ImageManager.operate(Operations.greyscale())
 }
 
 object MainControllerApp extends JFXApp3 {
