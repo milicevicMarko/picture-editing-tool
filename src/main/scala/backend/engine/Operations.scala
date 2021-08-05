@@ -7,14 +7,12 @@ import scala.language.implicitConversions
 case class Operation(f: RGB => RGB) {
   def andThen(that: Operation): Operation = Operation(this.f andThen that.f)
   def apply(image: Image): Image = {
-    val imageCopy = image.copy()
-    val img = imageCopy.getImage
-
+    val img = image.getImage
     for (x <- 0 until img.getWidth;
          y <- 0 until img.getHeight) {
       img.setRGB(x, y, f(img.getRGB(x, y)))
     }
-    imageCopy
+    image.copy()
   }
 }
 
@@ -39,6 +37,4 @@ object a extends App {
 
   val h = f andThen g // h(x) => g(f(x))
   println(h("Marko"))
-
-
 }

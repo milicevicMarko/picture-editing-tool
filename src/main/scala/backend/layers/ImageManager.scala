@@ -48,26 +48,15 @@ object ImageManager {
     updateSingle(image2, index1)
   }
 
-  def moveUp(image: Image): Unit = {
-    if (image.index != 0)
-      swap(image, imageAt(image.index - 1))
-  }
+  def moveUp(image: Image): Unit = if (image.index != 0) swap(image, imageAt(image.index - 1))
 
-  def moveDown(image: Image): Unit = {
-    if (image.index != size - 1)
-      swap(image, imageAt(image.index + 1))
-  }
+  def moveDown(image: Image): Unit = if (image.index != size - 1) swap(image, imageAt(image.index + 1))
 
   def remove(image: Image): Unit = imageBuffer.remove(image)
 
-  def duplicate(image: Image): Unit = {
-    val copy = new Image(image)
-    imageBuffer.addOne(copy)
-  }
+  def duplicate(image: Image): Unit = imageBuffer.addOne(image.copy())
 
   def rotate(isRight: Boolean): Unit = selected.foreach(img => img rotate isRight)
 
-  def operate(op: Operation): Unit = {
-    selected.foreach(image => imageBuffer.update(image.index, op(image)))
-  }
+  def operate(op: Operation): Unit = selected.foreach(image => imageBuffer.update(image.index, op(image)))
 }

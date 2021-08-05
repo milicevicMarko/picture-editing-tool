@@ -12,23 +12,18 @@ import java.io.File
 // todo create imageview Center and Thumbnail classes
 class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) { //} extends Ordered[Image] {
   def this(path: String) = this(FileImport.loadImage(path), path)
-  def this(that: Image) = this(that.getImage, that.getPath) // todo name should point to copy -> such as duplicate_copy.jpg
-
-  def copy(): Image = {
-    val copied = new Image(getImage, path, index)
-    copied
-  }
+  def copy(): Image = new Image(bufferedImage, path, index) // todo name should point to copy -> such as duplicate_copy.jpg
 
   def getImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
   def getPath: String = path
   val name: String = new File(path).getName
+
   lazy val cardView: CardView = new CardView(this)
+  lazy val imageView: ImageView = UIUtils.imageToImageView(bufferedImage)
 
   var isSelected: Boolean = false
   def select(): Unit = isSelected = !isSelected
   def select(setSelect: Boolean): Unit = isSelected = setSelect
-
-  val imageView: ImageView = UIUtils.imageToImageView(bufferedImage)
 
   def setOpacity(v: Double): Unit = imageView.setOpacity(v)
 
@@ -37,7 +32,7 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
     imageView.setRotate(imageView.getRotate + degrees)
   }
 
-  def bind(pane: Pane): Image = {
+  def bindTo(pane: Pane): Image = {
     imageView.fitWidthProperty().bind(pane.widthProperty().subtract(100))
     imageView.fitHeightProperty().bind(pane.heightProperty().subtract(100))
     imageView.setPreserveRatio(true)

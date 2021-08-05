@@ -124,7 +124,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     override def onChanged(change: ListChangeListener.Change[_ <: Image]): Unit = {
       while (change.next) {
         if (change.wasAdded() || change.wasRemoved())
-          centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bind centerPane).imageView)
+          centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
         if (centerPane.children.isEmpty)
           selectPane.children = openOnStack
         else
@@ -170,15 +170,10 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def testMe(): Unit = ImageManager.operate(Operations.div(5))
 
-  override def layerTest(): Unit = ImageManager.operate(Operations.sub(0.005))
-    //{
-  //    val img = ImageManager.imageBuffer.head
-  //    println(img.name)
-  //    val o1 = Operations.sub(0.005)
-  //    val img2 = o1(img)
-  //    ImageManager.imageBuffer.addOne(img2)
-  //  }
-
+  override def layerTest(): Unit = {
+    // refresh
+    centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
+  }
 }
 
 object MainControllerApp extends JFXApp3 {
