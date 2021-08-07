@@ -36,8 +36,7 @@ object ImageManager {
   def swap(image1: Image, image2: Image): Unit = {
     def updateSingle(image: Image, newIndex: Int): Unit = {
       imageBuffer.update(newIndex, image)
-      image.index = newIndex
-      image.cardView.updateIndex()
+      image.setIndex(newIndex)
     }
     val index1 = image1.index
     val index2 = image2.index
@@ -45,11 +44,16 @@ object ImageManager {
     updateSingle(image2, index1)
   }
 
+  def updateIndexes(): Unit = imageBuffer.foreach(img => img.setIndex(imageBuffer.indexOf(img)))
+
   def moveUp(image: Image): Unit = if (image.index != 0) swap(image, imageAt(image.index - 1))
 
   def moveDown(image: Image): Unit = if (image.index != size - 1) swap(image, imageAt(image.index + 1))
 
-  def remove(image: Image): Unit = imageBuffer.remove(image)
+  def remove(image: Image): Unit = {
+    imageBuffer.remove(image)
+    updateIndexes()
+  }
 
   def duplicate(image: Image): Unit = imageBuffer.addOne(image.copy(false))
 

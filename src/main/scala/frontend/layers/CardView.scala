@@ -4,7 +4,6 @@ import backend.layers.{Image, ImageManager}
 import frontend.utils.UIUtils
 import javafx.beans.value
 import javafx.beans.value.ObservableValue
-import javafx.event.ActionEvent
 import scalafx.scene.control.ListCell
 import scalafx.scene.image.ImageView
 import scalafxml.core.{DependenciesByType, FXMLLoader}

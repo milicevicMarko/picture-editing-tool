@@ -14,6 +14,11 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   def this(path: String) = this(FileImport.loadImage(path), path)
   def copy(useSameIndex: Boolean = true): Image = if (useSameIndex) new Image(bufferedImage, path, index) else new Image(bufferedImage, path)
 
+  def setIndex(index: Int): Unit = {
+    this.index = index
+    cardView.updateIndex()
+  }
+
   def getImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
   def getPath: String = path
   val name: String = new File(path).getName
