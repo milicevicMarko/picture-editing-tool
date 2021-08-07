@@ -12,6 +12,7 @@ trait Constants {
   val PictureExtensionFilter: ExtensionFilter = new ExtensionFilter("Picture", Extensions)
   val Title = "File Browser"
   val DefaultPath: String = System.getProperty("user.home")
+  val DebugPath: String = "src/test/test_images"
 
   def getDirectoryFromFile(file: File): File = new File(file.getPath + "/..")
 }
@@ -21,7 +22,7 @@ object FileBrowser extends Constants {
 
   val fileChooser: FileChooser = new FileChooser {
       title = Title
-      initialDirectory = new File(DefaultPath)
+      initialDirectory = new File(DebugPath)
       extensionFilters.addAll(PictureExtensionFilter)
   }
 
