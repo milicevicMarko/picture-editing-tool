@@ -41,9 +41,6 @@ object ImageManager {
     }
     val index1 = image1.index
     val index2 = image2.index
-//    image1.index = index2
-//    image2.index = index1
-//    imageBuffer.sortWith(_ < _)
     updateSingle(image1, index2)
     updateSingle(image2, index1)
   }
@@ -54,7 +51,7 @@ object ImageManager {
 
   def remove(image: Image): Unit = imageBuffer.remove(image)
 
-  def duplicate(image: Image): Unit = imageBuffer.addOne(image.copy())
+  def duplicate(image: Image): Unit = imageBuffer.addOne(image.copy(false))
 
   def rotate(isRight: Boolean): Unit = selected.foreach(img => img rotate isRight)
 

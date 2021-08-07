@@ -10,9 +10,9 @@ import java.awt.image.BufferedImage
 import java.io.File
 
 // todo create imageview Center and Thumbnail classes
-class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) { //} extends Ordered[Image] {
+class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) {
   def this(path: String) = this(FileImport.loadImage(path), path)
-  def copy(): Image = new Image(bufferedImage, path, index) // todo name should point to copy -> such as duplicate_copy.jpg
+  def copy(useSameIndex: Boolean = true): Image = if (useSameIndex) new Image(bufferedImage, path, index) else new Image(bufferedImage, path)
 
   def getImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
   def getPath: String = path
