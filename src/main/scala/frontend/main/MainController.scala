@@ -1,6 +1,6 @@
 package frontend.main
 
-import backend.engine.Operations
+import backend.engine.{Operation, Operations}
 import backend.io.FileBrowser
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
@@ -12,7 +12,7 @@ import javafx.scene.paint.Color
 import scalafx.Includes._
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, ColorPicker, ListView, ToggleButton}
+import scalafx.scene.control.{Button, ColorPicker, ListView, TextField, ToggleButton}
 import javafx.scene.input.MouseEvent
 import scalafx.scene.layout.{AnchorPane, StackPane}
 import scalafx.scene.shape.Rectangle
@@ -49,7 +49,7 @@ trait MainInterface {
 
 @sfxml
 class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack: Button, layers: ListView[Image],
-                     selectToggleButton: ToggleButton, fillToggleButton: ToggleButton, colorBox: ColorPicker)
+                     selectToggleButton: ToggleButton, fillToggleButton: ToggleButton, colorBox: ColorPicker, textField: TextField)
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
@@ -185,23 +185,31 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   override def layerTest(): Unit = centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
 
   // todo do this with select and with value from text field
-  // todo art
-  // todo critical images keep operations????
-  override def addOp(): Unit = ImageManager.operate(Operations.add(0.05))
+  override def addOp(): Unit = operate(Operations.add)
 
-  override def subOp(): Unit = ImageManager.operate(Operations.sub(0.05))
+  override def subOp(): Unit = operate(Operations.sub)
 
-  override def invSubOp(): Unit = ImageManager.operate(Operations.invSub(1))
+  override def invSubOp(): Unit = operate(Operations.invSub)
 
-  override def mulOp(): Unit = ImageManager.operate(Operations.mul(0.05))
+  override def mulOp(): Unit = operate(Operations.mul)
 
-  override def divOp(): Unit = ImageManager.operate(Operations.div(5))
+  override def divOp(): Unit = operate(Operations.div)
 
-  override def invDivOp(): Unit = ImageManager.operate(Operations.invDiv(1))
+  override def invDivOp(): Unit = operate(Operations.invDiv)
 
   override def invertOp(): Unit = ImageManager.operate(Operations.invSub(1))
 
   override def greyscaleOp(): Unit = ImageManager.operate(Operations.greyscale())
+
+  def operate(op: Double => Operation): Unit = readTextField() match {
+    case None => println("Please enter text field value")
+    case Some(value) => ImageManager.operate(op(value))
+  }
+
+  def readTextField(): Option[Double] = {
+    if (textField.getText.nonEmpty) Some(textField.getText.toDouble) // todo catch errors
+    else None
+  }
 }
 
 object MainControllerApp extends JFXApp3 {
