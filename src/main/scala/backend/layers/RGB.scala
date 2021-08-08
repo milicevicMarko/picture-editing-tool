@@ -17,6 +17,13 @@ case class RGB(red: Double, green: Double, blue: Double) {
   def *(const: Double): RGB = operation(const)((x, y) => x * y)
   def /(const: Double): RGB = operation(const)((x, y) => x / y)
   def /@(const: Double): RGB = operation(const)((x, y) => y / x)
+
+  def pow(const: Double): RGB = operation(const)((x, y) => math.pow(x, y))
+  def log(const: Double): RGB = operation(const)((x, y) => math.log(x) /  math.log(y))
+  def abs: RGB = operation(0)((x, _) => math.abs(x))
+  def min(const: Double): RGB = operation(const)((x,y) => math.min(x, y))
+  def max(const: Double): RGB = operation(const)((x,y) => math.max(x, y))
+
   def toGrey: RGB = operation((red + green + blue) / 3.0)((_, y) => y)
 
   override def toString: String = s"RGB($red, $green, $blue)"

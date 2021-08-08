@@ -32,7 +32,7 @@ trait MainInterface {
   def rotateLeft(): Unit
   def testMe(): Unit
   def swap(): Unit
-  def layerTest(): Unit
+  def refresh(): Unit
   def setFillColor(): Unit
   def toggleFillColor(): Unit
 
@@ -42,6 +42,12 @@ trait MainInterface {
   def mulOp(): Unit
   def divOp(): Unit
   def invDivOp(): Unit
+
+  def powOp(): Unit
+  def logOp(): Unit
+  def maxOp(): Unit
+  def minOp(): Unit
+  def absOp(): Unit
 
   def invertOp(): Unit
   def greyscaleOp(): Unit
@@ -182,7 +188,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   override def testMe(): Unit = ImageManager.operate(Operations.div(5))
 
   // refresh
-  override def layerTest(): Unit = centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
+  override def refresh(): Unit = centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
 
   // todo do this with select and with value from text field
   override def addOp(): Unit = operate(Operations.add)
@@ -197,9 +203,20 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def invDivOp(): Unit = operate(Operations.invDiv)
 
-  override def invertOp(): Unit = ImageManager.operate(Operations.invSub(1))
+  override def powOp(): Unit = operate(Operations.pow)
+
+  override def logOp(): Unit = operate(Operations.log)
+
+  override def maxOp(): Unit = operate(Operations.max)
+
+  override def minOp(): Unit = operate(Operations.min)
+
+  override def absOp(): Unit = ImageManager.operate(Operations.abs())
 
   override def greyscaleOp(): Unit = ImageManager.operate(Operations.greyscale())
+
+  override def invertOp(): Unit = ImageManager.operate(Operations.invSub(1))
+
 
   def operate(op: Double => Operation): Unit = readTextField() match {
     case None => println("Please enter text field value")

@@ -30,6 +30,12 @@ object Operations {
   def div(value: Double): Operation = (i: RGB) => i / value
   def invDiv(value: Double): Operation = (i: RGB) => i /@ value
 
+  def pow(value: Double): Operation = (i: RGB) => i pow value
+  def log(value: Double): Operation = (i: RGB) => i log value
+  def abs(): Operation = (i: RGB) => i.abs
+  def min(value: Double): Operation = (i: RGB) => i min value
+  def max(value: Double): Operation = (i: RGB) => i max value
+
   def greyscale(): Operation = (i: RGB) => (i.toGrey)
 }
 
