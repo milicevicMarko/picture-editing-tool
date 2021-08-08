@@ -52,6 +52,7 @@ trait MainInterface {
 
   def invertOp(): Unit
   def greyscaleOp(): Unit
+  def openComposer(): Unit
 }
 
 @sfxml
@@ -186,20 +187,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   }
 
 
-  override def testMe(): Unit = {
-    // load operations controller
-    val loader = new FXMLLoader(getClass.getResource("../operations/resources/operations.fxml"), new DependenciesByType(Map()))
-    loader.load()
-    val root: Parent = loader.getRoot[jfxs.Parent]
-    loader.getController[OperationsController]
-
-    val dialogStage = new Stage()
-    dialogStage.scene = new Scene(root)
-    dialogStage.initOwner(stage)
-    dialogStage.initModality(Modality.ApplicationModal)
-    dialogStage.title = "Operation Composer"
-    dialogStage.showAndWait()
-  }
+  override def testMe(): Unit = ???
 
   // refresh
   override def refresh(): Unit = centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
@@ -240,6 +228,20 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   def readTextField(): Option[Double] = {
     if (textField.getText.nonEmpty) Some(textField.getText.toDouble) // todo catch errors
     else None
+  }
+
+  override def openComposer(): Unit = {
+    val loader = new FXMLLoader(getClass.getResource("../operations/resources/operations.fxml"), new DependenciesByType(Map()))
+    loader.load()
+    val root: Parent = loader.getRoot[jfxs.Parent]
+    loader.getController[OperationsController]
+
+    val dialogStage = new Stage()
+    dialogStage.scene = new Scene(root)
+    dialogStage.initOwner(stage)
+    dialogStage.initModality(Modality.ApplicationModal)
+    dialogStage.title = "Operation Composer"
+    dialogStage.showAndWait()
   }
 }
 

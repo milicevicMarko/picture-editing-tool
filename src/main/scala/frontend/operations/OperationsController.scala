@@ -20,8 +20,9 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
                            listOfOperations: ListView[String], doneButton: Button) extends OperationsControllerInterface {
 //("add", "sub", "inv sub", "mul", "div", "inv div") grey, inverter etc?
   val basics: ObservableList[String] = new ObservableBuffer[String]()
-  val tempBasics = List("add", "sub", "inv sub", "mul", "div", "inv div")
-  tempBasics.foreach(op => basics.add(op))
+  basics.addAll("add", "sub", "inv sub", "mul", "div", "inv div")
+//  val tempBasics = List(
+//  tempBasics.foreach(op => basics.add(op))
 
   val composites: ObservableList[String] = new ObservableBuffer[String]()
   CompositeDB.composites.map(comp => composites.add(comp.toString))
