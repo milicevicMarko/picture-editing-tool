@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontend.operations.OperationsController">
+   <bottom>
+      <GridPane BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="305.0" minWidth="10.0" prefWidth="305.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="168.0" minWidth="0.0" prefWidth="81.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <HBox alignment="CENTER" prefHeight="30.0" prefWidth="246.0" spacing="20.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#addOperation" text="Add" />
+                  <Button mnemonicParsing="false" onAction="#removeOperation" text="Remove" />
+                  <Button mnemonicParsing="false" onAction="#clearList" text="Clear" />
+               </children>
+            </HBox>
+            <Button mnemonicParsing="false" onAction="#done" text="Done" GridPane.columnIndex="3" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" top="5.0" />
+         </padding>
+      </GridPane>
+   </bottom>
+   <left>
+      <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Choose operations for composite:">
+               <padding>
+                  <Insets bottom="20.0" />
+               </padding>
+            </Label>
+            <Accordion>
+              <panes>
+                <TitledPane animated="false" text="Basic">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <ListView fx:id="listOfBasics" layoutY="-1.0" prefHeight="351.0" prefWidth="600.0" />
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </TitledPane>
+                <TitledPane animated="false" text="Complex">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="192.0" prefWidth="244.0">
+                           <children>
+                              <ListView fx:id="listOfComposites" prefHeight="321.0" prefWidth="246.0" />
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </TitledPane>
+              </panes>
+            </Accordion>
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+         <padding>
+            <Insets bottom="5.0" left="30.0" right="5.0" top="5.0" />
+         </padding>
+      </VBox>
+   </left>
+   <center>
+      <AnchorPane prefHeight="370.0" prefWidth="365.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label layoutX="115.0" layoutY="47.0" text="Name of the composite:" />
+            <TextField fx:id="nameTextField" layoutX="79.0" layoutY="74.0" prefHeight="25.0" prefWidth="199.0" />
+            <ListView fx:id="listOfOperations" layoutX="78.0" layoutY="121.0" prefHeight="200.0" prefWidth="200.0" />
+         </children>
+      </AnchorPane>
+   </center>
+</BorderPane>

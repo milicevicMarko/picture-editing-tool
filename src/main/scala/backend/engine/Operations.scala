@@ -2,6 +2,7 @@ package backend.engine
 
 import backend.layers.{Image, RGB}
 
+import scala.collection.mutable.ListBuffer
 import scala.language.implicitConversions
 
 case class Operation(op: RGB => RGB) {
@@ -16,8 +17,15 @@ case class Operation(op: RGB => RGB) {
   }
 }
 
-class CompositeOperation(val operations: List[Operation]) {
+class CompositeOperation(val name: String, val operations: List[Operation]) {
   def apply(image: Image): Image = operations.foldLeft(image)((img, op) => op.apply(img))
+
+  override def toString: String = name
+}
+
+object CompositeDB {
+  val composites: ListBuffer[CompositeOperation] = new ListBuffer[CompositeOperation]
+  composites.addOne(new CompositeOperation("test", Nil))
 }
 
 object Operations {

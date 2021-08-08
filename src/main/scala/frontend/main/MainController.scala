@@ -5,6 +5,7 @@ import backend.io.FileBrowser
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
 import frontend.layers.CardListView
+import frontend.operations.OperationsController
 import javafx.collections.ListChangeListener
 import javafx.scene.{Parent, input}
 import javafx.{scene => jfxs}
@@ -16,7 +17,7 @@ import scalafx.scene.control.{Button, ColorPicker, ListView, TextField, ToggleBu
 import javafx.scene.input.MouseEvent
 import scalafx.scene.layout.{AnchorPane, StackPane}
 import scalafx.scene.shape.Rectangle
-import scalafx.stage.{Stage, WindowEvent}
+import scalafx.stage.{Modality, Stage, WindowEvent}
 import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
 
@@ -57,7 +58,7 @@ trait MainInterface {
 class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack: Button, layers: ListView[Image],
                      selectToggleButton: ToggleButton, fillToggleButton: ToggleButton, colorBox: ColorPicker, textField: TextField)
   extends MainInterface {
-  val stage: Stage = MainControllerApp.stage
+  var stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
 
   val selectRectangles = new ListBuffer[Rectangle]
@@ -185,7 +186,20 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   }
 
 
-  override def testMe(): Unit = ImageManager.operate(Operations.div(5))
+  override def testMe(): Unit = {
+    // load operations controller
+    val loader = new FXMLLoader(getClass.getResource("../operations/resources/operations.fxml"), new DependenciesByType(Map()))
+    loader.load()
+    val root: Parent = loader.getRoot[jfxs.Parent]
+    loader.getController[OperationsController]
+
+    val dialogStage = new Stage()
+    dialogStage.scene = new Scene(root)
+    dialogStage.initOwner(stage)
+    dialogStage.initModality(Modality.ApplicationModal)
+    dialogStage.title = "Operation Composer"
+    dialogStage.showAndWait()
+  }
 
   // refresh
   override def refresh(): Unit = centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
