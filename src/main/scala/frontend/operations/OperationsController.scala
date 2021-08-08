@@ -4,7 +4,8 @@ import backend.engine.{CompositeDB, CompositeOperation, Operations}
 import javafx.collections.ObservableList
 import javafx.stage.Stage
 import scalafx.collections.ObservableBuffer
-import scalafx.scene.control.{Button, ListView, TextField}
+import scalafx.scene.control.Alert.AlertType
+import scalafx.scene.control.{Alert, Button, ButtonType, ListView, TextField}
 import scalafxml.core.{DependenciesByType, FXMLLoader}
 import scalafxml.core.macros.sfxml
 
@@ -18,11 +19,10 @@ trait OperationsControllerInterface {
 @sfxml
 class OperationsController(listOfBasics: ListView[String], listOfComposites: ListView[String], nameTextField: TextField,
                            listOfOperations: ListView[String], doneButton: Button) extends OperationsControllerInterface {
-//("add", "sub", "inv sub", "mul", "div", "inv div") grey, inverter etc?
+  // todo grey, inverter etc?
   val basics: ObservableList[String] = new ObservableBuffer[String]()
   basics.addAll("add", "sub", "inv sub", "mul", "div", "inv div")
-//  val tempBasics = List(
-//  tempBasics.foreach(op => basics.add(op))
+
 
   val composites: ObservableList[String] = new ObservableBuffer[String]()
   CompositeDB.composites.map(comp => composites.add(comp.toString))
@@ -30,17 +30,63 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
   listOfBasics.setItems(basics)
   listOfComposites.setItems(composites)
 
-  override def addOperation(): Unit = println(listOfBasics.getSelectionModel.getSelectedItem)
+  override def addOperation(): Unit = {
+    def getSelected(list: ListView[String]): String = if (list.getSelectionModel.getSelectedItems.size() > 0) list.getSelectionModel.getSelectedItem else ""
+    def foldSelected(list: List[ListView[String]]): String = list.foldLeft("")((s, ls) => s + getSelected(ls))
+    def deselect(list: ListView[String]): Unit = list.getSelectionModel.clearSelection()
+    def deselectAll(list: List[ListView[String]]): Unit = list.foreach(l => deselect(l))
 
-  override def removeOperation(): Unit = println(listOfBasics.getSelectionModel.getSelectedItem)
+    val all: List[ListView[String]] = listOfBasics::listOfComposites::Nil
+    listOfOperations.getItems.add(foldSelected(all))
+    deselectAll(all)
+  }
 
-  override def clearList(): Unit = println("Empty")
+  override def removeOperation(): Unit = {
+    listOfOperations.getItems.remove(listOfOperations.getSelectionModel.getSelectedItem)
+  }
+
+  override def clearList(): Unit = listOfOperations.getItems.clear()
+
+  def close(): Unit = {
+    val stage: javafx.stage.Stage = listOfOperations.getScene.getWindow.asInstanceOf[Stage]
+    stage.close()
+  }
+
+  def nameEmptyAlert(): Boolean = {
+    val alert = new Alert(AlertType.Warning) {
+      initOwner(listOfOperations.getScene.getWindow.asInstanceOf[Stage])
+      title = "Confirmation Dialog"
+      headerText = "The Name of the composite function has been left empty. Continuing will NOT save the composite function!"
+      contentText = "Are you sure you want to continue?"
+    }
+
+    alertResult(alert)
+  }
+
+  def compositeListEmptyAlert(name: String): Boolean = {
+    val alert = new Alert(AlertType.Warning) {
+      initOwner(listOfOperations.getScene.getWindow.asInstanceOf[Stage])
+      title = "Confirmation Dialog"
+      headerText = s"The $name composite function is empty. Continuing will NOT save the composite function!"
+      contentText = "Are you sure you want to continue?"
+    }
+
+    alertResult(alert)
+  }
+
+  private def alertResult(alert: Alert) = alert.showAndWait() match {
+    case Some(ButtonType.OK) => true
+    case _ => false
+  }
 
   override def done(): Unit = {
     val name = nameTextField.getText
-    listOfOperations.getItems.forEach(i => println(i))
-    val stage: javafx.stage.Stage = listOfOperations.getScene.getWindow.asInstanceOf[Stage]
-    stage.close()
+    if (name.isEmpty && nameEmptyAlert()) close()
+    if (name.nonEmpty && listOfOperations.getItems.isEmpty && compositeListEmptyAlert(name)) close()
+    if (name.nonEmpty && !listOfOperations.getItems.isEmpty) {
+      println(s"Save composite $name(${listOfOperations.getItems.toString})")
+      close()
+    }
   }
 
 }
