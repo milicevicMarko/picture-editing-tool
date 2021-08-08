@@ -4,13 +4,13 @@ import backend.layers.{Image, RGB}
 
 import scala.language.implicitConversions
 
-case class Operation(f: RGB => RGB) {
-  def andThen(that: Operation): Operation = Operation(this.f andThen that.f)
+case class Operation(op: RGB => RGB) {
+  def andThen(that: Operation): Operation = Operation(this.op andThen that.op)
   def apply(image: Image): Image = {
     val img = image.getImage
     for (x <- 0 until img.getWidth;
          y <- 0 until img.getHeight) {
-      img.setRGB(x, y, f(img.getRGB(x, y)))
+      img.setRGB(x, y, op(img.getRGB(x, y)))
     }
     image.copy()
   }

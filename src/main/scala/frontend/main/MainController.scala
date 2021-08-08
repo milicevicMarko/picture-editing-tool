@@ -187,13 +187,13 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   // todo do this with select and with value from text field
   // todo art
   // todo critical images keep operations????
-  override def addOp(): Unit = ImageManager.operate(Operations.add(0.005))
+  override def addOp(): Unit = ImageManager.operate(Operations.add(0.05))
 
-  override def subOp(): Unit = ImageManager.operate(Operations.sub(0.005))
+  override def subOp(): Unit = ImageManager.operate(Operations.sub(0.05))
 
   override def invSubOp(): Unit = ImageManager.operate(Operations.invSub(1))
 
-  override def mulOp(): Unit = ImageManager.operate(Operations.mul(0.005))
+  override def mulOp(): Unit = ImageManager.operate(Operations.mul(0.05))
 
   override def divOp(): Unit = ImageManager.operate(Operations.div(5))
 
