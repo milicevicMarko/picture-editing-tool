@@ -19,9 +19,8 @@ trait OperationsControllerInterface {
 }
 
 @sfxml
-class OperationsController(listOfBasics: ListView[String], listOfComposites: ListView[String], nameTextField: TextField,
-                           listOfOperations: ListView[String], functionArgument: TextField, doneButton: Button) extends OperationsControllerInterface {
-  // todo grey, inverter etc?
+class OperationsController(listOfBasics: ListView[String], listOfComposites: ListView[String], listOfFunctions: ListView[String],
+                           nameTextField: TextField, listOfOperations: ListView[String], functionArgument: TextField, doneButton: Button) extends OperationsControllerInterface {
   val basics: ObservableList[String] = new ObservableBuffer[String]()
   basics.addAll("add", "sub", "inv sub", "mul", "div", "inv div")
 
@@ -29,8 +28,12 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
   val composites: ObservableList[String] = new ObservableBuffer[String]()
   CompositeDB.composites.map(comp => composites.add(comp.name))
 
+  val functions: ObservableList[String] = new ObservableBuffer[String]()
+  functions.addAll("pow", "log", "abs", "min", "max", "greyscale", "invert")
+
   listOfBasics.setItems(basics)
   listOfComposites.setItems(composites)
+  listOfFunctions.setItems(functions)
 
   override def addOperation(): Unit = {
     def getSelected(arg: String, list: ListView[String]): String = if (list.getSelectionModel.getSelectedItems.size() > 0) s"${list.getSelectionModel.getSelectedItem}($arg)"  else ""
@@ -41,7 +44,7 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
     if (functionArgument.getText.nonEmpty) {
       val arg = functionArgument.getText
       functionArgument.clear()
-      val all: List[ListView[String]] = listOfBasics::listOfComposites::Nil
+      val all: List[ListView[String]] = listOfBasics::listOfFunctions::listOfComposites::Nil
       listOfOperations.getItems.add(foldSelected(arg, all))
       deselectAll(all)
     }
