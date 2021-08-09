@@ -9,38 +9,23 @@
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frontend.operations.OperationsController">
    <bottom>
-      <GridPane BorderPane.alignment="CENTER">
-        <columnConstraints>
-          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="305.0" minWidth="10.0" prefWidth="305.0" />
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="168.0" minWidth="0.0" prefWidth="81.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
+      <HBox alignment="CENTER" spacing="50.0" BorderPane.alignment="CENTER">
          <children>
-            <HBox alignment="CENTER" prefHeight="30.0" prefWidth="246.0" spacing="20.0">
-               <children>
-                  <Button mnemonicParsing="false" onAction="#addOperation" text="Add" />
-                  <Button mnemonicParsing="false" onAction="#removeOperation" text="Remove" />
-                  <Button mnemonicParsing="false" onAction="#clearList" text="Clear" />
-               </children>
-            </HBox>
-            <Button mnemonicParsing="false" onAction="#done" text="Done" GridPane.columnIndex="3" />
+            <Button mnemonicParsing="false" onAction="#addOperation" text="Add" />
+            <TextField fx:id="functionArgument" prefHeight="25.0" prefWidth="104.0" />
+            <Button mnemonicParsing="false" onAction="#removeOperation" text="Remove" />
+            <Button mnemonicParsing="false" onAction="#clearList" text="Clear" />
+            <Button mnemonicParsing="false" onAction="#done" text="Done" />
          </children>
          <padding>
-            <Insets bottom="5.0" top="5.0" />
+            <Insets bottom="10.0" top="10.0" />
          </padding>
-      </GridPane>
+      </HBox>
    </bottom>
    <left>
       <VBox alignment="CENTER" BorderPane.alignment="CENTER">
@@ -61,6 +46,15 @@
                         </AnchorPane>
                   </content>
                 </TitledPane>
+                  <TitledPane animated="false" layoutX="10.0" layoutY="35.0" text="Functions">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="192.0" prefWidth="244.0">
+                           <children>
+                              <ListView fx:id="listOfFunctions" prefHeight="321.0" prefWidth="246.0" />
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </TitledPane>
                 <TitledPane animated="false" text="Complex">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="192.0" prefWidth="244.0">

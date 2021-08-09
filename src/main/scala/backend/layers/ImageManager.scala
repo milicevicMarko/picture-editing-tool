@@ -1,6 +1,6 @@
 package backend.layers
 
-import backend.engine.BaseOperation
+import backend.engine.{BaseOperation, CompositeOperation}
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.image.ImageView
 

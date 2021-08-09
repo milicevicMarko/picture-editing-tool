@@ -1,12 +1,12 @@
 package frontend.main
 
-import backend.engine.{BaseOperation, Operations}
+import backend.engine.{BaseOperation, CompositeDB, Operations}
 import backend.io.FileBrowser
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
 import frontend.layers.CardListView
 import frontend.operations.OperationsController
-import javafx.collections.ListChangeListener
+import javafx.collections.{ListChangeListener, ObservableList}
 import javafx.scene.{Parent, input}
 import javafx.{scene => jfxs}
 import javafx.scene.paint.Color
@@ -15,6 +15,7 @@ import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ColorPicker, ListView, TextField, ToggleButton}
 import javafx.scene.input.MouseEvent
+import scalafx.collections.ObservableBuffer
 import scalafx.scene.layout.{AnchorPane, StackPane}
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.{Modality, Stage, WindowEvent}
@@ -53,14 +54,17 @@ trait MainInterface {
   def invertOp(): Unit
   def greyscaleOp(): Unit
   def openComposer(): Unit
+  def useComposite(): Unit
 }
 
 @sfxml
 class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack: Button, layers: ListView[Image],
-                     selectToggleButton: ToggleButton, fillToggleButton: ToggleButton, colorBox: ColorPicker, textField: TextField)
+                     selectToggleButton: ToggleButton, fillToggleButton: ToggleButton, colorBox: ColorPicker,
+                     textField: TextField, compositeList: ListView[String])
   extends MainInterface {
   var stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
+  updateComposites()
 
   val selectRectangles = new ListBuffer[Rectangle]
   def selectRectangle: Rectangle = selectRectangles.last
@@ -242,6 +246,20 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     dialogStage.initModality(Modality.ApplicationModal)
     dialogStage.title = "Operation Composer"
     dialogStage.showAndWait()
+    updateComposites()
+  }
+
+  def updateComposites(): Unit = {
+    compositeList.items = CompositeDB.getObservables
+  }
+
+  override def useComposite(): Unit = {
+    if (compositeList.getSelectionModel.getSelectedItems.size() > 0) {
+      val name = compositeList.getSelectionModel.getSelectedItem
+      compositeList.getSelectionModel.clearSelection()
+      val composite = CompositeDB.findComposite(name)
+      ImageManager.operate(composite)
+    }
   }
 }
 

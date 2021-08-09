@@ -20,7 +20,7 @@ trait OperationsControllerInterface {
 
 @sfxml
 class OperationsController(listOfBasics: ListView[String], listOfComposites: ListView[String], nameTextField: TextField,
-                           listOfOperations: ListView[String], doneButton: Button) extends OperationsControllerInterface {
+                           listOfOperations: ListView[String], functionArgument: TextField, doneButton: Button) extends OperationsControllerInterface {
   // todo grey, inverter etc?
   val basics: ObservableList[String] = new ObservableBuffer[String]()
   basics.addAll("add", "sub", "inv sub", "mul", "div", "inv div")
@@ -33,14 +33,18 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
   listOfComposites.setItems(composites)
 
   override def addOperation(): Unit = {
-    def getSelected(list: ListView[String]): String = if (list.getSelectionModel.getSelectedItems.size() > 0) list.getSelectionModel.getSelectedItem else ""
-    def foldSelected(list: List[ListView[String]]): String = list.foldLeft("")((s, ls) => s + getSelected(ls))
+    def getSelected(arg: String, list: ListView[String]): String = if (list.getSelectionModel.getSelectedItems.size() > 0) s"${list.getSelectionModel.getSelectedItem}($arg)"  else ""
+    def foldSelected(arg: String, list: List[ListView[String]]): String = list.foldLeft("")((s, ls) => s + getSelected(arg, ls))
     def deselect(list: ListView[String]): Unit = list.getSelectionModel.clearSelection()
     def deselectAll(list: List[ListView[String]]): Unit = list.foreach(l => deselect(l))
 
-    val all: List[ListView[String]] = listOfBasics::listOfComposites::Nil
-    listOfOperations.getItems.add(foldSelected(all))
-    deselectAll(all)
+    if (functionArgument.getText.nonEmpty) {
+      val arg = functionArgument.getText
+      functionArgument.clear()
+      val all: List[ListView[String]] = listOfBasics::listOfComposites::Nil
+      listOfOperations.getItems.add(foldSelected(arg, all))
+      deselectAll(all)
+    }
   }
 
   override def removeOperation(): Unit = {
@@ -84,8 +88,11 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
   @tailrec
   private def getOperations(acc: List[BaseOperation], nameList: List[String]): List[BaseOperation] = nameList match {
     case Nil => acc
-    // todo add text field for values i guess
-    case x::xs => getOperations(Operations.call(x)(0.005)::acc, nameList.tail)
+    case x::xs =>
+      val funName: String = x.split('(')(0)
+      val funArg: Double = x.split('(')(1).split(')')(0).toDouble
+      val function: BaseOperation = Operations.call(funName)(funArg)
+      getOperations(function::acc, nameList.tail)
   }
 
   override def done(): Unit = {

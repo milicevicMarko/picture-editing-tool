@@ -1,6 +1,8 @@
 package backend.engine
 
 import backend.layers.{Image, RGB}
+import javafx.collections.ObservableList
+import scalafx.collections.ObservableBuffer
 
 import scala.collection.mutable.ListBuffer
 
@@ -33,7 +35,14 @@ class CompositeOperation(name: String, operations: List[BaseOperation]) extends 
 
 object CompositeDB {
   val composites: ListBuffer[CompositeOperation] = new ListBuffer[CompositeOperation]
-  composites.addOne(new CompositeOperation("test", Nil))
+
+  def getObservables: ObservableList[String] = {
+    val buffer: ObservableList[String] = new ObservableBuffer[String]()
+    composites.foreach(comp => buffer.add(comp.name))
+    buffer
+  }
+
+  def findComposite(name: String): BaseOperation = composites.find(c => c.name == name).get
 }
 
 object Operations {
@@ -48,10 +57,10 @@ object Operations {
 
   def pow(value: Double): BaseOperation = new SimpleOperation("pow", (i: RGB) => i pow value)
   def log(value: Double): BaseOperation = new SimpleOperation("log", (i: RGB) => i log value)
-  def abs(value: Double = 0): BaseOperation = new SimpleOperation("abs", (i: RGB) => i.abs)
   def min(value: Double): BaseOperation = new SimpleOperation("min", (i: RGB) => i min value)
   def max(value: Double): BaseOperation = new SimpleOperation("max", (i: RGB) => i max value)
 
+  def abs(value: Double = 0): BaseOperation = new SimpleOperation("abs", (i: RGB) => i.abs)
   def greyscale(value: Double = 0): BaseOperation =new SimpleOperation("greyscale", (i: RGB) => (i.toGrey))
   def invert(value: Double = 0): BaseOperation = Operations.invSub(1)
 
@@ -68,14 +77,7 @@ object Operations {
     case "max" => max
     case "greyscale" => greyscale
     case "invert" => invert
-    case _ =>
-      // todo add composite to db and then find it
-      println("Find in DB")
-      add
   }
 
-  def createComposite(name: String, ops: List[BaseOperation]): Unit = {
-    CompositeDB.composites.addOne(new CompositeOperation(name, ops))
-    println(CompositeDB.composites.foreach(c => println(c)))
-  }
+  def createComposite(name: String, ops: List[BaseOperation]): Unit = CompositeDB.composites.addOne(new CompositeOperation(name, ops))
 }
