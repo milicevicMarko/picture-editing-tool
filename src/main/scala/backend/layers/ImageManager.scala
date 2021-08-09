@@ -1,6 +1,6 @@
 package backend.layers
 
-import backend.engine.Operation
+import backend.engine.BaseOperation
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.image.ImageView
 
@@ -59,9 +59,9 @@ object ImageManager {
 
   def rotate(isRight: Boolean): Unit = selected.foreach(img => img rotate isRight)
 
-  def operate(op: Operation): Unit = selected.foreach(image => imageBuffer.update(image.index, op(image)))
+  def operate(op: BaseOperation): Unit = selected.foreach(image => imageBuffer.update(image.index, op(image)))
 
-  def usefulDebug(op: Operation): Unit = {
+  def usefulDebug(op: BaseOperation): Unit = {
     val rgbIntBefore = imageAt(0).getImage.getRGB(0,0)
     val rgbBefore = RGB.toRGB(rgbIntBefore)
     println(s"Before: $rgbIntBefore, $rgbBefore")

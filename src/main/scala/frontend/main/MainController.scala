@@ -1,6 +1,6 @@
 package frontend.main
 
-import backend.engine.{Operation, Operations}
+import backend.engine.{BaseOperation, Operations}
 import backend.io.FileBrowser
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
@@ -220,7 +220,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   override def invertOp(): Unit = ImageManager.operate(Operations.invSub(1))
 
 
-  def operate(op: Double => Operation): Unit = readTextField() match {
+  def operate(op: Double => BaseOperation): Unit = readTextField() match {
     case None => println("Please enter text field value")
     case Some(value) => ImageManager.operate(op(value))
   }

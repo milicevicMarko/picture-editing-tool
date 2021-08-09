@@ -1,6 +1,6 @@
 package frontend.operations
 
-import backend.engine.{CompositeDB, CompositeOperation, Operation, Operations}
+import backend.engine.{CompositeDB, CompositeOperation, BaseOperation, Operations}
 import javafx.collections.ObservableList
 import javafx.stage.Stage
 import scalafx.collections.ObservableBuffer
@@ -82,7 +82,7 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
   }
 
   @tailrec
-  private def getOperations(acc: List[Double => Operation], nameList: List[String]): List[Double => Operation] = nameList match {
+  private def getOperations(acc: List[Double => BaseOperation], nameList: List[String]): List[Double => BaseOperation] = nameList match {
     case Nil => acc
     case x::xs => getOperations(Operations.call(x)::acc, nameList.tail)
   }
