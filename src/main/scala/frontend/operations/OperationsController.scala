@@ -1,6 +1,6 @@
 package frontend.operations
 
-import backend.engine.{CompositeDB, CompositeOperation, Operations}
+import backend.engine.{CompositeDB, CompositeOperation, Operation, Operations}
 import javafx.collections.ObservableList
 import javafx.stage.Stage
 import scalafx.collections.ObservableBuffer
@@ -8,6 +8,8 @@ import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control.{Alert, Button, ButtonType, ListView, TextField}
 import scalafxml.core.{DependenciesByType, FXMLLoader}
 import scalafxml.core.macros.sfxml
+
+import scala.annotation.tailrec
 
 trait OperationsControllerInterface {
   def addOperation(): Unit
@@ -79,11 +81,20 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
     case _ => false
   }
 
+  @tailrec
+  private def getOperations(acc: List[Double => Operation], nameList: List[String]): List[Double => Operation] = nameList match {
+    case Nil => acc
+    case x::xs => getOperations(Operations.call(x)::acc, nameList.tail)
+  }
+
   override def done(): Unit = {
     val name = nameTextField.getText
     if (name.isEmpty && nameEmptyAlert()) close()
     if (name.nonEmpty && listOfOperations.getItems.isEmpty && compositeListEmptyAlert(name)) close()
     if (name.nonEmpty && !listOfOperations.getItems.isEmpty) {
+      val strList = listOfOperations.getItems.toArray.map(s => s.toString).toList
+      val opList = getOperations(Nil, strList)
+      println(opList)
       println(s"Save composite $name(${listOfOperations.getItems.toString})")
       close()
     }

@@ -45,6 +45,14 @@ object Operations {
   def max(value: Double): Operation = (i: RGB) => i max value
 
   def greyscale(): Operation = (i: RGB) => (i.toGrey)
+
+  def call(name: String): Double => Operation = name match {
+    case "add" => add
+    case "sub" => sub
+    case "inv sub" => invSub
+    case "mul" => mul
+    case "inv div" => invDiv
+  }
 }
 
 object a extends App {
