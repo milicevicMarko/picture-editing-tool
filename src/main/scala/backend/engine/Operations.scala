@@ -24,6 +24,11 @@ class SimpleOperation(name: String, operation: RGB => RGB) extends BaseOperation
 
 class CompositeOperation(name: String, operations: List[BaseOperation]) extends BaseOperation(name) {
   override def operate(acc: RGB): RGB = operations.foldLeft(acc)((rgb, bo) => bo.operate(rgb))
+
+  override def toString: String = {
+    super.toString
+    operations.foldLeft("")((s, op) => op.toString + " ")
+  }
 }
 
 object CompositeDB {
@@ -40,12 +45,15 @@ object Operations {
   def mul(value: Double): BaseOperation = new SimpleOperation("mul", (i: RGB) => i * value)
   def div(value: Double): BaseOperation = new SimpleOperation("div", (i: RGB) => i / value)
   def invDiv(value: Double): BaseOperation = new SimpleOperation("inv div", (i: RGB) => i /@ value)
+
   def pow(value: Double): BaseOperation = new SimpleOperation("pow", (i: RGB) => i pow value)
   def log(value: Double): BaseOperation = new SimpleOperation("log", (i: RGB) => i log value)
-  def abs(): BaseOperation = new SimpleOperation("abs", (i: RGB) => i.abs)
+  def abs(value: Double = 0): BaseOperation = new SimpleOperation("abs", (i: RGB) => i.abs)
   def min(value: Double): BaseOperation = new SimpleOperation("min", (i: RGB) => i min value)
   def max(value: Double): BaseOperation = new SimpleOperation("max", (i: RGB) => i max value)
-  def greyscale(): BaseOperation =new SimpleOperation("greyscale", (i: RGB) => (i.toGrey))
+
+  def greyscale(value: Double = 0): BaseOperation =new SimpleOperation("greyscale", (i: RGB) => (i.toGrey))
+  def invert(value: Double = 0): BaseOperation = Operations.invSub(1)
 
   def call(name: String): Double => BaseOperation = name match {
     case "add" => add
@@ -53,5 +61,21 @@ object Operations {
     case "inv sub" => invSub
     case "mul" => mul
     case "inv div" => invDiv
+    case "pow" => pow
+    case "log" => log
+    case "abs" => abs
+    case "min" => min
+    case "max" => max
+    case "greyscale" => greyscale
+    case "invert" => invert
+    case _ =>
+      // todo add composite to db and then find it
+      println("Find in DB")
+      add
+  }
+
+  def createComposite(name: String, ops: List[BaseOperation]): Unit = {
+    CompositeDB.composites.addOne(new CompositeOperation(name, ops))
+    println(CompositeDB.composites.foreach(c => println(c)))
   }
 }

@@ -217,7 +217,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def greyscaleOp(): Unit = ImageManager.operate(Operations.greyscale())
 
-  override def invertOp(): Unit = ImageManager.operate(Operations.invSub(1))
+  override def invertOp(): Unit = ImageManager.operate(Operations.invert())
 
 
   def operate(op: Double => BaseOperation): Unit = readTextField() match {

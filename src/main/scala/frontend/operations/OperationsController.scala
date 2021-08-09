@@ -27,7 +27,7 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
 
 
   val composites: ObservableList[String] = new ObservableBuffer[String]()
-  CompositeDB.composites.map(comp => composites.add(comp.toString))
+  CompositeDB.composites.map(comp => composites.add(comp.name))
 
   listOfBasics.setItems(basics)
   listOfComposites.setItems(composites)
@@ -82,9 +82,10 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
   }
 
   @tailrec
-  private def getOperations(acc: List[Double => BaseOperation], nameList: List[String]): List[Double => BaseOperation] = nameList match {
+  private def getOperations(acc: List[BaseOperation], nameList: List[String]): List[BaseOperation] = nameList match {
     case Nil => acc
-    case x::xs => getOperations(Operations.call(x)::acc, nameList.tail)
+    // todo add text field for values i guess
+    case x::xs => getOperations(Operations.call(x)(0.005)::acc, nameList.tail)
   }
 
   override def done(): Unit = {
@@ -93,9 +94,8 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
     if (name.nonEmpty && listOfOperations.getItems.isEmpty && compositeListEmptyAlert(name)) close()
     if (name.nonEmpty && !listOfOperations.getItems.isEmpty) {
       val strList = listOfOperations.getItems.toArray.map(s => s.toString).toList
-      val opList = getOperations(Nil, strList)
-      println(opList)
-      println(s"Save composite $name(${listOfOperations.getItems.toString})")
+      val operations = getOperations(Nil, strList)
+      Operations.createComposite(name, operations)
       close()
     }
   }
