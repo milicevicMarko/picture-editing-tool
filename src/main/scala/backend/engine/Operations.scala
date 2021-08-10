@@ -16,7 +16,6 @@ abstract case class BaseOperation(val name: String) {
     }
     image.copy()
   }
-
   override def toString: String = name
 }
 
@@ -31,6 +30,11 @@ class CompositeOperation(name: String, operations: List[BaseOperation]) extends 
     super.toString
     operations.foldLeft("")((s, op) => op.toString + " ")
   }
+}
+
+class FilterOperation(name: String) extends BaseOperation(name) {
+  override def operate(rgb: RGB): RGB = rgb
+  // todo wtf should i do ahhaha
 }
 
 object CompositeDB {
@@ -60,6 +64,7 @@ object Operations {
   def min(value: Double): BaseOperation = new SimpleOperation("min", (i: RGB) => i min value)
   def max(value: Double): BaseOperation = new SimpleOperation("max", (i: RGB) => i max value)
 
+  def limit(value: Double = 0): BaseOperation = new SimpleOperation("limit", (i: RGB) => i.limit)
   def abs(value: Double = 0): BaseOperation = new SimpleOperation("abs", (i: RGB) => i.abs)
   def greyscale(value: Double = 0): BaseOperation =new SimpleOperation("greyscale", (i: RGB) => (i.toGrey))
   def invert(value: Double = 0): BaseOperation = Operations.invSub(1)
@@ -77,6 +82,7 @@ object Operations {
     case "max" => max
     case "greyscale" => greyscale
     case "invert" => invert
+    case "limit" => limit
   }
 
   def createComposite(name: String, ops: List[BaseOperation]): Unit = CompositeDB.composites.addOne(new CompositeOperation(name, ops))
