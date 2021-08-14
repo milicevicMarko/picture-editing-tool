@@ -9,7 +9,6 @@ import scalafx.scene.layout.Pane
 import java.awt.image.BufferedImage
 import java.io.File
 
-// todo create imageview Center and Thumbnail classes
 class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) {
   def this(path: String) = this(FileImport.loadImage(path), path)
   def this(path: String, index: Int) = this(FileImport.loadImage(path), path, index)

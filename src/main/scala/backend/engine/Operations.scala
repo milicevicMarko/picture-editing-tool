@@ -85,5 +85,12 @@ object Operations {
     case "limit" => limit
   }
 
+  def needsArgument(op: Double => BaseOperation): Boolean = needsArgument(op(0).name)
+
+  def needsArgument(name: String): Boolean = name match {
+    case "limit" | "abs" | "greyscale" | "invert" => true
+    case _ => false
+  }
+
   def createComposite(name: String, ops: List[BaseOperation]): Unit = CompositeDB.composites.addOne(new CompositeOperation(name, ops))
 }

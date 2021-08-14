@@ -64,12 +64,14 @@ object ImageManager {
 
   def operate(op: BaseOperation): Unit = selected.foreach(image => imageBuffer.update(image.index, Operations.limit()(op(image))))
 
-  def blend(): Unit = {
-    val blended = activated.foldLeft(Image.emptyImage(activated.head))((img1, img2) => img1 blend img2)
+  def flatten(): Unit = {
+    val blended = blend()
     removeAllActive()
     imageBuffer.addOne(blended)
     updateIndexes()
   }
+
+  def blend(): Image = activated.foldLeft(Image.emptyImage(activated.head))((img1, img2) => img1 blend img2)
 
   def usefulDebug(op: BaseOperation): Unit = {
     val rgbIntBefore = imageAt(0).getImage.getRGB(0,0)

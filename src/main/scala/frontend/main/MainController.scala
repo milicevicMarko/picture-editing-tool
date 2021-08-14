@@ -35,6 +35,8 @@ trait MainInterface {
   def swap(): Unit
   def refresh(): Unit
   def print(): Unit
+  def flatten(): Unit
+
   def setFillColor(): Unit
   def toggleFillColor(): Unit
 
@@ -170,12 +172,6 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   // todo - check if there is unsaved work somehow
   override def close(): Unit = stage.fireEvent(new WindowEvent(stage, WindowEvent.WindowCloseRequest))
 
-//    Engine.getImageOption match {
-//    case Some(_) =>
-//      Engine.pictureTest()
-//    case None => println("Nothing to test")
-//  }
-
   override def rotateRight(): Unit = ImageManager.rotate(true)
 
   override def rotateLeft(): Unit = ImageManager.rotate(false)
@@ -190,8 +186,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     updateLayers()
   }
 
-
-  override def testMe(): Unit = ImageManager.blend()
+  override def testMe(): Unit = println("Nothing is set for debuging")
 
   override def refresh(): Unit = {
     ImageManager.activated.foreach(i => i.refresh())
@@ -199,7 +194,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   }
 
   override def print(): Unit = ImageManager.selected.foreach(i => println(i.getPixel(100, 100)))
-  // todo do this with select and with value from text field
+
   override def addOp(): Unit = operate(Operations.add)
 
   override def subOp(): Unit = operate(Operations.sub)
@@ -226,14 +221,14 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def invertOp(): Unit = ImageManager.operate(Operations.invert())
 
-
   def operate(op: Double => BaseOperation): Unit = readTextField() match {
-    case None => println("Please enter text field value")
     case Some(value) => ImageManager.operate(op(value))
+    case None if !Operations.needsArgument(op) => ImageManager.operate(op(0))
+    case None => println("Please enter text field value")
   }
 
   def readTextField(): Option[Double] = {
-    if (textField.getText.nonEmpty) Some(textField.getText.toDouble) // todo catch errors
+    if (textField.getText.matches("\\d*(\\.\\d+|)")) Some(textField.getText.toDouble)
     else None
   }
 
@@ -264,6 +259,8 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
       ImageManager.operate(composite)
     }
   }
+
+  override def flatten(): Unit = ImageManager.flatten()
 }
 
 object MainControllerApp extends JFXApp3 {
