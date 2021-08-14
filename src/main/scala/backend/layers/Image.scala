@@ -13,7 +13,9 @@ import java.io.File
 class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) {
   def this(path: String) = this(FileImport.loadImage(path), path)
   def this(path: String, index: Int) = this(FileImport.loadImage(path), path, index)
-  def copy(useSameIndex: Boolean = true): Image = if (useSameIndex) new Image(path, index) else new Image(path)
+
+  def copy(sameIndex: Boolean = true): Image = if (sameIndex) new Image(path, index) else new Image(path)
+  def deepCopy() = new Image(bufferedImage, path, index)
 
   def setIndex(index: Int): Unit = {
     this.index = index

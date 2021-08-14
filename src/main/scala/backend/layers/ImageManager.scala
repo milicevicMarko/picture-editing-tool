@@ -60,10 +60,7 @@ object ImageManager {
 
   def rotate(isRight: Boolean): Unit = selected.foreach(img => img rotate isRight)
 
-  def operate(op: BaseOperation): Unit = {
-    selected.foreach(image => imageBuffer.update(image.index, Operations.limit()(op(image))))
-    println(op.name)
-  }
+  def operate(op: BaseOperation): Unit = selected.foreach(image => imageBuffer.update(image.index, Operations.limit()(op(image))))
 
   def blend(): Unit = add(activated.foldLeft(Image.emptyImage(activated.head))((img1, img2) => img1 blend img2)).refresh()
 

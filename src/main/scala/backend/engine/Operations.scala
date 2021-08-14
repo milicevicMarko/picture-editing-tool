@@ -14,7 +14,7 @@ abstract case class BaseOperation(val name: String) {
          y <- 0 until img.getHeight) {
       img.setRGB(x, y, operate(img.getRGB(x, y)))
     }
-    image.copy()
+    image.deepCopy()
   }
   override def toString: String = name
 }
@@ -66,7 +66,7 @@ object Operations {
 
   def limit(value: Double = 0): BaseOperation = new SimpleOperation("limit", (i: RGB) => i.limit)
   def abs(value: Double = 0): BaseOperation = new SimpleOperation("abs", (i: RGB) => i.abs)
-  def greyscale(value: Double = 0): BaseOperation =new SimpleOperation("greyscale", (i: RGB) => (i.toGrey))
+  def greyscale(value: Double = 0): BaseOperation =  new SimpleOperation("greyscale", (i: RGB) => i.toGrey)
   def invert(value: Double = 0): BaseOperation = Operations.invSub(1)
 
   def call(name: String): Double => BaseOperation = name match {
