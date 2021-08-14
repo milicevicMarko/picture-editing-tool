@@ -14,17 +14,21 @@ trait CardListControllerInterface {
   def getDeleteButton: Button
   def getUpButton: Button
   def getDownButton: Button
+  def getVisibleButton: Button
+  def getInvisibleButton: Button
+  def toggleVisible(visible: Boolean): Unit
 }
 
 @sfxml
 class CardListController(layerNumber: Label, thumbnail: ImageView, fileName: Label, opacitySlider: Slider,
-                         opacityLabel: Label, upButton: Button, downButton: Button, duplicateButton: Button, deleteButton: Button) extends CardListControllerInterface {
+                         opacityLabel: Label, upButton: Button, downButton: Button, duplicateButton: Button,
+                         deleteButton: Button, visibleButton: Button, invisibleButton: Button) extends CardListControllerInterface {
 
-    opacitySlider.valueProperty().addListener(new value.ChangeListener[Number] {
-      override def changed(observableValue: ObservableValue[_ <: Number], oldValue: Number, newValue: Number): Unit = {
-        opacityLabel.textProperty().setValue(String.valueOf(newValue.intValue()) + "%")
-      }
-    })
+  opacitySlider.valueProperty().addListener(new value.ChangeListener[Number] {
+    override def changed(observableValue: ObservableValue[_ <: Number], oldValue: Number, newValue: Number): Unit = {
+      opacityLabel.textProperty().setValue(String.valueOf(newValue.intValue()) + "%")
+    }
+  })
 
   override def setData(imageView: ImageView, name: String, number: Int): Unit = {
     thumbnail.setImage(imageView.getImage)
@@ -44,4 +48,16 @@ class CardListController(layerNumber: Label, thumbnail: ImageView, fileName: Lab
 
   override def getDeleteButton: Button = deleteButton
 
+  override def getInvisibleButton: Button = invisibleButton
+
+  override def getVisibleButton: Button = visibleButton
+
+  private def toggleButton(enable: Boolean, button: Button): Unit = {
+    button.disable = !enable
+    button.visible = enable
+  }
+  override def toggleVisible(visible: Boolean): Unit = {
+    toggleButton(visible, visibleButton)
+    toggleButton(!visible, invisibleButton)
+  }
 }

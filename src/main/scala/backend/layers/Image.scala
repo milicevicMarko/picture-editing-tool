@@ -26,6 +26,10 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   lazy val cardView: CardView = new CardView(this)
   lazy val imageView: ImageView = UIUtils.imageToImageView(bufferedImage)
 
+  var isActive: Boolean = true
+  def activate(): Unit = isActive = !isActive
+  def activate(setActive: Boolean): Unit = isActive = setActive
+
   var isSelected: Boolean = false
   def select(): Unit = isSelected = !isSelected
   def select(setSelect: Boolean): Unit = isSelected = setSelect
