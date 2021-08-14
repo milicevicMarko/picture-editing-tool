@@ -9,7 +9,7 @@ object ImageManager {
 
   def size: Int = imageBuffer.size
 
-  def selected: List[Image] = imageBuffer.filter(image => image.isSelected).toList
+  def selected: List[Image] = activated.filter(image => image.isSelected)
   def activated: List[Image] = imageBuffer.filter(image => image.isActive).toList
 
   def deselectAll(): Unit = imageBuffer.foreach(i => i.select(false))
