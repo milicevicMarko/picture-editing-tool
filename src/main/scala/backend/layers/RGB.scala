@@ -11,6 +11,9 @@ case class RGB(red: Double, green: Double, blue: Double) {
   private def operation(const: Double)(f: (Double, Double) => Double): RGB =
     new RGB(f(red, const), f(green, const), f(blue, const))
 
+  def withOpacity(opacity: Double): RGB = this * opacity
+  def blend(that: RGB): RGB = new RGB(limit(this.red + that.red), limit(this.green + that.green), limit(this.blue + that.blue))
+
   def +(const: Double): RGB = operation(const)((x, y) => x + y)
   def -(const: Double): RGB = operation(const)((x, y) => x - y)
   def -@(const: Double): RGB = operation(const)((x, y) => y - x)

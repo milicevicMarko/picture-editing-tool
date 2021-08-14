@@ -35,6 +35,7 @@ trait MainInterface {
   def testMe(): Unit
   def swap(): Unit
   def refresh(): Unit
+  def print(): Unit
   def setFillColor(): Unit
   def toggleFillColor(): Unit
 
@@ -191,11 +192,12 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   }
 
 
-  override def testMe(): Unit = ???
+  override def testMe(): Unit = ImageManager.blend()
 
   // refresh
   override def refresh(): Unit = centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
 
+  override def print(): Unit = ImageManager.selected.foreach(i => println(i.getPixel(100, 100)))
   // todo do this with select and with value from text field
   override def addOp(): Unit = operate(Operations.add)
 

@@ -12,7 +12,8 @@ import java.io.File
 // todo create imageview Center and Thumbnail classes
 class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) {
   def this(path: String) = this(FileImport.loadImage(path), path)
-  def copy(useSameIndex: Boolean = true): Image = if (useSameIndex) new Image(bufferedImage, path, index) else new Image(bufferedImage, path)
+  def this(path: String, index: Int) = this(FileImport.loadImage(path), path, index)
+  def copy(useSameIndex: Boolean = true): Image = if (useSameIndex) new Image(path, index) else new Image(path)
 
   def setIndex(index: Int): Unit = {
     this.index = index
@@ -35,6 +36,7 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   def select(setSelect: Boolean): Unit = isSelected = setSelect
 
   def setOpacity(v: Double): Unit = imageView.setOpacity(v)
+  def getOpacity: Double = imageView.getOpacity
 
   def rotate(isRight: Boolean): Unit = {
     val degrees = if (isRight) 90 else -90
@@ -46,5 +48,28 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
     imageView.fitHeightProperty().bind(pane.heightProperty().subtract(100))
     imageView.setPreserveRatio(true)
     this
+  }
+
+  def getPixel(x: Int, y: Int): RGB = getImage.getRGB(x, y)
+
+  def getPixel(x: Int, y: Int, withOpacity: Boolean): RGB = {
+//    val pixel: RGB = getPixel(x, y).withOpacity(getOpacity)
+    val pixel: RGB = getPixel(x, y)
+    val r = pixel * getOpacity
+    println(s"(x,y)_($x, $y)   pixel: ${pixel} vs r: ${r}")
+    r
+  }
+
+  def blend(that: Image): Image = {
+    val newImage = this.copy()
+    val img = newImage.getImage
+    for (x <- 0 until img.getWidth;
+         y <- 0 until img.getHeight;
+         if x < that.getImage.getWidth && y < that.getImage.getHeight) {
+      val pixel: RGB =  this.getPixel(x, y, true) blend that.getPixel(x, y, true)
+      img.setRGB(x, y, pixel)
+      println(pixel)
+    }
+    newImage
   }
 }
