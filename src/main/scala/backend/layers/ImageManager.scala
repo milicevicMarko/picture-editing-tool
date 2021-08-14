@@ -47,6 +47,8 @@ object ImageManager {
 
   def updateIndexes(): Unit = imageBuffer.foreach(img => img.setIndex(imageBuffer.indexOf(img)))
 
+  def removeAllActive(): Unit = imageBuffer.removeIf(img => img.isActive)
+
   def moveUp(image: Image): Unit = if (image.index != 0) swap(image, imageAt(image.index - 1))
 
   def moveDown(image: Image): Unit = if (image.index != size - 1) swap(image, imageAt(image.index + 1))
@@ -62,7 +64,12 @@ object ImageManager {
 
   def operate(op: BaseOperation): Unit = selected.foreach(image => imageBuffer.update(image.index, Operations.limit()(op(image))))
 
-  def blend(): Unit = add(activated.foldLeft(Image.emptyImage(activated.head))((img1, img2) => img1 blend img2)).refresh()
+  def blend(): Unit = {
+    val blended = activated.foldLeft(Image.emptyImage(activated.head))((img1, img2) => img1 blend img2)
+    removeAllActive()
+    imageBuffer.addOne(blended)
+    updateIndexes()
+  }
 
   def usefulDebug(op: BaseOperation): Unit = {
     val rgbIntBefore = imageAt(0).getImage.getRGB(0,0)

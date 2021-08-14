@@ -56,7 +56,6 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   def getPixel(x: Int, y: Int): RGB = getImage.getRGB(x, y)
   def getPixelWithOpacity(x: Int, y: Int): RGB = getPixel(x, y) * getOpacity
 
-
   def blend(that: Image): Image = {
     val img = getImage
     for (x <- 0 until img.getWidth;
@@ -64,10 +63,11 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
          if x < that.getImage.getWidth && y < that.getImage.getHeight) {
       img.setRGB(x, y, this.getPixelWithOpacity(x, y) blend that.getPixelWithOpacity(x, y))
     }
-    this
+    deepCopy()
   }
 }
 
 object Image {
-  def emptyImage(image: Image): Image = new Image(new BufferedImage(image.getImage.getWidth, image.getImage.getHeight, BufferedImage.TYPE_INT_RGB))
+  def emptyImage(image: Image): Image = emptyImage(image.getImage.getWidth, image.getImage.getHeight)
+  def emptyImage(width: Int, height: Int): Image = new Image(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB))
 }
