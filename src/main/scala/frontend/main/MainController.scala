@@ -15,7 +15,6 @@ import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ColorPicker, ListView, TextField, ToggleButton}
 import javafx.scene.input.MouseEvent
-import scalafx.collections.ObservableBuffer
 import scalafx.scene.layout.{AnchorPane, StackPane}
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.{Modality, Stage, WindowEvent}
@@ -194,8 +193,10 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def testMe(): Unit = ImageManager.blend()
 
-  // refresh
-  override def refresh(): Unit = centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
+  override def refresh(): Unit = {
+    ImageManager.activated.foreach(i => i.refresh())
+    centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
+  }
 
   override def print(): Unit = ImageManager.selected.foreach(i => println(i.getPixel(100, 100)))
   // todo do this with select and with value from text field

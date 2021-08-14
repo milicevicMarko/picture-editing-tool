@@ -1,9 +1,7 @@
 package backend.layers
 
-import backend.engine.{BaseOperation, CompositeOperation, Operations, SimpleOperation}
+import backend.engine.{BaseOperation, Operations}
 import scalafx.collections.ObservableBuffer
-import scalafx.scene.Group
-import scalafx.scene.effect.BlendMode
 import scalafx.scene.image.ImageView
 
 object ImageManager {
@@ -67,6 +65,8 @@ object ImageManager {
     println(op.name)
   }
 
+  def blend(): Unit = add(activated.foldLeft(Image.emptyImage(activated.head))((img1, img2) => img1 blend img2)).refresh()
+
   def usefulDebug(op: BaseOperation): Unit = {
     val rgbIntBefore = imageAt(0).getImage.getRGB(0,0)
     val rgbBefore = RGB.toRGB(rgbIntBefore)
@@ -75,19 +75,5 @@ object ImageManager {
     val rgbIntAfter = imageAt(0).getImage.getRGB(0,0)
     val rgbAfter = RGB.toRGB(rgbIntAfter)
     println(s"After: $rgbIntAfter, $rgbAfter")
-  }
-
-  def blend(): Unit = {
-//    val a = imageBuffer(0)
-//    val b = imageBuffer(1)
-//
-//    // imageBuffer.addOne(a blend b)
-//    imageBuffer.addOne(a.blend(b))
-//    println(s"${a.name} - ${a.getPixel(100,100)}")
-//    println(s"${b.name} - ${b.getPixel(100,100)}")
-    val acc = activated.head
-    activated.foldLeft(acc)((a, b) => a blend b)
-    println(s"blended: ${acc.getPixel(100,100)}")
-    imageBuffer.addOne(acc)
   }
 }

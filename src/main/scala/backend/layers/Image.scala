@@ -20,12 +20,13 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
     cardView.updateIndex()
   }
 
+  def refresh(): Unit = ImageManager.imageBuffer.update(index, new Image(bufferedImage, path, index))
   def getImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
   def getPath: String = path
   val name: String = new File(path).getName
 
   lazy val cardView: CardView = new CardView(this)
-  lazy val imageView: ImageView = UIUtils.imageToImageView(bufferedImage)
+  lazy val imageView: ImageView = UIUtils.imageToImageView(bufferedImage) // check if you can use def
 
   var isActive: Boolean = true
   def activate(): Unit = isActive = !isActive
@@ -51,25 +52,20 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   }
 
   def getPixel(x: Int, y: Int): RGB = getImage.getRGB(x, y)
+  def getPixelWithOpacity(x: Int, y: Int): RGB = getPixel(x, y) * getOpacity
 
-  def getPixel(x: Int, y: Int, withOpacity: Boolean): RGB = {
-//    val pixel: RGB = getPixel(x, y).withOpacity(getOpacity)
-    val pixel: RGB = getPixel(x, y)
-    val r = pixel * getOpacity
-    println(s"(x,y)_($x, $y)   pixel: ${pixel} vs r: ${r}")
-    r
-  }
 
   def blend(that: Image): Image = {
-    val newImage = this.copy()
-    val img = newImage.getImage
+    val img = getImage
     for (x <- 0 until img.getWidth;
-         y <- 0 until img.getHeight;
+         y <- 0 until img.getHeight
          if x < that.getImage.getWidth && y < that.getImage.getHeight) {
-      val pixel: RGB =  this.getPixel(x, y, true) blend that.getPixel(x, y, true)
-      img.setRGB(x, y, pixel)
-      println(pixel)
+      img.setRGB(x, y, this.getPixelWithOpacity(x, y) blend that.getPixelWithOpacity(x, y))
     }
-    newImage
+    this
   }
+}
+
+object Image {
+  def emptyImage(image: Image): Image = new Image(new BufferedImage(image.getImage.getWidth, image.getImage.getHeight, BufferedImage.TYPE_INT_RGB))
 }
