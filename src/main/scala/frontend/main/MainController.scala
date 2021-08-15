@@ -57,6 +57,7 @@ trait MainInterface {
   def greyscaleOp(): Unit
   def openComposer(): Unit
   def useComposite(): Unit
+  def removeComposite(): Unit
 }
 
 @sfxml
@@ -68,6 +69,9 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   val cardListView: CardListView = new CardListView(layers)
   updateComposites()
 
+  // ----------------------------------------
+  // selection
+  // ----------------------------------------
   val selectRectangles = new ListBuffer[Rectangle]
   def selectRectangle: Rectangle = selectRectangles.last
 
@@ -105,6 +109,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => if (selectToggleButton.isSelected && centerPaneNonEmpty) e.getEventType match {
     case MouseEvent.MOUSE_PRESSED =>
+      println(e.getX, e.getY)
       newRectangle(e.getX, e.getY)
       selectPane.children.addOne(selectRectangle)
     case MouseEvent.MOUSE_DRAGGED =>
@@ -145,6 +150,9 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   def setFillColor(): Unit = fillColor = Some(colorBox.getValue)
 
+  // ----------------------------------------
+  // central image listeners
+  // ----------------------------------------
   ImageManager.imageBuffer.addListener(new ListChangeListener[Image] {
     override def onChanged(change: ListChangeListener.Change[_ <: Image]): Unit = {
       while (change.next) {
@@ -158,6 +166,9 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     }
   })
 
+  // ----------------------------------------
+  // open, save, save as
+  // ----------------------------------------
   override def open(): Unit = {
     FileBrowser.chooseImportMultiplePath() match {
       case paths: List[String] => ImageManager add paths
@@ -172,6 +183,9 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   // todo - check if there is unsaved work somehow
   override def close(): Unit = stage.fireEvent(new WindowEvent(stage, WindowEvent.WindowCloseRequest))
 
+  // ----------------------------------------
+  // operations
+  // ----------------------------------------
   override def rotateRight(): Unit = ImageManager.rotate(true)
 
   override def rotateLeft(): Unit = ImageManager.rotate(false)
@@ -181,10 +195,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     centerPane.children = ImageManager.allImageViews
   }
 
-  override def swap(): Unit = {
-    ImageManager.swap()
-    updateLayers()
-  }
+  override def swap(): Unit = ImageManager.swap()
 
   override def testMe(): Unit = println("Nothing is set for debugging")
 
@@ -195,6 +206,9 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def print(): Unit = ImageManager.selected.foreach(i => println(i.getPixel(100, 100)))
 
+  // ----------------------------------------
+  // right operations
+  // ----------------------------------------
   override def addOp(): Unit = operate(Operations.add)
 
   override def subOp(): Unit = operate(Operations.sub)
@@ -215,15 +229,17 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def minOp(): Unit = operate(Operations.min)
 
-  override def absOp(): Unit = ImageManager.operate(Operations.abs())
+  override def absOp(): Unit = ImageManager.operate(Operations.abs(), selectRectangles.toList)
 
-  override def greyscaleOp(): Unit = ImageManager.operate(Operations.greyscale())
+  override def greyscaleOp(): Unit = ImageManager.operate(Operations.greyscale(), selectRectangles.toList)
 
-  override def invertOp(): Unit = ImageManager.operate(Operations.invert())
+  override def invertOp(): Unit = ImageManager.operate(Operations.invert(), selectRectangles.toList)
+
+  override def flatten(): Unit = ImageManager.flatten()
 
   def operate(op: Double => BaseOperation): Unit = readTextField() match {
-    case Some(value) => ImageManager.operate(op(value))
-    case None if !Operations.needsArgument(op) => ImageManager.operate(op(0))
+    case Some(value) => ImageManager.operate(op(value), selectRectangles.toList)
+    case None if !Operations.needsArgument(op) => ImageManager.operate(op(0), selectRectangles.toList)
     case None => println("Please enter text field value")
   }
 
@@ -232,6 +248,9 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     else None
   }
 
+  // ----------------------------------------
+  // op composer
+  // ----------------------------------------
   override def openComposer(): Unit = {
     val loader = new FXMLLoader(getClass.getResource("../operations/resources/operations.fxml"), new DependenciesByType(Map()))
     loader.load()
@@ -256,11 +275,11 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
       val name = compositeList.getSelectionModel.getSelectedItem
       compositeList.getSelectionModel.clearSelection()
       val composite = CompositeDB.findComposite(name)
-      ImageManager.operate(composite)
+      ImageManager.operate(composite, selectRectangles.toList)
     }
   }
 
-  override def flatten(): Unit = ImageManager.flatten()
+  override def removeComposite(): Unit = ???
 }
 
 object MainControllerApp extends JFXApp3 {

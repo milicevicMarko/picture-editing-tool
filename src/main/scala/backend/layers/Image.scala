@@ -46,9 +46,11 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   }
 
   def bindTo(pane: Pane): Image = {
-    imageView.fitWidthProperty().bind(pane.widthProperty().subtract(100))
-    imageView.fitHeightProperty().bind(pane.heightProperty().subtract(100))
-    imageView.setPreserveRatio(true)
+    if (bufferedImage.getWidth > pane.getWidth || bufferedImage.getHeight > pane.getHeight) {
+      imageView.fitWidthProperty().bind(pane.widthProperty().subtract(100))
+      imageView.fitHeightProperty().bind(pane.heightProperty().subtract(100))
+      imageView.setPreserveRatio(true)
+    }
     this
   }
 

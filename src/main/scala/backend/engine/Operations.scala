@@ -3,15 +3,32 @@ package backend.engine
 import backend.layers.{Image, RGB}
 import javafx.collections.ObservableList
 import scalafx.collections.ObservableBuffer
+import scalafx.scene.shape.Rectangle
 
+import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 
 abstract case class BaseOperation(name: String) {
   def operate(rgb: RGB): RGB
-  def apply(image: Image): Image = {
+
+  def isPixelInSelection(x: Double, y: Double, selection: List[Rectangle]): Boolean = {
+    def inSelection(x: Double, y: Double, r: Rectangle): Boolean = x >= r.getX && x <= r.getX + r.getWidth && y>= r.getY && y <= r.getY + r.getHeight
+    @tailrec
+    def iterSelections(x: Double, y: Double, selections: List[Rectangle]): Boolean = selections match {
+      case s::ss => if (!inSelection(x, y, s)) iterSelections(x, y, ss) else true
+      case List(s) => inSelection(x, y, s)
+      case Nil => false
+    }
+    iterSelections(x, y, selection)
+  }
+
+  def apply(image: Image, selection: List[Rectangle]): Image = {
+    val positionX = image.imageView.getLayoutX
+    val positionY = image.imageView.getLayoutY
     val img = image.getImage
     for (x <- 0 until img.getWidth;
-         y <- 0 until img.getHeight) {
+         y <- 0 until img.getHeight
+         if selection.isEmpty || isPixelInSelection(positionX + x, positionY + y, selection)) {
       img.setRGB(x, y, operate(img.getRGB(x, y)).limit())
     }
     image.deepCopy()
