@@ -7,12 +7,17 @@ import scala.language.implicitConversions
 // 0->1 == 0->255
 case class RGB(red: Double, green: Double, blue: Double) {
   def this(r: Int, g: Int, b: Int) = this(r / 255.0, g / 255.0, b / 255.0)
-  private def limit(d: Double): Double = if (d < 0) 0 else if (d > 1) 1 else d
+  private def limitColor(d: Double): Double = if (d < 0) 0 else if (d > 1) 1 else d
+  private def colorsOutsideLimit(): Boolean = {
+    def colorLimitBreached(d: Double): Boolean = if (d > 1 || d < 0) true else false
+    colorLimitBreached(red) || colorLimitBreached(green) || colorLimitBreached(blue)
+  }
+  def limit(): RGB = if (colorsOutsideLimit()) new RGB(limitColor(red), limitColor(green), limitColor(blue)) else this
   private def operation(const: Double)(f: (Double, Double) => Double): RGB =
     new RGB(f(red, const), f(green, const), f(blue, const))
 
   def withOpacity(opacity: Double): RGB = this * opacity
-  def blend(that: RGB): RGB = new RGB(limit(this.red + that.red), limit(this.green + that.green), limit(this.blue + that.blue))
+  def blend(that: RGB): RGB = new RGB(limitColor(this.red + that.red), limitColor(this.green + that.green), limitColor(this.blue + that.blue))
 
   def +(const: Double): RGB = operation(const)((x, y) => x + y)
   def -(const: Double): RGB = operation(const)((x, y) => x - y)
@@ -28,7 +33,6 @@ case class RGB(red: Double, green: Double, blue: Double) {
   def max(const: Double): RGB = operation(const)((x,y) => math.max(x, y))
 
   def toGrey: RGB = operation((red + green + blue) / 3.0)((_, y) => y)
-  def limit: RGB = new RGB(limit(red), limit(green), limit(blue))
 
   override def toString: String = s"RGB($red, $green, $blue)"
 }

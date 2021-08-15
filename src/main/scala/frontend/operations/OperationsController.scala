@@ -104,7 +104,7 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
     if (name.nonEmpty && listOfOperations.getItems.isEmpty && compositeListEmptyAlert(name)) close()
     if (name.nonEmpty && !listOfOperations.getItems.isEmpty) {
       val strList = listOfOperations.getItems.toArray.map(s => s.toString).toList
-      val operations = getOperations(Nil, strList)
+      val operations = getOperations(Nil, strList).reverse
       Operations.createComposite(name, operations)
       close()
     }

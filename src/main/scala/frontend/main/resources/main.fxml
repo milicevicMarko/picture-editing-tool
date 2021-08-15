@@ -263,11 +263,10 @@
                   </StackPane>
                   <AnchorPane prefHeight="120.0" prefWidth="403.0" GridPane.rowIndex="1">
                      <children>
-                        <ListView fx:id="compositeList" layoutX="16.0" layoutY="25.0" prefHeight="76.0" prefWidth="171.0" />
-                        <AnchorPane layoutX="248.0" layoutY="46.0">
+                        <AnchorPane layoutX="2.0" layoutY="3.0" prefHeight="99.0" prefWidth="393.0">
                            <children>
-                              <Label layoutX="25.0" text="Composites" />
-                              <Button alignment="CENTER" contentDisplay="CENTER" layoutY="23.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#openComposer" prefHeight="25.0" prefWidth="25.0" textAlignment="JUSTIFY">
+                              <Label layoutX="70.0" layoutY="-8.0" text="Composites" />
+                              <Button alignment="CENTER" contentDisplay="CENTER" layoutX="197.0" layoutY="31.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#openComposer" prefHeight="25.0" prefWidth="25.0" textAlignment="JUSTIFY">
                                  <graphic>
                                     <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -279,7 +278,19 @@
                                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                  </padding>
                               </Button>
-                              <Button layoutX="74.0" layoutY="23.0" mnemonicParsing="false" onAction="#useComposite" text="Go" />
+                              <Button alignment="CENTER" contentDisplay="CENTER" layoutX="197.0" layoutY="66.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#useComposite" prefHeight="25.0" prefWidth="25.0" textAlignment="JUSTIFY">
+                                 <graphic>
+                                    <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@icons/play-composed.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                                 <padding>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </padding>
+                              </Button>
+                              <ListView fx:id="compositeList" layoutX="16.0" layoutY="18.0" prefHeight="76.0" prefWidth="171.0" />
                            </children>
                         </AnchorPane>
                      </children>
@@ -348,11 +359,6 @@
                         <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                      </padding>
                   </Button>
-                  <Button alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="39.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#testMe" prefHeight="25.0" prefWidth="25.0" text="T" textAlignment="JUSTIFY">
-                     <padding>
-                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-                     </padding>
-                  </Button>
                   <Button alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#rotateRight" prefHeight="25.0" prefWidth="25.0" textAlignment="JUSTIFY">
                      <graphic>
                         <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
@@ -405,7 +411,7 @@
                      <graphic>
                         <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@icons/bug.png" />
+                              <Image url="@icons/print.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -418,6 +424,18 @@
                         <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@icons/swap.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <padding>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                     </padding>
+                  </Button>
+                  <Button alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="242.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#testMe" prefHeight="25.0" prefWidth="25.0" textAlignment="JUSTIFY">
+                     <graphic>
+                        <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@icons/bug.png" />
                            </image>
                         </ImageView>
                      </graphic>

@@ -6,13 +6,13 @@ import scalafx.collections.ObservableBuffer
 
 import scala.collection.mutable.ListBuffer
 
-abstract case class BaseOperation(val name: String) {
+abstract case class BaseOperation(name: String) {
   def operate(rgb: RGB): RGB
   def apply(image: Image): Image = {
     val img = image.getImage
     for (x <- 0 until img.getWidth;
          y <- 0 until img.getHeight) {
-      img.setRGB(x, y, operate(img.getRGB(x, y)))
+      img.setRGB(x, y, operate(img.getRGB(x, y)).limit())
     }
     image.deepCopy()
   }
@@ -64,7 +64,6 @@ object Operations {
   def min(value: Double): BaseOperation = new SimpleOperation("min", (i: RGB) => i min value)
   def max(value: Double): BaseOperation = new SimpleOperation("max", (i: RGB) => i max value)
 
-  def limit(value: Double = 0): BaseOperation = new SimpleOperation("limit", (i: RGB) => i.limit)
   def abs(value: Double = 0): BaseOperation = new SimpleOperation("abs", (i: RGB) => i.abs)
   def greyscale(value: Double = 0): BaseOperation =  new SimpleOperation("greyscale", (i: RGB) => i.toGrey)
   def invert(value: Double = 0): BaseOperation = Operations.invSub(1)
@@ -74,15 +73,18 @@ object Operations {
     case "sub" => sub
     case "inv sub" => invSub
     case "mul" => mul
+    case "div" => div
     case "inv div" => invDiv
+
     case "pow" => pow
     case "log" => log
     case "abs" => abs
     case "min" => min
     case "max" => max
+
     case "greyscale" => greyscale
     case "invert" => invert
-    case "limit" => limit
+    //case _ => CompositeDB.findComposite(name)
   }
 
   def needsArgument(op: Double => BaseOperation): Boolean = needsArgument(op(0).name)

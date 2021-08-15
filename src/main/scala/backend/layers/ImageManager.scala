@@ -62,7 +62,7 @@ object ImageManager {
 
   def rotate(isRight: Boolean): Unit = selected.foreach(img => img rotate isRight)
 
-  def operate(op: BaseOperation): Unit = selected.foreach(image => imageBuffer.update(image.index, Operations.limit()(op(image))))
+  def operate(op: BaseOperation): Unit = selected.foreach(image => imageBuffer.update(image.index, op(image)))
 
   def flatten(): Unit = {
     val blended = blend()
