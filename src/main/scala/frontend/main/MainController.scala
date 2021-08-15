@@ -6,15 +6,15 @@ import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
 import frontend.layers.CardListView
 import frontend.operations.OperationsController
-import javafx.collections.{ListChangeListener, ObservableList}
+import javafx.collections.ListChangeListener
 import javafx.scene.{Parent, input}
 import javafx.{scene => jfxs}
+import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
 import scalafx.Includes._
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, ColorPicker, ListView, TextField, ToggleButton}
-import javafx.scene.input.MouseEvent
 import scalafx.scene.layout.{AnchorPane, StackPane}
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.{Modality, Stage, WindowEvent}
@@ -186,7 +186,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     updateLayers()
   }
 
-  override def testMe(): Unit = println("Nothing is set for debuging")
+  override def testMe(): Unit = println("Nothing is set for debugging")
 
   override def refresh(): Unit = {
     ImageManager.activated.foreach(i => i.refresh())

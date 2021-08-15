@@ -28,7 +28,7 @@ class CompositeOperation(name: String, operations: List[BaseOperation]) extends 
 
   override def toString: String = {
     super.toString
-    operations.foldLeft("")((s, op) => op.toString + " ")
+    operations.foldLeft("")((_, op) => " " + op.toString)
   }
 }
 
