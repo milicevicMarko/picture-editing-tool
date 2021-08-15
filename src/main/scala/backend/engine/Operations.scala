@@ -68,23 +68,24 @@ object Operations {
   def greyscale(value: Double = 0): BaseOperation =  new SimpleOperation("greyscale", (i: RGB) => i.toGrey)
   def invert(value: Double = 0): BaseOperation = Operations.invSub(1)
 
-  def call(name: String): Double => BaseOperation = name match {
-    case "add" => add
-    case "sub" => sub
-    case "inv sub" => invSub
-    case "mul" => mul
-    case "div" => div
-    case "inv div" => invDiv
+  def call(name: String)(argument: Double): BaseOperation = name match {
+    case "add" => add(argument)
+    case "sub" => sub(argument)
+    case "inv sub" => invSub(argument)
+    case "mul" => mul(argument)
+    case "div" => div(argument)
+    case "inv div" => invDiv(argument)
 
-    case "pow" => pow
-    case "log" => log
-    case "abs" => abs
-    case "min" => min
-    case "max" => max
+    case "pow" => pow(argument)
+    case "log" => log(argument)
+    case "abs" => abs(argument)
+    case "min" => min(argument)
+    case "max" => max(argument)
 
-    case "greyscale" => greyscale
-    case "invert" => invert
-    //case _ => CompositeDB.findComposite(name)
+    case "greyscale" => greyscale(argument)
+    case "invert" => invert(argument)
+
+    case _ => CompositeDB.findComposite(name)
   }
 
   def needsArgument(op: Double => BaseOperation): Boolean = needsArgument(op(0).name)
