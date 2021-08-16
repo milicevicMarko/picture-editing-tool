@@ -65,7 +65,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
                      selectToggleButton: ToggleButton, fillToggleButton: ToggleButton, colorBox: ColorPicker,
                      textField: TextField, compositeList: ListView[String])
   extends MainInterface {
-  var stage: Stage = MainControllerApp.stage
+  val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
   updateComposites()
 
@@ -158,9 +158,10 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
       while (change.next) {
         if (change.wasAdded() || change.wasRemoved())
           centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
-        if (centerPane.children.isEmpty)
+        if (centerPane.children.isEmpty) {
           selectPane.children = openOnStack
-        else
+          selectRectangles.clear()
+        } else
           selectPane.children.remove(openOnStack)
       }
     }
