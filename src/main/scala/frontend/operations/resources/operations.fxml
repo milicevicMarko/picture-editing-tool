@@ -37,7 +37,7 @@
             </Label>
             <Accordion>
               <panes>
-                <TitledPane animated="false" text="Basic">
+                <TitledPane fx:id="titledPaneBasic" animated="false" text="Basic">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -46,7 +46,7 @@
                         </AnchorPane>
                   </content>
                 </TitledPane>
-                  <TitledPane animated="false" layoutX="10.0" layoutY="35.0" text="Functions">
+                  <TitledPane fx:id="titledPaneFunctions" animated="false" layoutX="10.0" layoutY="35.0" text="Functions">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="192.0" prefWidth="244.0">
                            <children>
@@ -55,7 +55,7 @@
                         </AnchorPane>
                      </content>
                   </TitledPane>
-                <TitledPane animated="false" text="Complex">
+                <TitledPane fx:id="titledPaneComplex" animated="false" text="Complex">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="192.0" prefWidth="244.0">
                            <children>

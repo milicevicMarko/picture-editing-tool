@@ -1,12 +1,11 @@
 package frontend.operations
 
-import backend.engine.{CompositeDB, CompositeOperation, BaseOperation, Operations}
+import backend.engine.{BaseOperation, CompositeDB, Operations}
 import javafx.collections.ObservableList
 import javafx.stage.Stage
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.Alert.AlertType
-import scalafx.scene.control.{Alert, Button, ButtonType, ListView, TextField}
-import scalafxml.core.{DependenciesByType, FXMLLoader}
+import scalafx.scene.control.{Alert, ButtonType, ListView, TextField, TitledPane}
 import scalafxml.core.macros.sfxml
 
 import scala.annotation.tailrec
@@ -20,10 +19,15 @@ trait OperationsControllerInterface {
 
 @sfxml
 class OperationsController(listOfBasics: ListView[String], listOfComposites: ListView[String], listOfFunctions: ListView[String],
-                           nameTextField: TextField, listOfOperations: ListView[String], functionArgument: TextField, doneButton: Button) extends OperationsControllerInterface {
+                           nameTextField: TextField, functionArgument: TextField, listOfOperations: ListView[String],
+                           titledPaneBasic: TitledPane, titledPaneFunctions: TitledPane, titledPaneComplex: TitledPane) extends OperationsControllerInterface {
+
+  titledPaneBasic.expandedProperty().addListener((_,_,_) => deselectAll())
+  titledPaneFunctions.expandedProperty().addListener((_,_,_) => deselectAll())
+  titledPaneComplex.expandedProperty().addListener((_,_,_) => deselectAll())
+
   val basics: ObservableList[String] = new ObservableBuffer[String]()
   basics.addAll("add", "sub", "inv sub", "mul", "div", "inv div")
-
 
   val composites: ObservableList[String] = new ObservableBuffer[String]()
   CompositeDB.composites.map(comp => composites.add(comp.name))
@@ -35,18 +39,19 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
   listOfComposites.setItems(composites)
   listOfFunctions.setItems(functions)
 
+  val allLists: List[ListView[String]] = listOfBasics::listOfFunctions::listOfComposites::Nil
+
+  def deselectAll(): Unit = allLists.foreach(list => list.getSelectionModel.clearSelection())
+
   override def addOperation(): Unit = {
-    def getSelected(arg: String, list: ListView[String]): String = if (list.getSelectionModel.getSelectedItems.size() > 0) s"${list.getSelectionModel.getSelectedItem}($arg)"  else ""
-    def foldSelected(arg: String, list: List[ListView[String]]): String = list.foldLeft("")((s, ls) => s + getSelected(arg, ls))
-    def deselect(list: ListView[String]): Unit = list.getSelectionModel.clearSelection()
-    def deselectAll(list: List[ListView[String]]): Unit = list.foreach(l => deselect(l))
+    def tryToGetSelected(arg: String, list: ListView[String]): String = if (list.getSelectionModel.getSelectedItems.size() > 0) s"${list.getSelectionModel.getSelectedItem}($arg)"  else ""
+    def getSelected(arg: String, list: List[ListView[String]]): String = list.foldLeft("")((s, ls) => s + tryToGetSelected(arg, ls))
 
     if (functionArgument.getText.nonEmpty) {
       val arg = functionArgument.getText
       functionArgument.clear()
-      val all: List[ListView[String]] = listOfBasics::listOfFunctions::listOfComposites::Nil
-      listOfOperations.getItems.add(foldSelected(arg, all))
-      deselectAll(all)
+      listOfOperations.getItems.add(getSelected(arg, allLists))
+      deselectAll()
     }
   }
 
@@ -95,7 +100,7 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
       val funName: String = x.split('(')(0)
       val funArg: Double = x.split('(')(1).split(')')(0).toDouble
       val function: BaseOperation = Operations.call(funName)(funArg)
-      getOperations(function::acc, nameList.tail)
+      getOperations(function::acc, xs)
   }
 
   override def done(): Unit = {
