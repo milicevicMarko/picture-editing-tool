@@ -64,6 +64,7 @@ object CompositeDB {
   }
 
   def findComposite(name: String): BaseOperation = composites.find(c => c.name == name).get
+  def removeComposite(name: String): Unit = composites.remove(composites.indexOf(findComposite(name)))
 }
 
 object Operations {

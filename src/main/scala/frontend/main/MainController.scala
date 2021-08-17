@@ -288,7 +288,14 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     }
   }
 
-  override def removeComposite(): Unit = ???
+  override def removeComposite(): Unit = {
+    if (compositeList.getSelectionModel.getSelectedItems.size() > 0) {
+      val name = compositeList.getSelectionModel.getSelectedItem
+      compositeList.getSelectionModel.clearSelection()
+      CompositeDB.removeComposite(name)
+      updateComposites()
+    }
+  }
 }
 
 object MainControllerApp extends JFXApp3 {
