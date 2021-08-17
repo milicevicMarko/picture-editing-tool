@@ -73,9 +73,9 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   // selection
   // ----------------------------------------
   val selectRectangles = new ListBuffer[Rectangle]
-  def selectRectangle: Rectangle = selectRectangles.last
+  def currentSelection: Rectangle = selectRectangles.last
 
-  def newRectangle(xx: Double, yy: Double): Unit = {
+  def newRectangle(xx: Double, yy: Double, ww: Double = 0, hh: Double = 0): Unit = {
     val r = new Rectangle() {
       visible = true
       stroke = Color.BLACK
@@ -84,6 +84,8 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
       strokeWidth = 0.5
       x = xx
       y = yy
+      width = ww
+      height = hh
     }
 
     r.setOnMouseClicked(e => {
@@ -95,7 +97,13 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
         r.strokeWidth = 0
       }
     })
-    selectRectangles.addOne(r)
+
+    addSelectRectangle(r)
+  }
+
+  def addSelectRectangle(rectangle: Rectangle): Unit = {
+    selectPane.children.addOne(rectangle)
+    selectRectangles.addOne(rectangle)
   }
 
   def deleteSelectRectangle(rect: Rectangle): Unit = {
@@ -108,26 +116,26 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   def centerPaneNonEmpty: Boolean = centerPane.children.nonEmpty || devHack
 
   selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => if (selectToggleButton.isSelected && centerPaneNonEmpty) e.getEventType match {
-    case MouseEvent.MOUSE_PRESSED =>
-      println(e.getX, e.getY)
-      newRectangle(e.getX, e.getY)
-      selectPane.children.addOne(selectRectangle)
+    case MouseEvent.MOUSE_PRESSED => newRectangle(e.getX, e.getY)
     case MouseEvent.MOUSE_DRAGGED =>
-      val dx = e.getX - selectRectangle.getX
-      selectRectangle.translateX = if (dx < 0) dx else 0
-      selectRectangle.width = dx.abs
+      val dx = e.getX - currentSelection.getX
+      currentSelection.translateX = if (dx < 0) dx else 0
+      currentSelection.width = dx.abs
 
-      val dy = e.getY - selectRectangle.getY
-      selectRectangle.translateY = if (dy < 0) dy else 0
-      selectRectangle.height = dy.abs
+      val dy = e.getY - currentSelection.getY
+      currentSelection.translateY = if (dy < 0) dy else 0
+      currentSelection.height = dy.abs
 
     case MouseEvent.MOUSE_RELEASED =>
-      // todo select pixels beneath
-      if (selectRectangle.getWidth <= 5 && selectRectangle.getHeight <= 5)
+      // ignore clicks
+      if (currentSelection.getWidth <= 5 && currentSelection.getHeight <= 5)
         selectRectangles.remove(selectRectangles.size - 1)
-      else
-        println(selectRectangles.size)
-      println("done")
+      // switch x,y of rectangle
+      else if (e.getX < currentSelection.getX || e.getY < currentSelection.getY) {
+          val old = currentSelection
+          newRectangle(e.getX, e.getY, currentSelection.getWidth, currentSelection.getHeight)
+          deleteSelectRectangle(old)
+        }
     case _ =>
   })
 
