@@ -3,16 +3,19 @@ package backend.engine
 import backend.layers.{Image, RGB}
 import javafx.collections.ObservableList
 import scalafx.collections.ObservableBuffer
+import javafx.scene.paint.Color
 import scalafx.scene.shape.Rectangle
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
+import scala.language.implicitConversions
 
 abstract case class BaseOperation(name: String) {
   def operate(rgb: RGB): RGB
 
+  def inSelection(x: Double, y: Double, r: Rectangle): Boolean = x >= r.getX && x <= r.getX + r.getWidth && y>= r.getY && y <= r.getY + r.getHeight
+
   def isPixelInSelection(x: Double, y: Double, selection: List[Rectangle]): Boolean = {
-    def inSelection(x: Double, y: Double, r: Rectangle): Boolean = x >= r.getX && x <= r.getX + r.getWidth && y>= r.getY && y <= r.getY + r.getHeight
     @tailrec
     def iterSelections(x: Double, y: Double, selections: List[Rectangle]): Boolean = selections match {
       case s::ss => if (!inSelection(x, y, s)) iterSelections(x, y, ss) else true
@@ -38,6 +41,27 @@ abstract case class BaseOperation(name: String) {
 
 class SimpleOperation(name: String, operation: RGB => RGB) extends BaseOperation(name) {
   override def operate(rgb: RGB): RGB = operation(rgb)
+}
+
+class FillOperation() extends BaseOperation("fill") {
+  implicit def intRGBFromSelectionFill(rectangle: Rectangle): Int = {
+    val c: Color = rectangle.getFill.asInstanceOf[Color]
+    new RGB(c.getRed, c.getGreen, c.getBlue)
+  }
+  override def apply(image: Image, selection: List[Rectangle]): Image = {
+    val positionX = image.imageView.getLayoutX
+    val positionY = image.imageView.getLayoutY
+    val img = image.getImage
+    for (rect <- selection;
+         x <- 0 until img.getWidth;
+         y <- 0 until img.getHeight
+         if inSelection(positionX + x, positionY + y, rect)) {
+      img.setRGB(x, y, rect)
+    }
+    image.deepCopy()
+  }
+
+  override def operate(rgb: RGB): RGB = rgb
 }
 
 class CompositeOperation(name: String, operations: List[BaseOperation]) extends BaseOperation(name) {
@@ -86,6 +110,8 @@ object Operations {
   def greyscale(value: Double = 0): BaseOperation =  new SimpleOperation("greyscale", (i: RGB) => i.toGrey)
   def invert(value: Double = 0): BaseOperation = Operations.invSub(1)
 
+  def fill(rgb: RGB = null): BaseOperation = new FillOperation() // new SimpleOperation("fill", (i: RGB) => rgb)
+
   def call(name: String)(argument: Double): BaseOperation = name match {
     case "add" => add(argument)
     case "sub" => sub(argument)
@@ -109,7 +135,7 @@ object Operations {
   def needsArgument(op: Double => BaseOperation): Boolean = needsArgument(op(0).name)
 
   def needsArgument(name: String): Boolean = name match {
-    case "limit" | "abs" | "greyscale" | "invert" => true
+    case "limit" | "abs" | "greyscale" | "invert" | "fill" => true
     case _ => false
   }
 

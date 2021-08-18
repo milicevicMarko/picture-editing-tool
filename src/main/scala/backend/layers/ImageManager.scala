@@ -1,6 +1,6 @@
 package backend.layers
 
-import backend.engine.{BaseOperation, Operations}
+import backend.engine.BaseOperation
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.image.ImageView
 import scalafx.scene.shape.Rectangle
@@ -31,7 +31,7 @@ object ImageManager {
   }
 
   def swap(): Unit = selected match {
-    case x::y::xs => swap(x, y)
+    case x::y::_ => swap(x, y)
     case _ => println("Did not select enough")
   }
 
@@ -63,7 +63,10 @@ object ImageManager {
 
   def rotate(isRight: Boolean): Unit = selected.foreach(img => img rotate isRight)
 
-  def operate(op: BaseOperation, selection: List[Rectangle]): Unit = selected.foreach(image => imageBuffer.update(image.index, op(image, selection)))
+  def operate(op: BaseOperation, selection: List[Rectangle]): Unit = op.name match {
+    case "fill" => activated.foreach(image => imageBuffer.update(image.index, op(image, selection)))
+    case _ => selected.foreach(image => imageBuffer.update(image.index, op(image, selection)))
+  }
 
   def flatten(): Unit = {
     val blended = blend()

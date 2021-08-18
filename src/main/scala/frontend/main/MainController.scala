@@ -69,6 +69,24 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
   val cardListView: CardListView = new CardListView(layers)
   updateComposites()
 
+
+  // ----------------------------------------
+  // central image listeners
+  // ----------------------------------------
+  ImageManager.imageBuffer.addListener(new ListChangeListener[Image] {
+    override def onChanged(change: ListChangeListener.Change[_ <: Image]): Unit = {
+      while (change.next) {
+        if (change.wasAdded() || change.wasRemoved())
+          centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
+        if (centerPane.children.isEmpty) {
+          selectPane.children.clear()
+          selectPane.children.addAll(openOnStack, colorBox)
+          selectRectangles.clear()
+        } else
+          selectPane.children.remove(openOnStack)
+      }
+    }
+  })
   // ----------------------------------------
   // selection
   // ----------------------------------------
@@ -147,41 +165,13 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
       }
   }
 
-  def toggleFillColor(): Unit = {
-    colorBox.setVisible(fillToggleButton.isSelected)
-    colorBox.setDisable(!fillToggleButton.isSelected)
-    if (!fillToggleButton.isSelected)
-      fillColor = None
-    else if (selectToggleButton.isSelected)
-        selectToggleButton.selected = false
-  }
-
-  def setFillColor(): Unit = fillColor = Some(colorBox.getValue)
-
-  // ----------------------------------------
-  // central image listeners
-  // ----------------------------------------
-  ImageManager.imageBuffer.addListener(new ListChangeListener[Image] {
-    override def onChanged(change: ListChangeListener.Change[_ <: Image]): Unit = {
-      while (change.next) {
-        if (change.wasAdded() || change.wasRemoved())
-          centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
-        if (centerPane.children.isEmpty) {
-          selectPane.children = openOnStack
-          selectRectangles.clear()
-        } else
-          selectPane.children.remove(openOnStack)
-      }
-    }
-  })
-
   // ----------------------------------------
   // open, save, save as
   // ----------------------------------------
   override def open(): Unit = {
     FileBrowser.chooseImportMultiplePath() match {
       case paths: List[String] => ImageManager add paths
-      case Nil => println("Canceled")
+      case _ => println("Canceled")
     }
   }
 
@@ -213,7 +203,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
     centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
   }
 
-  override def print(): Unit = ImageManager.selected.foreach(i => println(i.getPixel(100, 100)))
+  override def print(): Unit = ImageManager.selected.foreach(i => println(s"${i.getPixel(20, 20)}\t${i.getPixel(200, 200)}"))
 
   // ----------------------------------------
   // right operations
@@ -238,13 +228,32 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def minOp(): Unit = operate(Operations.min)
 
+  // todo check this
   override def absOp(): Unit = ImageManager.operate(Operations.abs(), selectRectangles.toList)
 
   override def greyscaleOp(): Unit = ImageManager.operate(Operations.greyscale(), selectRectangles.toList)
 
   override def invertOp(): Unit = ImageManager.operate(Operations.invert(), selectRectangles.toList)
 
-  override def flatten(): Unit = ImageManager.flatten()
+  override def flatten(): Unit = {
+    tryToFill()
+    ImageManager.flatten()
+  }
+
+  def tryToFill(): Unit = if (selectRectangles.count(r => r.getFill != null) > 0) fillSelection()
+
+  def fillSelection(): Unit = ImageManager.operate(Operations.fill(), selectRectangles.filter(r => r.getFill != null).toList)
+
+  def toggleFillColor(): Unit = {
+    colorBox.setVisible(fillToggleButton.isSelected)
+    colorBox.setDisable(!fillToggleButton.isSelected)
+    if (!fillToggleButton.isSelected)
+      fillColor = None
+    else if (selectToggleButton.isSelected)
+      selectToggleButton.selected = false
+  }
+
+  def setFillColor(): Unit = fillColor = Some(colorBox.getValue)
 
   def operate(op: Double => BaseOperation): Unit = readTextField() match {
     case Some(value) => ImageManager.operate(op(value), selectRectangles.toList)
