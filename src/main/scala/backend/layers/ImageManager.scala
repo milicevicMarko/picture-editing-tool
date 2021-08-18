@@ -63,10 +63,13 @@ object ImageManager {
 
   def rotate(isRight: Boolean): Unit = selected.foreach(img => img rotate isRight)
 
-  def operate(op: BaseOperation, selection: List[Rectangle]): Unit = op.name match {
-    case "fill" => activated.foreach(image => imageBuffer.update(image.index, op(image, selection)))
-    case _ => selected.foreach(image => imageBuffer.update(image.index, op(image, selection)))
-  }
+//  def operate(op: BaseOperation, selection: List[Rectangle]): Unit = op.name match {
+//    case "fill" => activated.foreach(image => imageBuffer.update(image.index, op(image, selection)))
+//    case _ => selected.foreach(image => imageBuffer.update(image.index, op(image, selection)))
+//  }
+
+  // todo test
+  def operate(op: BaseOperation, selection: List[Rectangle]): Unit = activated.foreach(image => imageBuffer.update(image.index, op(image, selection)))
 
   def flatten(): Unit = {
     val blended = blend()
