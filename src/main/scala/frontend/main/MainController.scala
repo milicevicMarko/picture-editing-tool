@@ -32,6 +32,7 @@ trait MainInterface {
   def rotateRight(): Unit
   def rotateLeft(): Unit
   def testMe(): Unit
+  def debugCursor(): Unit
   def swap(): Unit
   def refresh(): Unit
   def print(): Unit
@@ -145,6 +146,8 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
       currentSelection.height = dy.abs
 
     case MouseEvent.MOUSE_RELEASED =>
+      val r = currentSelection
+      println(s"rect: [${r.getX}, ${r.getY}], [${r.getWidth}, ${r.getHeight}]")
       // ignore clicks
       if (currentSelection.getWidth <= 5 && currentSelection.getHeight <= 5)
         selectRectangles.remove(selectRectangles.size - 1)
@@ -196,7 +199,18 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def swap(): Unit = ImageManager.swap()
 
-  override def testMe(): Unit = println("Nothing is set for debugging")
+  override def testMe(): Unit = ImageManager.imageBuffer.head.getCenter //println("Nothing is set for debugging")
+
+  override def debugCursor(): Unit = {
+    selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => e.getEventType match {
+      case MouseEvent.MOUSE_PRESSED =>
+        val a: (Double, Double) = (e.getX, e.getY)
+        val b: (Double, Double) = (e.getSceneX, e.getSceneY)
+        val c: (Double, Double) = (e.getScreenX, e.getScreenY)
+        println(s"[click]\tregular: $a\tscene: $b\tscreen: $c")
+      case _ =>
+    })
+  }
 
   override def refresh(): Unit = {
     ImageManager.activated.foreach(i => i.refresh())
@@ -319,6 +333,7 @@ object MainControllerApp extends JFXApp3 {
     stage = new JFXApp3.PrimaryStage() {
       title = "FPhotoshop"
       scene = new Scene(root)
+//      maximized = true
       filterEvent(WindowEvent.WindowCloseRequest) {
         event: WindowEvent => ExitController.handleExitEvent(event)
       }

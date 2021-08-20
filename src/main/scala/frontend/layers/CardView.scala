@@ -11,7 +11,7 @@ import scalafxml.core.{DependenciesByType, FXMLLoader}
 import scala.language.implicitConversions
 
 class CardView(val image: Image) extends ListCell[CardView] {
-  val thumbnail: ImageView = UIUtils.imageToThumbnail(image.getImage)
+  val thumbnail: ImageView = UIUtils.imageToThumbnail(image.getBufferedImage)
   val loader = new FXMLLoader(getClass.getResource("resources/CardList.fxml"), new DependenciesByType(Map()))
   val card: javafx.scene.Node = loader.load()
   val cardListController: CardListControllerInterface = {

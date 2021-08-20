@@ -22,7 +22,8 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   }
 
   def refresh(): Unit = ImageManager.imageBuffer.update(index, new Image(bufferedImage, path, index))
-  def getImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
+  def getBufferedImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
+  def getImageView: ImageView = imageView
   def getPath: String = path
   val name: String = new File(path).getName
 
@@ -50,25 +51,46 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
       imageView.fitWidthProperty().bind(pane.widthProperty().subtract(100))
       imageView.fitHeightProperty().bind(pane.heightProperty().subtract(100))
       imageView.setPreserveRatio(true)
+    } else {
+      imageView.fitWidth = bufferedImage.getWidth
+      imageView.fitHeight = bufferedImage.getHeight
     }
     this
   }
 
-  def getPixel(x: Int, y: Int): RGB = getImage.getRGB(x, y)
+  def getPixel(x: Int, y: Int): RGB = getBufferedImage.getRGB(x, y)
   def getPixelWithOpacity(x: Int, y: Int): RGB = getPixel(x, y) * getOpacity
 
   def blend(that: Image): Image = {
-    val img = getImage
+    val img = getBufferedImage
     for (x <- 0 until img.getWidth;
          y <- 0 until img.getHeight
-         if x < that.getImage.getWidth && y < that.getImage.getHeight) {
+         if x < that.getBufferedImage.getWidth && y < that.getBufferedImage.getHeight) {
       img.setRGB(x, y, this.getPixelWithOpacity(x, y) blend that.getPixelWithOpacity(x, y))
     }
     deepCopy()
   }
+
+  // why not the other way round???
+  lazy val proportion: (Double, Double) = (getImageView.getFitWidth / bufferedImage.getWidth, getImageView.getFitHeight / bufferedImage.getHeight)
+  def relativePosition(pos: (Double, Double)): (Double, Double) = (pos._1 * proportion._1, pos._2 * proportion._2)
+
+  def getLayoutPosition: (Double, Double) = (imageView.getLayoutX, imageView.getLayoutY)
+
+  def getCenter: (Double, Double) = {
+    def center: (Double, Double) = (bufferedImage.getWidth/2, bufferedImage.getHeight/2)
+
+    def prints(name: String, list: List[Any]): Unit = println(list.foldLeft("["+name+"]:\t")((s, l) => s + "\t" + l.toString))
+    prints("x,y", List(imageView.getLayoutX, imageView.getLayoutY))
+    prints("iv wh 0-max", List(imageView.getX, imageView.getFitWidth,"|", imageView.getY, imageView.getFitHeight))
+    prints("bi x,y", List(bufferedImage.getWidth, bufferedImage.getHeight))
+    prints("center", List(center._1, center._2, (center._1 + imageView.getLayoutX), (center._2 + imageView.getLayoutY)))
+    prints("relative", List(relativePosition(0, 0), relativePosition(bufferedImage.getWidth, bufferedImage.getHeight)))
+    (2, 3)
+  }
 }
 
 object Image {
-  def emptyImage(image: Image): Image = emptyImage(image.getImage.getWidth, image.getImage.getHeight)
+  def emptyImage(image: Image): Image = emptyImage(image.getBufferedImage.getWidth, image.getBufferedImage.getHeight)
   def emptyImage(width: Int, height: Int): Image = new Image(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB))
 }

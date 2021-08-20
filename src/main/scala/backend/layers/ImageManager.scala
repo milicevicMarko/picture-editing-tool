@@ -80,13 +80,4 @@ object ImageManager {
 
   def blend(): Image = activated.foldLeft(Image.emptyImage(activated.head))((img1, img2) => img1 blend img2)
 
-//  def usefulDebug(op: BaseOperation): Unit = {
-//    val rgbIntBefore = imageAt(0).getImage.getRGB(0,0)
-//    val rgbBefore = RGB.toRGB(rgbIntBefore)
-//    println(s"Before: $rgbIntBefore, $rgbBefore")
-//    imageBuffer.update(0, op(imageAt(0)))
-//    val rgbIntAfter = imageAt(0).getImage.getRGB(0,0)
-//    val rgbAfter = RGB.toRGB(rgbIntAfter)
-//    println(s"After: $rgbIntAfter, $rgbAfter")
-//  }
 }
