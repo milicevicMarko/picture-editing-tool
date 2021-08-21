@@ -51,9 +51,6 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
       imageView.fitWidthProperty().bind(pane.widthProperty().subtract(100))
       imageView.fitHeightProperty().bind(pane.heightProperty().subtract(100))
       imageView.setPreserveRatio(true)
-    } else {
-      imageView.fitWidth = bufferedImage.getWidth
-      imageView.fitHeight = bufferedImage.getHeight
     }
     this
   }
@@ -71,13 +68,20 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
     deepCopy()
   }
 
-  // why not the other way round???
-  lazy val proportion: (Double, Double) = (getImageView.getFitWidth / bufferedImage.getWidth, getImageView.getFitHeight / bufferedImage.getHeight)
-  def relativePosition(pos: (Double, Double)): (Double, Double) = (pos._1 * proportion._1, pos._2 * proportion._2)
+  def actualOffsetX: Double = imageView.getLayoutX
+  def actualOffsetY: Double = imageView.getLayoutY
 
-  def getLayoutPosition: (Double, Double) = (imageView.getLayoutX, imageView.getLayoutY)
+  def actualWidth: Double = imageView.getBoundsInParent.getWidth
+  def actualHeight: Double = imageView.getBoundsInParent.getHeight
 
-  def getCenter: (Double, Double) = {
+  def relativeWidth: Double = getBufferedImage.getWidth
+  def relativeHeight: Double = getBufferedImage.getHeight
+
+  def actualX(relX: Double): Double = relX * actualWidth / relativeWidth + actualOffsetX
+  def actualY(relY: Double): Double = relY * actualHeight / relativeHeight +  actualOffsetY
+  def actualCoordinates(x: Double, y: Double): (Double, Double) = (actualX(x), actualY(y))
+
+  def debugPositions: (Double, Double) = {
     def center: (Double, Double) = (bufferedImage.getWidth/2, bufferedImage.getHeight/2)
 
     def prints(name: String, list: List[Any]): Unit = println(list.foldLeft("["+name+"]:\t")((s, l) => s + "\t" + l.toString))
@@ -85,7 +89,7 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
     prints("iv wh 0-max", List(imageView.getX, imageView.getFitWidth,"|", imageView.getY, imageView.getFitHeight))
     prints("bi x,y", List(bufferedImage.getWidth, bufferedImage.getHeight))
     prints("center", List(center._1, center._2, (center._1 + imageView.getLayoutX), (center._2 + imageView.getLayoutY)))
-    prints("relative", List(relativePosition(0, 0), relativePosition(bufferedImage.getWidth, bufferedImage.getHeight)))
+    prints("actual 100, 100", List(actualX(100), actualY(100)))
     (2, 3)
   }
 }

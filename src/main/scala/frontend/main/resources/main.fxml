@@ -330,10 +330,10 @@
       </SplitPane>
    </right>
    <center>
-      <StackPane BorderPane.alignment="CENTER">
+      <StackPane fx:id="mainPane" BorderPane.alignment="CENTER">
          <children>
             <StackPane fx:id="centerPane" prefHeight="500.0" prefWidth="500.0" />
-            <AnchorPane fx:id="selectPane" maxHeight="800.0" maxWidth="900.0" prefHeight="200.0" prefWidth="200.0">
+            <AnchorPane fx:id="selectPane" prefHeight="500.0" prefWidth="500.0">
                <children>
                   <Button fx:id="openOnStack" layoutX="393.0" layoutY="369.0" mnemonicParsing="false" onAction="#open" text="Open..." />
                   <ColorPicker fx:id="colorBox" disable="true" layoutY="37.0" onAction="#setFillColor" visible="false" />

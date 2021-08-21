@@ -62,7 +62,7 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack: Button, layers: ListView[Image],
+class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: StackPane, openOnStack: Button, layers: ListView[Image],
                      selectToggleButton: ToggleButton, fillToggleButton: ToggleButton, colorBox: ColorPicker,
                      textField: TextField, compositeList: ListView[String])
   extends MainInterface {
@@ -146,8 +146,9 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
       currentSelection.height = dy.abs
 
     case MouseEvent.MOUSE_RELEASED =>
-      val r = currentSelection
-      println(s"rect: [${r.getX}, ${r.getY}], [${r.getWidth}, ${r.getHeight}]")
+//      val r = currentSelection
+//      println(s"rect: [${r.getX}, ${r.getY}], [${r.getX + r.getWidth}, ${r.getY + r.getHeight}]")
+
       // ignore clicks
       if (currentSelection.getWidth <= 5 && currentSelection.getHeight <= 5)
         selectRectangles.remove(selectRectangles.size - 1)
@@ -199,17 +200,22 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def swap(): Unit = ImageManager.swap()
 
-  override def testMe(): Unit = ImageManager.imageBuffer.head.getCenter //println("Nothing is set for debugging")
+  override def testMe(): Unit = ImageManager.imageBuffer.head.debugPositions //println("Nothing is set for debugging")
 
+  var debugMouse: Boolean = false
   override def debugCursor(): Unit = {
-    selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => e.getEventType match {
-      case MouseEvent.MOUSE_PRESSED =>
+    if (debugMouse) {
+      selectPane.removeEventFilter[MouseEvent](MouseEvent.MOUSE_PRESSED, _)
+      debugMouse = false
+    } else {
+      debugMouse = true
+      selectPane.addEventFilter[MouseEvent](MouseEvent.MOUSE_PRESSED, e => {
         val a: (Double, Double) = (e.getX, e.getY)
         val b: (Double, Double) = (e.getSceneX, e.getSceneY)
         val c: (Double, Double) = (e.getScreenX, e.getScreenY)
         println(s"[click]\tregular: $a\tscene: $b\tscreen: $c")
-      case _ =>
-    })
+      })
+    }
   }
 
   override def refresh(): Unit = {
