@@ -5,6 +5,8 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.image.ImageView
 import scalafx.scene.shape.Rectangle
 
+import java.io.{File, FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream, SequenceInputStream}
+
 @SerialVersionUID(100L)
 object ImageManager extends Serializable {
   val imageBuffer: ObservableBuffer[Image] = new ObservableBuffer[Image]
@@ -81,4 +83,35 @@ object ImageManager extends Serializable {
 
   def blend(): Image = activated.foldLeft(Image.emptyImage(activated.head))((img1, img2) => img1 blend img2)
 
+  val dataReference: String = "data.temp"
+  def readDataReference(): List[String] = {
+    if (new File(dataReference).exists()) {
+      val ois = new ObjectInputStream(new FileInputStream(dataReference))
+      val list: List[String] = ois.readObject().asInstanceOf[List[String]]
+      ois.close()
+      list
+    } else
+      Nil
+  }
+
+  def deleteOldTemporaries(): Unit = {
+    def deleteFile(name: String): Unit = {
+      val file = new File(name)
+      if (file.exists()) file.delete
+    }
+
+    val listOfFiles = readDataReference()
+    listOfFiles.foreach(fileName => deleteFile(fileName))
+    deleteFile(dataReference)
+  }
+  def writeImages(): Unit = {
+    deleteOldTemporaries()
+
+    imageBuffer.foreach(img => img.writeTemporary())
+    val listOfReferences: List[String] = imageBuffer.map(img => img.tempName).toList
+    val oos = new ObjectOutputStream(new FileOutputStream(dataReference))
+    oos.writeObject(listOfReferences)
+    oos.close()
+  }
+  def readImages(): Unit = readDataReference().foreach(t => ImageManager.add(Image.read(new File(t))))
 }

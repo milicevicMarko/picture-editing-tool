@@ -6,14 +6,15 @@ import scalafx.scene.image.{ImageView, WritableImage}
 import scalafx.scene.layout.Pane
 
 import java.awt.image.BufferedImage
-import java.io.{File, FileInputStream, ObjectInputStream, ObjectOutputStream}
+import java.io.{File, FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
 import javax.imageio.ImageIO
 
 @SerialVersionUID(101L)
-class Image(val bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) extends Serializable{
+class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) extends Serializable {
   def this(path: String) = this(FileImport.loadImage(path), path)
   def this(path: String, index: Int) = this(FileImport.loadImage(path), path, index)
 
+  // todo serialize name, path, isActivated?
   def duplicate(sameIndex: Boolean = true): Image = new Image(copyBufferedImage(), path, if (sameIndex) index else ImageManager.size)
   def deepCopy() = new Image(bufferedImage, path, index)
 
@@ -37,6 +38,7 @@ class Image(val bufferedImage: BufferedImage, path: String = "", var index: Int 
   def getImageView: ImageView = imageView
   def getPath: String = path
   val name: String = new File(path).getName
+  val tempName: String = index.toString + ".temp"
 
   lazy val cardView: CardView = new CardView(this)
   lazy val imageView: ImageView = Image.imageToImageView(bufferedImage) // check if you can use def
@@ -105,16 +107,20 @@ class Image(val bufferedImage: BufferedImage, path: String = "", var index: Int 
     (2, 3)
   }
 
-  def export(outFile: File, fileFormat: String = "png"): Boolean = ImageIO.write(getBufferedImage, fileFormat, outFile)
+  def writeTemporary(): Boolean = ImageIO.write(getBufferedImage, "png", new ObjectOutputStream(new FileOutputStream(tempName)))
+  def write(outStream: ObjectOutputStream, fileFormat: String = "png"): Boolean = ImageIO.write(getBufferedImage, fileFormat, outStream)
 
-  def writeObject(oos: ObjectOutputStream): Boolean = ImageIO.write(getBufferedImage, "png", oos)
-
-  def writeObject(outFile: File): Boolean = ImageIO.write(getBufferedImage, "png", outFile)
   override def toString: String = path
 }
 
 object Image {
-  def readObject(inFile: File): Image = new Image(ImageIO.read(new ObjectInputStream(new FileInputStream(inFile))))
+  def read(inFile: File): Image = {
+    val is = new ObjectInputStream(new FileInputStream(inFile))
+    val img = Image.read(is)
+    is.close()
+    img
+  }
+  def read(is: ObjectInputStream): Image = new Image(ImageIO.read(is))
 
   def emptyImage(image: Image): Image = emptyImage(image.getBufferedImage.getWidth, image.getBufferedImage.getHeight)
   def emptyImage(width: Int, height: Int): Image = new Image(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB))
