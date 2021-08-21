@@ -29,7 +29,6 @@ abstract case class BaseOperation(name: String) {
     val img = image.getBufferedImage
     for (x <- 0 until img.getWidth;
          y <- 0 until img.getHeight
-          // replace posX, posY with rects
          if selection.isEmpty || isPixelInSelection(image.actualCoordinates(x, y), selection)) {
       img.setRGB(x, y, operate(img.getRGB(x, y)).limit())
     }
@@ -49,6 +48,7 @@ class FillOperation() extends BaseOperation("fill") {
   }
   override def apply(image: Image, selection: List[Rectangle]): Image = {
     val img = image.getBufferedImage
+    // iterate only trough selections
     for (rect <- selection;
          x <- 0 until img.getWidth;
          y <- 0 until img.getHeight

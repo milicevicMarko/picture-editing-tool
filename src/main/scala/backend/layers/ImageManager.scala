@@ -59,7 +59,7 @@ object ImageManager {
     updateIndexes()
   }
 
-  def duplicate(image: Image): Unit = imageBuffer.addOne(image.copy(false))
+  def duplicate(image: Image): Unit = imageBuffer.addOne(image.duplicate(false))
 
   def rotate(isRight: Boolean): Unit = selected.foreach(img => img rotate isRight)
 
