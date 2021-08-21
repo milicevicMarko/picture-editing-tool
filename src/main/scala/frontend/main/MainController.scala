@@ -1,7 +1,7 @@
 package frontend.main
 
 import backend.engine.{BaseOperation, CompositeDB, Operations}
-import backend.io.FileBrowser
+import backend.io.{FileBrowser, ResourceManager}
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
 import frontend.layers.CardListView
@@ -200,7 +200,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
 
   override def swap(): Unit = ImageManager.swap()
 
-  override def testMe(): Unit = ImageManager.imageBuffer.head.debugPositions //println("Nothing is set for debugging")
+  override def testMe(): Unit = ResourceManager.test() //println("Nothing is set for debugging")
 
   var debugMouse: Boolean = false
   override def debugCursor(): Unit = {

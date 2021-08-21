@@ -61,6 +61,21 @@ class FillOperation() extends BaseOperation("fill") {
   override def operate(rgb: RGB): RGB = rgb
 }
 
+// todo test
+class BlendOperation() extends BaseOperation("blend") {
+  override def operate(rgb: RGB): RGB = rgb
+
+   def apply(image1: Image, image2: Image): Image = {
+    val img = image1.getBufferedImage
+    for (x <- 0 until img.getWidth;
+         y <- 0 until img.getHeight
+         if x < image1.getBufferedImage.getWidth && y < image2.getBufferedImage.getHeight) {
+      img.setRGB(x, y, image1.getPixelWithOpacity(x, y) blend image2.getPixelWithOpacity(x, y))
+    }
+    image1.deepCopy()
+  }
+}
+
 class CompositeOperation(name: String, operations: List[BaseOperation]) extends BaseOperation(name) {
   override def operate(acc: RGB): RGB = operations.foldLeft(acc)((rgb, bo) => bo.operate(rgb))
 
@@ -75,7 +90,8 @@ class FilterOperation(name: String) extends BaseOperation(name) {
   // todo wtf should i do ahhaha
 }
 
-object CompositeDB {
+@SerialVersionUID(102L)
+object CompositeDB extends Serializable{
   val composites: ListBuffer[CompositeOperation] = new ListBuffer[CompositeOperation]
 
   def getObservables: ObservableList[String] = {

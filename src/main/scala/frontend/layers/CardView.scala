@@ -1,7 +1,6 @@
 package frontend.layers
 
 import backend.layers.{Image, ImageManager}
-import frontend.utils.UIUtils
 import javafx.beans.value
 import javafx.beans.value.ObservableValue
 import scalafx.scene.control.ListCell

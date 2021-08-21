@@ -2,14 +2,15 @@ package backend.layers
 
 import backend.io.FileImport
 import frontend.layers.CardView
-import frontend.utils.UIUtils
-import scalafx.scene.image.ImageView
+import scalafx.scene.image.{ImageView, WritableImage}
 import scalafx.scene.layout.Pane
 
-import java.awt.image.{BufferedImage, WritableRaster, ColorModel}
-import java.io.File
+import java.awt.image.BufferedImage
+import java.io.{File, FileInputStream, ObjectInputStream, ObjectOutputStream}
+import javax.imageio.ImageIO
 
-class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) {
+@SerialVersionUID(101L)
+class Image(val bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) extends Serializable{
   def this(path: String) = this(FileImport.loadImage(path), path)
   def this(path: String, index: Int) = this(FileImport.loadImage(path), path, index)
 
@@ -17,7 +18,7 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   def deepCopy() = new Image(bufferedImage, path, index)
 
   def copyBufferedImage(): BufferedImage = {
-    def deepCopy(bi: BufferedImage) = {
+    def deepCopy(bi: BufferedImage): BufferedImage = {
       val cm = bi.getColorModel
       val isAlphaPremultiplied = cm.isAlphaPremultiplied
       val raster = bi.copyData(null)
@@ -38,7 +39,7 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   val name: String = new File(path).getName
 
   lazy val cardView: CardView = new CardView(this)
-  lazy val imageView: ImageView = UIUtils.imageToImageView(bufferedImage) // check if you can use def
+  lazy val imageView: ImageView = Image.imageToImageView(bufferedImage) // check if you can use def
 
   var isActive: Boolean = true
   def activate(): Unit = isActive = !isActive
@@ -103,9 +104,37 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
     prints("actual 100, 100", List(actualX(100), actualY(100)))
     (2, 3)
   }
+
+  def export(outFile: File, fileFormat: String = "png"): Boolean = ImageIO.write(getBufferedImage, fileFormat, outFile)
+
+  def writeObject(oos: ObjectOutputStream): Boolean = ImageIO.write(getBufferedImage, "png", oos)
+
+  def writeObject(outFile: File): Boolean = ImageIO.write(getBufferedImage, "png", outFile)
+  override def toString: String = path
 }
 
 object Image {
+  def readObject(inFile: File): Image = new Image(ImageIO.read(new ObjectInputStream(new FileInputStream(inFile))))
+
   def emptyImage(image: Image): Image = emptyImage(image.getBufferedImage.getWidth, image.getBufferedImage.getHeight)
   def emptyImage(width: Int, height: Int): Image = new Image(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB))
+
+  def imageToThumbnail(bi: BufferedImage): ImageView = setThumbnailFit()(imageToImageView(bi))
+
+  def setThumbnailFit(width: Int = 100, height: Int = 100, keepRatio: Boolean = true)(imageView: ImageView): ImageView = {
+    imageView.setFitWidth(width)
+    imageView.setFitHeight(height)
+    imageView.setPreserveRatio(keepRatio)
+    imageView
+  }
+
+  def imageToImageView(img: BufferedImage): ImageView = {
+    val wrImg: WritableImage = new WritableImage(img.getWidth, img.getHeight)
+    val pxImg = wrImg.getPixelWriter
+    for (x <- 0 until img.getWidth;
+        y <- 0 until img.getHeight) {
+      pxImg.setArgb(x, y, img.getRGB(x, y))
+    }
+    new ImageView(wrImg)
+  }
 }

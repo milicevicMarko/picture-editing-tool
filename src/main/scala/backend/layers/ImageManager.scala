@@ -5,7 +5,8 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.image.ImageView
 import scalafx.scene.shape.Rectangle
 
-object ImageManager {
+@SerialVersionUID(100L)
+object ImageManager extends Serializable {
   val imageBuffer: ObservableBuffer[Image] = new ObservableBuffer[Image]
 
   def size: Int = imageBuffer.size
