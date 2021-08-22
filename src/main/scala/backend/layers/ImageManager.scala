@@ -1,6 +1,6 @@
 package backend.layers
 
-import backend.engine.BaseOperation
+import backend.engine.{BaseOperation, Selection}
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.image.ImageView
 import scalafx.scene.shape.Rectangle
@@ -72,7 +72,7 @@ object ImageManager extends Serializable {
 //  }
 
   // todo test
-  def operate(op: BaseOperation, selection: List[Rectangle]): Unit = activated.foreach(image => imageBuffer.update(image.index, op(image, selection)))
+  def operate(op: BaseOperation, selection: List[Selection]): Unit = activated.foreach(image => imageBuffer.update(image.index, op(image, selection)))
 
   def flatten(): Unit = {
     val blended = blend()

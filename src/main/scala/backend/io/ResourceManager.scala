@@ -11,7 +11,7 @@ object ResourceManager {
   def test(): Unit = {
     if (out)
 //      ImageManager.writeImages()
-      SelectionManager.test()
+      SelectionManager.write()
     else
 //      ImageManager.readImages()
       SelectionManager.read()

@@ -1,6 +1,6 @@
 package frontend.main
 
-import backend.engine.{BaseOperation, CompositeDB, Operations}
+import backend.engine.{BaseOperation, CompositeDB, Operations, Selection, SelectionManager}
 import backend.io.{FileBrowser, ResourceManager}
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
@@ -82,84 +82,92 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
         if (centerPane.children.isEmpty) {
           selectPane.children.clear()
           selectPane.children.addAll(openOnStack, colorBox)
-          selectRectangles.clear()
-        } else
+          SelectionManager.clear()
+        } else {
           selectPane.children.remove(openOnStack)
+        }
       }
     }
   })
   // ----------------------------------------
   // selection
   // ----------------------------------------
-  val selectRectangles = new ListBuffer[Rectangle]
-  def currentSelection: Rectangle = selectRectangles.last
 
-  def newRectangle(xx: Double, yy: Double, ww: Double = 0, hh: Double = 0): Unit = {
-    val r = new Rectangle() {
-      visible = true
-      stroke = Color.BLACK
-      strokeDashArray = Seq(2d)
-      fill = Color.TRANSPARENT
-      strokeWidth = 0.5
-      x = xx
-      y = yy
-      width = ww
-      height = hh
+//  val selectRectangles = new ListBuffer[Rectangle]
+//  def currentSelection: Rectangle = selectRectangles.last
+  SelectionManager.buffer.addListener(new ListChangeListener[Selection] {
+    override def onChanged(change: ListChangeListener.Change[_ <: Selection]): Unit = {
+      while (change.next) {
+        if (change.wasAdded() || change.wasRemoved()) {
+          selectPane.children.clear()
+          selectPane.children = SelectionManager.buffer.map(selection => selection.rectangle).toList
+          selectPane.children.addOne(colorBox)
+        }
+      }
     }
+  })
+
+  def newRectangle(xx: Double, yy: Double, ww: Double = 0, hh: Double = 0): Rectangle = {
+    val r = SelectionManager.newRectangle(xx, yy, ww, hh)
 
     r.setOnMouseClicked(e => {
-      if (e.getButton == input.MouseButton.SECONDARY) deleteSelectRectangle(r)
+      if (e.getButton == input.MouseButton.SECONDARY) {
+        SelectionManager.remove(r)
+      }
       else if (e.getButton == input.MouseButton.PRIMARY && fillColor.isDefined) {
-        r.setFill(fillColor.get)
+        // replace in selection manager
+        val selection = SelectionManager.get(r)
+        val filled = selection.fill(fillColor.get)
+        SelectionManager.replace(selection, filled)
         fillColor = None
         r.setOpacity(1)
         r.strokeWidth = 0
       }
     })
 
-    addSelectRectangle(r)
-  }
-
-  def addSelectRectangle(rectangle: Rectangle): Unit = {
-    selectPane.children.addOne(rectangle)
-    selectRectangles.addOne(rectangle)
-  }
-
-  def deleteSelectRectangle(rect: Rectangle): Unit = {
-    selectPane.children.remove(rect)
-    selectRectangles.remove(selectRectangles.indexOf(rect))
+    selectPane.children.add(r)
+    r
   }
 
   var fillColor: Option[Color] = None
   val devHack = true
   def centerPaneNonEmpty: Boolean = centerPane.children.nonEmpty || devHack
 
-  selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => if (selectToggleButton.isSelected && centerPaneNonEmpty) e.getEventType match {
-    case MouseEvent.MOUSE_PRESSED => newRectangle(e.getX, e.getY)
-    case MouseEvent.MOUSE_DRAGGED =>
-      val dx = e.getX - currentSelection.getX
-      currentSelection.translateX = if (dx < 0) dx else 0
-      currentSelection.width = dx.abs
+  var currentSelect: Rectangle = null
 
-      val dy = e.getY - currentSelection.getY
-      currentSelection.translateY = if (dy < 0) dy else 0
-      currentSelection.height = dy.abs
+  selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => if (selectToggleButton.isSelected && centerPaneNonEmpty) e.getEventType match {
+    case MouseEvent.MOUSE_PRESSED => currentSelect = newRectangle(e.getX, e.getY)
+    case MouseEvent.MOUSE_DRAGGED =>
+      val dx = e.getX - currentSelect.getX
+      currentSelect.translateX = if (dx < 0) dx else 0
+      currentSelect.width = dx.abs
+
+      val dy = e.getY - currentSelect.getY
+      currentSelect.translateY = if (dy < 0) dy else 0
+      currentSelect.height = dy.abs
 
     case MouseEvent.MOUSE_RELEASED =>
 //      val r = currentSelection
 //      println(s"rect: [${r.getX}, ${r.getY}], [${r.getX + r.getWidth}, ${r.getY + r.getHeight}]")
 
       // ignore clicks
-      if (currentSelection.getWidth <= 5 && currentSelection.getHeight <= 5)
-        selectRectangles.remove(selectRectangles.size - 1)
+      if (rectangleIsACLick(currentSelect)) {
+        selectPane.children.remove(currentSelect)
+        currentSelect = null
+      }
       // switch x,y of rectangle
-      else if (e.getX < currentSelection.getX || e.getY < currentSelection.getY) {
-          val old = currentSelection
-          newRectangle(e.getX, e.getY, currentSelection.getWidth, currentSelection.getHeight)
-          deleteSelectRectangle(old)
+      else if (e.getX < currentSelect.getX || e.getY < currentSelect.getY) {
+          val old = currentSelect
+          val newRect = newRectangle(e.getX, e.getY, currentSelect.getWidth, currentSelect.getHeight)
+          selectPane.children.remove(old)
+          currentSelect = newRect
         }
+      if (currentSelect != null)
+        SelectionManager.add(currentSelect)
     case _ =>
   })
+
+  def rectangleIsACLick(rectangle: Rectangle): Boolean = rectangle.getWidth <= 5 && rectangle.getHeight <= 5
 
   def toggleSelect(): Unit = {
     if (selectToggleButton.isSelected)
@@ -249,11 +257,11 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
   override def minOp(): Unit = operate(Operations.min)
 
   // todo check this
-  override def absOp(): Unit = ImageManager.operate(Operations.abs(), selectRectangles.toList)
+  override def absOp(): Unit = ImageManager.operate(Operations.abs(), SelectionManager.buffer.toList)
 
-  override def greyscaleOp(): Unit = ImageManager.operate(Operations.greyscale(), selectRectangles.toList)
+  override def greyscaleOp(): Unit = ImageManager.operate(Operations.greyscale(), SelectionManager.buffer.toList)
 
-  override def invertOp(): Unit = ImageManager.operate(Operations.invert(), selectRectangles.toList)
+  override def invertOp(): Unit = ImageManager.operate(Operations.invert(), SelectionManager.buffer.toList)
 
   override def flatten(): Unit = {
     tryToFill()
@@ -261,9 +269,9 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
   }
 
   // todo check if transparent is marked as filled, probably yes!
-  def tryToFill(): Unit = if (selectRectangles.count(r => isSelectionFilled(r)) > 0) fillSelection()
+  def tryToFill(): Unit = if (SelectionManager.hasFilled) fillSelection()
 
-  def fillSelection(): Unit = ImageManager.operate(Operations.fill(), selectRectangles.filter(r => isSelectionFilled(r)).toList)
+  def fillSelection(): Unit = ImageManager.operate(Operations.fill(), SelectionManager.getFilled)
 
   def isSelectionFilled(rectangle: Rectangle): Boolean = rectangle.getFill != null && rectangle.getFill != Color.TRANSPARENT
 
@@ -279,8 +287,8 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
   def setFillColor(): Unit = fillColor = Some(colorBox.getValue)
 
   def operate(op: Double => BaseOperation): Unit = readTextField() match {
-    case Some(value) => ImageManager.operate(op(value), selectRectangles.toList)
-    case None if !Operations.needsArgument(op) => ImageManager.operate(op(0), selectRectangles.toList)
+    case Some(value) => ImageManager.operate(op(value), SelectionManager.buffer.toList)
+    case None if !Operations.needsArgument(op) => ImageManager.operate(op(0), SelectionManager.buffer.toList)
     case None => println("Please enter text field value")
   }
 
@@ -316,7 +324,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
       val name = compositeList.getSelectionModel.getSelectedItem
       compositeList.getSelectionModel.clearSelection()
       val composite = CompositeDB.findComposite(name)
-      ImageManager.operate(composite, selectRectangles.toList)
+      ImageManager.operate(composite, SelectionManager.buffer.toList)
     }
   }
 

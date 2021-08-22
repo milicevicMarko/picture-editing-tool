@@ -4,7 +4,6 @@ import backend.layers.{Image, RGB}
 import javafx.collections.ObservableList
 import scalafx.collections.ObservableBuffer
 import javafx.scene.paint.Color
-import scalafx.scene.shape.Rectangle
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
@@ -13,19 +12,20 @@ import scala.language.implicitConversions
 abstract case class BaseOperation(name: String) {
   def operate(rgb: RGB): RGB
 
-  def inSelection(pixelCoordinates: (Double, Double), r: Rectangle): Boolean = {
-    pixelCoordinates._1 >= r.getX && pixelCoordinates._1 <= r.getX + r.getWidth && pixelCoordinates._2 >= r.getY && pixelCoordinates._2 <= r.getY + r.getHeight
+  def inSelection(pixelCoordinates: (Double, Double), r: Selection): Boolean = {
+    r.isPixelInside(pixelCoordinates)
+//    pixelCoordinates._1 >= r.getX && pixelCoordinates._1 <= r.getX + r.getWidth && pixelCoordinates._2 >= r.getY && pixelCoordinates._2 <= r.getY + r.getHeight
   }
-  def isPixelInSelection(pixelCoordinates: (Double, Double), selectionList: List[Rectangle]): Boolean = {
+  def isPixelInSelection(pixelCoordinates: (Double, Double), selectionList: List[Selection]): Boolean = {
     @tailrec
-    def iterSelections(selection: List[Rectangle]): Boolean = selection match {
+    def iterSelections(selection: List[Selection]): Boolean = selection match {
       case s::ss => if (!inSelection(pixelCoordinates, s)) iterSelections(ss) else true
       case Nil => false
     }
     iterSelections(selectionList)
   }
 
-  def apply(image: Image, selection: List[Rectangle]): Image = {
+  def apply(image: Image, selection: List[Selection]): Image = {
     val img = image.getBufferedImage
     for (x <- 0 until img.getWidth;
          y <- 0 until img.getHeight
@@ -42,11 +42,10 @@ class SimpleOperation(name: String, operation: RGB => RGB) extends BaseOperation
 }
 
 class FillOperation() extends BaseOperation("fill") {
-  implicit def intRGBFromSelectionFill(rectangle: Rectangle): Int = {
-    val c: Color = rectangle.getFill.asInstanceOf[Color]
-    new RGB(c.getRed, c.getGreen, c.getBlue)
+  implicit def intRGBFromSelectionFill(rectangle: Selection): Int = {
+    rectangle.color
   }
-  override def apply(image: Image, selection: List[Rectangle]): Image = {
+  override def apply(image: Image, selection: List[Selection]): Image = {
     val img = image.getBufferedImage
     // iterate only trough selections
     for (rect <- selection;
