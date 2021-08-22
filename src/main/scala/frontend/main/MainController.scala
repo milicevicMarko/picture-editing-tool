@@ -260,9 +260,12 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
     ImageManager.flatten()
   }
 
-  def tryToFill(): Unit = if (selectRectangles.count(r => r.getFill != null) > 0) fillSelection()
+  // todo check if transparent is marked as filled, probably yes!
+  def tryToFill(): Unit = if (selectRectangles.count(r => isSelectionFilled(r)) > 0) fillSelection()
 
-  def fillSelection(): Unit = ImageManager.operate(Operations.fill(), selectRectangles.filter(r => r.getFill != null).toList)
+  def fillSelection(): Unit = ImageManager.operate(Operations.fill(), selectRectangles.filter(r => isSelectionFilled(r)).toList)
+
+  def isSelectionFilled(rectangle: Rectangle): Boolean = rectangle.getFill != null && rectangle.getFill != Color.TRANSPARENT
 
   def toggleFillColor(): Unit = {
     colorBox.setVisible(fillToggleButton.isSelected)

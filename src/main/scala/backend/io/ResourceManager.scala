@@ -1,5 +1,6 @@
 package backend.io
 
+import backend.engine.SelectionManager
 import backend.layers.{Image, ImageManager}
 
 import java.awt.image.BufferedImage
@@ -9,9 +10,11 @@ object ResourceManager {
   var out = true
   def test(): Unit = {
     if (out)
-      ImageManager.writeImages()
+//      ImageManager.writeImages()
+      SelectionManager.test()
     else
-      ImageManager.readImages()
+//      ImageManager.readImages()
+      SelectionManager.read()
     out = !out
   }
 }

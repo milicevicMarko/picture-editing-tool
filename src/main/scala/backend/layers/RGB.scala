@@ -1,6 +1,7 @@
 package backend.layers
 
 import backend.layers.RGB.toInt
+import scalafx.scene.paint.Color
 
 import scala.language.implicitConversions
 
@@ -38,8 +39,10 @@ case class RGB(red: Double, green: Double, blue: Double) {
 }
 
 object RGB {
+  implicit def toColor(rgb: RGB): Color = Color.color(rgb.red, rgb.green, rgb.blue)
   implicit def toInt(rgb: RGB): Int = (255 << 24) + ((rgb.red * 255.0).round.toInt << 16) + ((rgb.green * 255.0).round.toInt << 8) + ((rgb.blue * 255.0).round.toInt << 0)
   implicit def toRGB(color: Int): RGB = new RGB((color & 0xff0000) >> 16, (color & 0xff00) >> 8, (color & 0xff) >> 0)
+  implicit def toRGB(color: Color): RGB = new RGB(color.getRed, color.getGreen, color.getBlue)
 }
 
 object M {
