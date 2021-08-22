@@ -21,6 +21,16 @@ class Selection(val x: Double, val y: Double, val width: Double = 0, val height:
     new Selection(x, y, width, height, rectangle, false, RGB.toRGB(color))
   }
 
+  def getRectangle: Rectangle = {
+    if (rectangle == null) {
+      val newSelection = new Selection(x, y, width, height, Selection.toRectangle(this), isTransparent, color)
+      SelectionManager.replace(this, newSelection)
+      SelectionManager.addActionListeners(newSelection.getRectangle)
+      newSelection.getRectangle
+    } else {
+      rectangle
+    }
+  }
   def isPixelInside(pixelCoordinates: (Double, Double)): Boolean =
     pixelCoordinates._1 >= xBorder._1 && pixelCoordinates._1 <= xBorder._2 && pixelCoordinates._2 >= yBorder._1 && pixelCoordinates._2 <= yBorder._2
 
@@ -60,9 +70,11 @@ object Selection {
   def isRectangleTransparent(rectangle: Rectangle): Boolean = rectangle.getFill == null || rectangle.getFill == Color.TRANSPARENT
 }
 
+@SerialVersionUID(111L)
 object SelectionManager extends Serializable {
   val buffer: ObservableBuffer[Selection] = new ObservableBuffer[Selection]
   val storageReference: String = "dataSelection.temp"
+
   def last: Selection = buffer.last
   def size: Int = buffer.size
   def clear(): Unit = buffer.clear()

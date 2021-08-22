@@ -3,13 +3,14 @@ package backend.engine
 import backend.layers.{Image, RGB}
 import javafx.collections.ObservableList
 import scalafx.collections.ObservableBuffer
-import javafx.scene.paint.Color
 
+import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 import scala.language.implicitConversions
 
-abstract case class BaseOperation(name: String) {
+@SerialVersionUID(107L)
+abstract case class BaseOperation(name: String) extends Serializable {
   def operate(rgb: RGB): RGB
 
   def inSelection(pixelCoordinates: (Double, Double), r: Selection): Boolean = {
@@ -39,6 +40,7 @@ abstract case class BaseOperation(name: String) {
 
 class SimpleOperation(name: String, operation: RGB => RGB) extends BaseOperation(name) {
   override def operate(rgb: RGB): RGB = operation(rgb)
+  override def toString: String = operation.toString()
 }
 
 class FillOperation() extends BaseOperation("fill") {
@@ -77,11 +79,7 @@ class BlendOperation() extends BaseOperation("blend") {
 
 class CompositeOperation(name: String, operations: List[BaseOperation]) extends BaseOperation(name) {
   override def operate(acc: RGB): RGB = operations.foldLeft(acc)((rgb, bo) => bo.operate(rgb))
-
-  override def toString: String = {
-    super.toString
-    operations.foldLeft("")((_, op) => " " + op.toString)
-  }
+  override def toString: String = name
 }
 
 class FilterOperation(name: String) extends BaseOperation(name) {
@@ -89,18 +87,28 @@ class FilterOperation(name: String) extends BaseOperation(name) {
   // todo wtf should i do ahhaha
 }
 
-@SerialVersionUID(102L)
-object CompositeDB extends Serializable{
-  val composites: ListBuffer[CompositeOperation] = new ListBuffer[CompositeOperation]
-
-  def getObservables: ObservableList[String] = {
-    val buffer: ObservableList[String] = new ObservableBuffer[String]()
-    composites.foreach(comp => buffer.add(comp.name))
-    buffer
-  }
+@SerialVersionUID(110L)
+object OperationManager extends Serializable {
+  val composites: ObservableBuffer[CompositeOperation] = new ObservableBuffer[CompositeOperation]
+  val dataOperations = "dataOperations.temp"
 
   def findComposite(name: String): BaseOperation = composites.find(c => c.name == name).get
   def removeComposite(name: String): Unit = composites.remove(composites.indexOf(findComposite(name)))
+
+  def write(): Unit = {
+    val oos = new ObjectOutputStream(new FileOutputStream(dataOperations))
+    oos.writeObject(composites.toList)
+    oos.close()
+  }
+
+  def read(): Unit = {
+    val ois = new ObjectInputStream(new FileInputStream(dataOperations))
+    val list: List[CompositeOperation] = ois.readObject().asInstanceOf[List[CompositeOperation]]
+    ois.close()
+    composites.clear()
+    composites.addAll(list)
+  }
+  override def toString: String = composites.foldLeft("")((s, co) => s + co.toString)
 }
 
 object Operations {
@@ -141,7 +149,7 @@ object Operations {
     case "greyscale" => greyscale(argument)
     case "invert" => invert(argument)
 
-    case _ => CompositeDB.findComposite(name)
+    case _ => OperationManager.findComposite(name)
   }
 
   def needsArgument(op: Double => BaseOperation): Boolean = needsArgument(op(0).name)
@@ -150,6 +158,4 @@ object Operations {
     case "limit" | "abs" | "greyscale" | "invert" | "fill" => true
     case _ => false
   }
-
-  def createComposite(name: String, ops: List[BaseOperation]): Unit = CompositeDB.composites.addOne(new CompositeOperation(name, ops))
 }

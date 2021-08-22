@@ -3,9 +3,8 @@ package backend.layers
 import backend.engine.{BaseOperation, Selection}
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.image.ImageView
-import scalafx.scene.shape.Rectangle
 
-import java.io.{File, FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream, SequenceInputStream}
+import java.io.{File, FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
 
 @SerialVersionUID(100L)
 object ImageManager extends Serializable {
@@ -83,7 +82,7 @@ object ImageManager extends Serializable {
 
   def blend(): Image = activated.foldLeft(Image.emptyImage(activated.head))((img1, img2) => img1 blend img2)
 
-  val dataReference: String = "data.temp"
+  val dataReference: String = "dataImage.temp"
   def readDataReference(): List[String] = {
     if (new File(dataReference).exists()) {
       val ois = new ObjectInputStream(new FileInputStream(dataReference))
@@ -104,7 +103,7 @@ object ImageManager extends Serializable {
     listOfFiles.foreach(fileName => deleteFile(fileName))
     deleteFile(dataReference)
   }
-  def writeImages(): Unit = {
+  def write(): Unit = {
     deleteOldTemporaries()
 
     imageBuffer.foreach(img => img.writeTemporary())
@@ -113,5 +112,10 @@ object ImageManager extends Serializable {
     oos.writeObject(listOfReferences)
     oos.close()
   }
-  def readImages(): Unit = readDataReference().foreach(t => ImageManager.add(Image.read(new File(t))))
+
+  def overwrite(): Unit = {
+    imageBuffer.foreach(img => img.overwrite())
+  }
+
+  def read(): Unit = readDataReference().foreach(t => ImageManager.add(Image.read(new File(t))))
 }

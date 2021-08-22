@@ -1,6 +1,6 @@
 package frontend.main
 
-import backend.engine.{BaseOperation, CompositeDB, Operations, Selection, SelectionManager}
+import backend.engine.{BaseOperation, CompositeOperation, OperationManager, Operations, Selection, SelectionManager}
 import backend.io.{FileBrowser, ResourceManager}
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
@@ -29,7 +29,6 @@ trait MainInterface {
   def close(): Unit
   def rotateRight(): Unit
   def rotateLeft(): Unit
-  def testMe(): Unit
   def debugCursor(): Unit
   def swap(): Unit
   def refresh(): Unit
@@ -57,6 +56,9 @@ trait MainInterface {
   def openComposer(): Unit
   def useComposite(): Unit
   def removeComposite(): Unit
+
+  def write(): Unit
+  def read(): Unit
 }
 
 @sfxml
@@ -66,7 +68,6 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
   extends MainInterface {
   val stage: Stage = MainControllerApp.stage
   val cardListView: CardListView = new CardListView(layers)
-  updateComposites()
 
 
   // ----------------------------------------
@@ -96,7 +97,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
       while (change.next) {
         if (change.wasAdded() || change.wasRemoved()) {
           selectPane.children.clear()
-          selectPane.children = SelectionManager.buffer.map(selection => selection.rectangle).toList
+          selectPane.children = SelectionManager.buffer.map(selection => selection.getRectangle).toList
           selectPane.children.addOne(colorBox)
         }
       }
@@ -188,8 +189,6 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
   }
 
   override def swap(): Unit = ImageManager.swap()
-
-  override def testMe(): Unit = ResourceManager.test() //println("Nothing is set for debugging")
 
   var debugMouse: Boolean = false
   override def debugCursor(): Unit = {
@@ -288,18 +287,22 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
     dialogStage.initModality(Modality.ApplicationModal)
     dialogStage.title = "Operation Composer"
     dialogStage.showAndWait()
-    updateComposites()
   }
 
-  def updateComposites(): Unit = {
-    compositeList.items = CompositeDB.getObservables
-  }
+  OperationManager.composites.addListener(new ListChangeListener[CompositeOperation] {
+    override def onChanged(change: ListChangeListener.Change[_ <: CompositeOperation]): Unit = {
+      while (change.next) {
+        if (change.wasAdded() || change.wasRemoved())
+          compositeList.items = OperationManager.composites.map(c => c.toString)
+      }
+    }
+  })
 
   override def useComposite(): Unit = {
     if (compositeList.getSelectionModel.getSelectedItems.size() > 0) {
       val name = compositeList.getSelectionModel.getSelectedItem
       compositeList.getSelectionModel.clearSelection()
-      val composite = CompositeDB.findComposite(name)
+      val composite = OperationManager.findComposite(name)
       ImageManager.operate(composite, SelectionManager.buffer.toList)
     }
   }
@@ -308,10 +311,15 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
     if (compositeList.getSelectionModel.getSelectedItems.size() > 0) {
       val name = compositeList.getSelectionModel.getSelectedItem
       compositeList.getSelectionModel.clearSelection()
-      CompositeDB.removeComposite(name)
-      updateComposites()
+      OperationManager.removeComposite(name)
     }
   }
+
+  val testFile: String = "my-test.cool"
+
+  override def write(): Unit = ResourceManager().write(testFile)
+
+  override def read(): Unit = ResourceManager().read(testFile)
 }
 
 object MainControllerApp extends JFXApp3 {

@@ -10,7 +10,7 @@ import java.io.{File, FileInputStream, FileOutputStream, ObjectInputStream, Obje
 import javax.imageio.ImageIO
 
 @SerialVersionUID(101L)
-class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) extends Serializable {
+class Image(@transient val bufferedImage: BufferedImage, path: String = "", var index: Int = ImageManager.size) extends Serializable {
   def this(path: String) = this(FileImport.loadImage(path), path)
   def this(path: String, index: Int) = this(FileImport.loadImage(path), path, index)
 
@@ -34,14 +34,24 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   }
 
   def refresh(): Unit = ImageManager.imageBuffer.update(index, new Image(bufferedImage, path, index))
-  def getBufferedImage: BufferedImage = if (bufferedImage == null) FileImport.loadImage(path) else bufferedImage
+
+  // todo could lead to stack overflow if file does not exist!
+  def getBufferedImage: BufferedImage = {
+    if (bufferedImage == null) {
+      val newImage = new Image(FileImport.loadImage(path), path, index)
+      ImageManager.imageBuffer.update(index, newImage)
+      newImage.getBufferedImage
+    } else {
+      bufferedImage
+    }
+  }
   def getImageView: ImageView = imageView
   def getPath: String = path
   val name: String = new File(path).getName
   val tempName: String = index.toString + ".temp"
 
-  lazy val cardView: CardView = new CardView(this)
-  lazy val imageView: ImageView = Image.imageToImageView(bufferedImage) // check if you can use def
+  @transient lazy val cardView: CardView = new CardView(this)
+  @transient lazy val imageView: ImageView = Image.imageToImageView(getBufferedImage) // check if you can use def
 
   var isActive: Boolean = true
   def activate(): Unit = isActive = !isActive
@@ -60,7 +70,7 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
   }
 
   def bindTo(pane: Pane): Image = {
-    if (bufferedImage.getWidth > pane.getWidth || bufferedImage.getHeight > pane.getHeight) {
+    if (getBufferedImage.getWidth > pane.getWidth || getBufferedImage.getHeight > pane.getHeight) {
       imageView.fitWidthProperty().bind(pane.widthProperty().subtract(100))
       imageView.fitHeightProperty().bind(pane.heightProperty().subtract(100))
       imageView.setPreserveRatio(true)
@@ -107,7 +117,9 @@ class Image(bufferedImage: BufferedImage, path: String = "", var index: Int = Im
     (2, 3)
   }
 
-  def writeTemporary(): Boolean = ImageIO.write(getBufferedImage, "png", new ObjectOutputStream(new FileOutputStream(tempName)))
+  def writeTemporary(): Boolean = ImageIO.write(getBufferedImage, "png", new File(path))
+  def overwrite(): Unit = ImageIO.write(getBufferedImage, "png", new File(path))
+
   def write(outStream: ObjectOutputStream, fileFormat: String = "png"): Boolean = ImageIO.write(getBufferedImage, fileFormat, outStream)
 
   override def toString: String = path

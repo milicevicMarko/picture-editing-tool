@@ -1,6 +1,6 @@
 package frontend.operations
 
-import backend.engine.{BaseOperation, CompositeDB, Operations}
+import backend.engine.{BaseOperation, CompositeOperation, OperationManager, Operations}
 import javafx.collections.ObservableList
 import javafx.stage.Stage
 import scalafx.collections.ObservableBuffer
@@ -30,7 +30,7 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
   basics.addAll("add", "sub", "inv sub", "mul", "div", "inv div")
 
   val composites: ObservableList[String] = new ObservableBuffer[String]()
-  CompositeDB.composites.map(comp => composites.add(comp.name))
+  OperationManager.composites.map(comp => composites.add(comp.name))
 
   val functions: ObservableList[String] = new ObservableBuffer[String]()
   functions.addAll("pow", "log", "abs", "min", "max", "greyscale", "invert")
@@ -110,7 +110,7 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
     if (name.nonEmpty && !listOfOperations.getItems.isEmpty) {
       val strList = listOfOperations.getItems.toArray.map(s => s.toString).toList
       val operations = getOperations(Nil, strList).reverse
-      Operations.createComposite(name, operations)
+      OperationManager.composites.addOne(new CompositeOperation(name, operations))
       close()
     }
   }
