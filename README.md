@@ -1,5 +1,7 @@
 # Functional Programming course assignment
 
+> Before you lose yourself in the code, take note that this is my first real 'functional' project written in Scala. There may be (most probably is or even the whole of it is) smelly code. I'm a beginner so don't be too harsh :)
+
 This is a project done for the Functional Programming course at the University of Belgrade, School of Electrical engineering 2021.
 It is meant to be used as a picture editing software tool with working GUI.
 Written mainly in SCALA functional language, it is meant to follow the functional programming paradigm. 
