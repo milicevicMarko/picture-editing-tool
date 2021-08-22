@@ -7,10 +7,9 @@ import frontend.exit.ExitController
 import frontend.layers.CardListView
 import frontend.operations.OperationsController
 import javafx.collections.ListChangeListener
-import javafx.scene.{Parent, input}
+import javafx.scene.Parent
 import javafx.{scene => jfxs}
 import javafx.scene.input.MouseEvent
-import javafx.scene.paint.Color
 import scalafx.Includes._
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
@@ -22,7 +21,6 @@ import scalafxml.core.macros.sfxml
 import scalafxml.core.{DependenciesByType, FXMLLoader}
 
 import java.net.URL
-import scala.collection.mutable.ListBuffer
 
 trait MainInterface {
   def open(): Unit
@@ -114,35 +112,38 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
     r
   }
 
-  var currentSelect: Rectangle = null
+  var currentSelect: Option[Rectangle] = None
 
   selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => if (selectToggleButton.isSelected && centerPane.children.nonEmpty) e.getEventType match {
     case MouseEvent.MOUSE_PRESSED =>
-      currentSelect = newRectangle(e.getX, e.getY)
+      currentSelect = Some(newRectangle(e.getX, e.getY))
 
     case MouseEvent.MOUSE_DRAGGED =>
-      val dx = e.getX - currentSelect.getX
-      currentSelect.translateX = if (dx < 0) dx else 0
-      currentSelect.width = dx.abs
+      val selected = currentSelect.get
+      val dx = e.getX - selected.getX
+      selected.translateX = if (dx < 0) dx else 0
+      selected.width = dx.abs
 
-      val dy = e.getY - currentSelect.getY
-      currentSelect.translateY = if (dy < 0) dy else 0
-      currentSelect.height = dy.abs
+      val dy = e.getY - selected.getY
+      selected.translateY = if (dy < 0) dy else 0
+      selected.height = dy.abs
 
     case MouseEvent.MOUSE_RELEASED =>
-      if (rectangleIsACLick(currentSelect)) {
+      if (rectangleIsACLick(currentSelect.get)) {
         // ignore clicks
-        selectPane.children.remove(currentSelect)
-        currentSelect = null
-      } else if (e.getX < currentSelect.getX || e.getY < currentSelect.getY) {
+        selectPane.children.remove(currentSelect.get)
+        currentSelect = None
+      } else if (e.getX < currentSelect.get.getX || e.getY < currentSelect.get.getY) {
         // switch x,y of rectangle
         val old = currentSelect
-        val newRect = newRectangle(e.getX, e.getY, currentSelect.getWidth, currentSelect.getHeight)
+        val newRect = newRectangle(e.getX, e.getY, currentSelect.get.getWidth, currentSelect.get.getHeight)
         selectPane.children.remove(old)
-        currentSelect = newRect
+        currentSelect = Some(newRect)
       }
-      if (currentSelect != null)
-        SelectionManager.add(currentSelect)
+      currentSelect match {
+        case Some(_) => SelectionManager.add(currentSelect.get)
+        case None =>
+      }
 
     case _ =>
   })
@@ -248,12 +249,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
     ImageManager.flatten()
   }
 
-  // todo mopve to selection manager
-  def tryToFill(): Unit = if (SelectionManager.hasFilled) fillSelection()
-
-  def fillSelection(): Unit = ImageManager.operate(Operations.fill(), SelectionManager.getFilled)
-
-  def isSelectionFilled(rectangle: Rectangle): Boolean = rectangle.getFill != null && rectangle.getFill != Color.TRANSPARENT
+  def tryToFill(): Unit = SelectionManager.tryToFill()
 
   def toggleFillColor(): Unit = {
     colorBox.setVisible(fillToggleButton.isSelected)

@@ -1,6 +1,6 @@
 package backend.engine
 
-import backend.layers.RGB
+import backend.layers.{ImageManager, RGB}
 import javafx.scene.input
 import javafx.scene.paint.Color
 import scalafx.Includes._
@@ -114,6 +114,10 @@ object SelectionManager extends Serializable {
       }
     })
   }
+
+  def tryToFill(): Unit = if (SelectionManager.hasFilled) SelectionManager.fillSelection()
+
+  def fillSelection(): Unit = ImageManager.operate(Operations.fill(), SelectionManager.getFilled)
 
   def write(): Unit = {
     val oos = new ObjectOutputStream(new FileOutputStream(storageReference))
