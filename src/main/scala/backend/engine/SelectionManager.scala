@@ -1,6 +1,7 @@
 package backend.engine
 
 import backend.layers.RGB
+import javafx.scene.input
 import javafx.scene.paint.Color
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
@@ -30,8 +31,8 @@ case class TransparentSelection(xx: Double, yy: Double, ww: Double, hh: Double, 
 case class FilledSelection(xx: Double, yy: Double, ww: Double, hh: Double, rr: Rectangle, rgb: RGB) extends Selection(xx, yy, ww, hh, rr, false, rgb)
 
 object Selection {
-  def rectangleEdges(rect: Rectangle): Unit = {
-    if (rect.getFill == Color.TRANSPARENT) {
+  def rectangleEdges(rect: Rectangle, isTransparent: Boolean): Unit = {
+    if (isTransparent) {
       rect.stroke = Color.BLACK
       rect.strokeWidth = 0.5
       rect.strokeDashArray = Seq(2d)
@@ -45,11 +46,9 @@ object Selection {
     y = selection.y
     width = selection.width
     height = selection.height
-    if (!selection.isTransparent)
-      fill = selection.color
-    rectangleEdges(this)
+    fill = if (selection.isTransparent) Color.TRANSPARENT else selection.color
+    rectangleEdges(this, selection.isTransparent)
   }
-
 
   def toSelection(rectangle: Rectangle): Selection = {
     if (isRectangleTransparent(rectangle))
@@ -98,7 +97,23 @@ object SelectionManager extends Serializable {
     height = hh
   }
 
+  var fillColor: Option[Color] = None
 
+  def addActionListeners(r: Rectangle): Unit = {
+    r.setOnMouseClicked(e => {
+      if (e.getButton == input.MouseButton.SECONDARY) {
+        SelectionManager.remove(r)
+      }
+      else if (e.getButton == input.MouseButton.PRIMARY && fillColor.isDefined) {
+        // replace in selection manager
+        val selection = SelectionManager.get(r)
+        val filled = selection.fill(fillColor.get)
+        SelectionManager.replace(selection, filled)
+        r.setOpacity(1)
+        r.strokeWidth = 0
+      }
+    })
+  }
 
   def write(): Unit = {
     val oos = new ObjectOutputStream(new FileOutputStream(storageReference))
@@ -109,9 +124,10 @@ object SelectionManager extends Serializable {
   def read(): Unit = {
     val ois = new ObjectInputStream(new FileInputStream(storageReference))
     val list = ois.readObject().asInstanceOf[List[Selection]]
-    list.foreach(selection => selection.rectangle = Selection.toRectangle(selection))
+    val list_ = list.map(s => new Selection(s.x, s.y, s.width, s.height, Selection.toRectangle(s), s.isTransparent, s.color))
+    list_.foreach(s => SelectionManager.addActionListeners(s.rectangle))
     ois.close()
     buffer.clear()
-    add(list)
+    add(list_)
   }
 }

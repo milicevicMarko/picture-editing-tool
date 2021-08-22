@@ -93,8 +93,6 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
   // selection
   // ----------------------------------------
 
-//  val selectRectangles = new ListBuffer[Rectangle]
-//  def currentSelection: Rectangle = selectRectangles.last
   SelectionManager.buffer.addListener(new ListChangeListener[Selection] {
     override def onChanged(change: ListChangeListener.Change[_ <: Selection]): Unit = {
       while (change.next) {
@@ -104,39 +102,24 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
           selectPane.children.addOne(colorBox)
         }
       }
+      if (centerPane.children.isEmpty)
+        selectPane.children.add(openOnStack)
     }
   })
 
   def newRectangle(xx: Double, yy: Double, ww: Double = 0, hh: Double = 0): Rectangle = {
     val r = SelectionManager.newRectangle(xx, yy, ww, hh)
-
-    r.setOnMouseClicked(e => {
-      if (e.getButton == input.MouseButton.SECONDARY) {
-        SelectionManager.remove(r)
-      }
-      else if (e.getButton == input.MouseButton.PRIMARY && fillColor.isDefined) {
-        // replace in selection manager
-        val selection = SelectionManager.get(r)
-        val filled = selection.fill(fillColor.get)
-        SelectionManager.replace(selection, filled)
-        fillColor = None
-        r.setOpacity(1)
-        r.strokeWidth = 0
-      }
-    })
-
+    SelectionManager.addActionListeners(r)
     selectPane.children.add(r)
     r
   }
 
-  var fillColor: Option[Color] = None
-  val devHack = true
-  def centerPaneNonEmpty: Boolean = centerPane.children.nonEmpty || devHack
-
   var currentSelect: Rectangle = null
 
-  selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => if (selectToggleButton.isSelected && centerPaneNonEmpty) e.getEventType match {
-    case MouseEvent.MOUSE_PRESSED => currentSelect = newRectangle(e.getX, e.getY)
+  selectPane.addEventFilter[MouseEvent](MouseEvent.ANY, e => if (selectToggleButton.isSelected && centerPane.children.nonEmpty) e.getEventType match {
+    case MouseEvent.MOUSE_PRESSED =>
+      currentSelect = newRectangle(e.getX, e.getY)
+
     case MouseEvent.MOUSE_DRAGGED =>
       val dx = e.getX - currentSelect.getX
       currentSelect.translateX = if (dx < 0) dx else 0
@@ -147,23 +130,20 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
       currentSelect.height = dy.abs
 
     case MouseEvent.MOUSE_RELEASED =>
-//      val r = currentSelection
-//      println(s"rect: [${r.getX}, ${r.getY}], [${r.getX + r.getWidth}, ${r.getY + r.getHeight}]")
-
-      // ignore clicks
       if (rectangleIsACLick(currentSelect)) {
+        // ignore clicks
         selectPane.children.remove(currentSelect)
         currentSelect = null
+      } else if (e.getX < currentSelect.getX || e.getY < currentSelect.getY) {
+        // switch x,y of rectangle
+        val old = currentSelect
+        val newRect = newRectangle(e.getX, e.getY, currentSelect.getWidth, currentSelect.getHeight)
+        selectPane.children.remove(old)
+        currentSelect = newRect
       }
-      // switch x,y of rectangle
-      else if (e.getX < currentSelect.getX || e.getY < currentSelect.getY) {
-          val old = currentSelect
-          val newRect = newRectangle(e.getX, e.getY, currentSelect.getWidth, currentSelect.getHeight)
-          selectPane.children.remove(old)
-          currentSelect = newRect
-        }
       if (currentSelect != null)
         SelectionManager.add(currentSelect)
+
     case _ =>
   })
 
@@ -268,7 +248,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
     ImageManager.flatten()
   }
 
-  // todo check if transparent is marked as filled, probably yes!
+  // todo mopve to selection manager
   def tryToFill(): Unit = if (SelectionManager.hasFilled) fillSelection()
 
   def fillSelection(): Unit = ImageManager.operate(Operations.fill(), SelectionManager.getFilled)
@@ -279,12 +259,12 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
     colorBox.setVisible(fillToggleButton.isSelected)
     colorBox.setDisable(!fillToggleButton.isSelected)
     if (!fillToggleButton.isSelected)
-      fillColor = None
+      SelectionManager.fillColor = None
     else if (selectToggleButton.isSelected)
       selectToggleButton.selected = false
   }
 
-  def setFillColor(): Unit = fillColor = Some(colorBox.getValue)
+  def setFillColor(): Unit = SelectionManager.fillColor = Some(colorBox.getValue)
 
   def operate(op: Double => BaseOperation): Unit = readTextField() match {
     case Some(value) => ImageManager.operate(op(value), SelectionManager.buffer.toList)
