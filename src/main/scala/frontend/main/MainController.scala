@@ -1,7 +1,7 @@
 package frontend.main
 
 import backend.engine.{BaseOperation, CompositeOperation, OperationManager, Operations, Selection, SelectionManager}
-import backend.io.{FileBrowser, FileExport, ResourceManager}
+import backend.io.{FileBrowser, FileExport, FileImport, ResourceManager}
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
 import frontend.layers.CardListView
@@ -162,12 +162,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
   // ----------------------------------------
   // open, save, save as
   // ----------------------------------------
-  override def open(): Unit = {
-    FileBrowser.chooseImportMultiplePath() match {
-      case paths: List[String] => ImageManager add paths
-      case _ => println("Canceled")
-    }
-  }
+  override def open(): Unit = FileImport.importFile()
 
   override def save(): Unit = FileExport.save()
 
