@@ -26,8 +26,8 @@ trait ExitController{
 object ExitController extends ExitController {
 
   def handleExitEvent(event: WindowEvent): Unit = exit(MainControllerApp.stage) match {
-    case SaveText => ???
-    case SaveAsText => ???
+    case SaveText => FileExport.save()
+    case SaveAsText => FileExport.saveAs()
     case CancelText => event.consume(); println("Cancel")
     case OkText => println("Exit")
     case _ => throw new UnknownError

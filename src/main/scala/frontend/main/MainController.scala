@@ -1,7 +1,7 @@
 package frontend.main
 
 import backend.engine.{BaseOperation, CompositeOperation, OperationManager, Operations, Selection, SelectionManager}
-import backend.io.{FileBrowser, ResourceManager}
+import backend.io.{FileBrowser, FileExport, ResourceManager}
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
 import frontend.layers.CardListView
@@ -169,9 +169,9 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
     }
   }
 
-  override def save(): Unit = ???
+  override def save(): Unit = FileExport.save()
 
-  override def saveAs(): Unit = ???
+  override def saveAs(): Unit = FileExport.saveAs()
 
   // todo - check if there is unsaved work somehow
   override def close(): Unit = stage.fireEvent(new WindowEvent(stage, WindowEvent.WindowCloseRequest))

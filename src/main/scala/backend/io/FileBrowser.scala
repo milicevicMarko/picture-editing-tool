@@ -8,8 +8,10 @@ import scalafx.stage.FileChooser
 import java.io.File
 
 trait Constants {
-  val Extensions: Seq[String] = Seq("*.jpg", "*.jpeg", "*.png")
-  val PictureExtensionFilter: ExtensionFilter = new ExtensionFilter("Picture", Extensions)
+  val PictureExtensions: Seq[String] = Seq("*.jpg", "*.jpeg", "*.png")
+  val MyExtensions: Seq[String] = Seq("*.cool")
+  val PictureExtensionFilter: ExtensionFilter = new ExtensionFilter("Picture", PictureExtensions)
+  val MyExtensionFilter: ExtensionFilter = new ExtensionFilter("FPhotoshop", MyExtensions)
   val Title = "File Browser"
   val DefaultPath: String = System.getProperty("user.home")
   val DebugPath: String = "src/test/test_images"
@@ -23,7 +25,7 @@ object FileBrowser extends Constants {
   val fileChooser: FileChooser = new FileChooser {
       title = Title
       initialDirectory = new File(DebugPath)
-      extensionFilters.addAll(PictureExtensionFilter)
+      extensionFilters.addAll(PictureExtensionFilter, MyExtensionFilter)
   }
 
   def chooseImportPath(): String = fileChooser.showOpenDialog(primaryStage) match {
@@ -40,6 +42,8 @@ object FileBrowser extends Constants {
     case f:File => f.getPath
     case null => ""
   }
+
+  def getType(path: String): String = new File(path).getName.split('.')(1)
 
   def chooseFileImport(): File = fileChooser.showOpenDialog(primaryStage)
   def chooseFileExport(): File = fileChooser.showSaveDialog(primaryStage)

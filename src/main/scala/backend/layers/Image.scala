@@ -14,7 +14,6 @@ class Image(@transient val bufferedImage: BufferedImage, path: String = "", var 
   def this(path: String) = this(FileImport.loadImage(path), path)
   def this(path: String, index: Int) = this(FileImport.loadImage(path), path, index)
 
-  // todo serialize name, path, isActivated?
   def duplicate(sameIndex: Boolean = true): Image = new Image(copyBufferedImage(), path, if (sameIndex) index else ImageManager.size)
   def deepCopy() = new Image(bufferedImage, path, index)
 
@@ -120,8 +119,9 @@ class Image(@transient val bufferedImage: BufferedImage, path: String = "", var 
   def writeTemporary(): Boolean = ImageIO.write(getBufferedImage, "png", new File(path))
   def overwrite(): Unit = ImageIO.write(getBufferedImage, "png", new File(path))
 
-  def write(outStream: ObjectOutputStream, fileFormat: String = "png"): Boolean = ImageIO.write(getBufferedImage, fileFormat, outStream)
+//  def write(outStream: ObjectOutputStream, fileFormat: String = "png"): Boolean = ImageIO.write(getBufferedImage, fileFormat, outStream)
 
+  def write(path: String, fileFormat: String = "png"): Unit = ImageIO.write(getBufferedImage, fileFormat, new File(path))
   override def toString: String = path
 }
 

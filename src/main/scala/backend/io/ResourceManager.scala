@@ -11,7 +11,8 @@ case class ResourceManager() extends Serializable {
   val operationManager: List[CompositeOperation] = OperationManager.composites.toList
   val selectionManager: List[Selection] = SelectionManager.buffer.toList
 
-  def write(name: String): Unit = {
+  // todo add current millis time
+  def write(name: String = "local.cool"): Unit = {
     ImageManager.overwrite()
     val oos = new ObjectOutputStream(new FileOutputStream(name))
     oos.writeObject(this)

@@ -117,5 +117,9 @@ object ImageManager extends Serializable {
     imageBuffer.foreach(img => img.overwrite())
   }
 
+  def write(path: String, format: String): Unit = {
+    imageBuffer.head.write(path, format)
+  }
+
   def read(): Unit = readDataReference().foreach(t => ImageManager.add(Image.read(new File(t))))
 }

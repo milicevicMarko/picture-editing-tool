@@ -1,42 +1,38 @@
 package backend.io
 
-import backend.layers.Image
+import backend.layers.ImageManager
 
-import java.io.File
-import javax.imageio.ImageIO
-
-abstract class SaveCommand
-case class Save() extends SaveCommand
-case class SaveAs() extends SaveCommand
+abstract class SaveCommand(path: String = "")
+case class Save() extends SaveCommand() {
+  ResourceManager().write()
+}
+case class SaveAsPNG(p: String) extends SaveCommand(p) {
+  ImageManager.write(p, "PNG")
+}
+case class SaveAsJPG(p: String) extends SaveCommand(p) {
+  ImageManager.write(p, "JPG")
+}
+case class SaveAsCool(p: String) extends SaveCommand(p) {
+  ResourceManager().write(p)
+}
 
 object FileExport {
+  def tryToSave(path: String = ""): Unit =
+    if (path.nonEmpty)
+      FileBrowser.getType(path) match {
+        case "png" => SaveAsPNG(path)
+        case "jpg" | "jpeg" => SaveAsJPG(path)
+        case "cool" => SaveAsCool(path)
+      }
+    else
+      Save()
 
-  def tryToSave(saveCommand: SaveCommand)(image: Image): Boolean = saveCommand match {
-    case Save() => ImageIO.write(image.getBufferedImage, "jpg", new File(image.getPath))
-    case SaveAs() => ImageIO.write(image.getBufferedImage, "jpg", new File(FileBrowser.chooseExportPath()))
+  def save(): Unit= tryToSave()
+
+  // if image is originally png, it cannot be saved as jpg
+  // vice versa works
+  def saveAs(): Unit = {
+    val path = FileBrowser.chooseExportPath()
+    if (path.nonEmpty) tryToSave(path)
   }
-//
-//  def tryToSave1(stageOption: Option[Stage]): Unit = Engine.getImageOption match {
-//    case Some(_) => saveFile(stageOption)
-//    case None => println("Nothing to save")
-//  }
-
-//  def saveFile(stageOption: Option[Stage]): Boolean = stageOption match {
-//    case Some(_) => saveFile(FileBrowser.chooseFileExport())
-//    case None => ??? // saveFile(FileBrowser.getCurrentFile)
-//  }
-
-//  private def saveFile(fileExported: File): Boolean = {
-//    if (fileExported != null && Engine.getImageFile.getName.nonEmpty)
-//      ImageIO.write(Engine.getImage, Engine.getImageFile.getName.split('.').toList.tail.head, fileExported)
-//    else
-//      println("Save canceled"); false
-//  }
-//  private def saveFile(path: String): Boolean = {
-//    if (path.nonEmpty && Engine.getImageFile.getName.nonEmpty)
-//      ImageIO.write(Engine.getImage, Engine.getImageFile.getName.split('.').toList.tail.head, new File(path))
-//    else
-//      println("Save canceled"); false
-//  }
-
 }
