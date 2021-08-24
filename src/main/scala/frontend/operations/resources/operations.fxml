@@ -35,7 +35,7 @@
                   <Insets bottom="20.0" />
                </padding>
             </Label>
-            <Accordion>
+            <Accordion prefHeight="296.0" prefWidth="246.0">
               <panes>
                 <TitledPane fx:id="titledPaneBasic" animated="false" text="Basic">
                   <content>

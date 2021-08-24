@@ -11,10 +11,8 @@ import scala.language.implicitConversions
 abstract case class BaseOperation(name: String) extends Serializable {
   def operate(rgb: RGB): RGB
 
-  def inSelection(pixelCoordinates: (Double, Double), r: Selection): Boolean = {
-    r.isPixelInside(pixelCoordinates)
-//    pixelCoordinates._1 >= r.getX && pixelCoordinates._1 <= r.getX + r.getWidth && pixelCoordinates._2 >= r.getY && pixelCoordinates._2 <= r.getY + r.getHeight
-  }
+  def inSelection(pixelCoordinates: (Double, Double), r: Selection): Boolean = r.isPixelInside(pixelCoordinates)
+
   def isPixelInSelection(pixelCoordinates: (Double, Double), selectionList: List[Selection]): Boolean = {
     @tailrec
     def iterSelections(selection: List[Selection]): Boolean = selection match {
@@ -45,14 +43,14 @@ class FillOperation() extends BaseOperation("fill") {
   implicit def intRGBFromSelectionFill(rectangle: Selection): Int = {
     rectangle.color
   }
-  override def apply(image: Image, selection: List[Selection]): Image = {
+  override def apply(image: Image, selections: List[Selection]): Image = {
     val img = image.getBufferedImage
     // iterate only trough selections
-    for (rect <- selection;
+    for (selection <- selections;
          x <- 0 until img.getWidth;
          y <- 0 until img.getHeight
-         if inSelection(image.actualCoordinates(x, y), rect)) {
-      img.setRGB(x, y, rect)
+         if inSelection(image.actualCoordinates(x, y), selection)) {
+      img.setRGB(x, y, selection)
     }
     image.deepCopy()
   }
@@ -80,6 +78,12 @@ class CompositeOperation(name: String, operations: List[BaseOperation]) extends 
   override def toString: String = name
 }
 
+// todo how to put inside of operation composer
+// problem :  overridden operate does not do anything as there's a new operate
+//            operate needs neighbors, which needs border (or try catch maybe can fix that)
+//                                                    but more importantly - neighbor needs x,y of pixel :(
+// this will either change everything or skip it
+//  override def operate(rgb: RGB): RGB = filter(getNeighborRGBS(getNeighbor()))
 class FilterOperation(name: String, n: Int, filter: List[RGB] => RGB) extends BaseOperation(name) {
   override def operate(rgb: RGB): RGB = rgb
 
