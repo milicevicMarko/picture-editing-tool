@@ -1,12 +1,10 @@
 package backend.engine
 
 import backend.layers.{Image, RGB}
-import javafx.collections.ObservableList
 import scalafx.collections.ObservableBuffer
 
 import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
 import scala.annotation.tailrec
-import scala.collection.mutable.ListBuffer
 import scala.language.implicitConversions
 
 @SerialVersionUID(107L)
@@ -82,9 +80,31 @@ class CompositeOperation(name: String, operations: List[BaseOperation]) extends 
   override def toString: String = name
 }
 
-class FilterOperation(name: String) extends BaseOperation(name) {
+class FilterOperation(name: String, n: Int, filter: List[RGB] => RGB) extends BaseOperation(name) {
   override def operate(rgb: RGB): RGB = rgb
-  // todo wtf should i do ahhaha
+
+  def operate(neighbors: List[(Int, Int)], image: Image): RGB = filter(getNeighborRGBS(neighbors, image))
+
+  // todo make dp
+  def getNeighborRGBS(neighbors: List[(Int, Int)], image: Image): List[RGB] =
+    neighbors.map(coordinate => image.getBufferedImage.getRGB(coordinate._1, coordinate._2))
+
+  def getNeighbor(pixel: (Double, Double), maxWidthHeight: (Int, Int), n: Int): List[(Int, Int)] = {
+    for (x <-(pixel._1.toInt - n until pixel._1.toInt + n + 1).toList;
+         y <- (pixel._2.toInt - n until pixel._2.toInt + n + 1).toList
+         if x >= 0 && x < maxWidthHeight._1 && y >= 0 && y < maxWidthHeight._2) yield (x, y)
+  }
+
+  override def apply(image: Image, selection: List[Selection]): Image = {
+    val img = image.getBufferedImage
+    val borders: (Int, Int) = (img.getWidth, img.getHeight)
+    for (x <- 0 until img.getWidth;
+         y <- 0 until img.getHeight
+         if selection.isEmpty || isPixelInSelection(image.actualCoordinates(x, y), selection)) {
+      img.setRGB(x, y, operate(getNeighbor((x, y), borders, n), image).limit())
+    }
+    image.deepCopy()
+  }
 }
 
 @SerialVersionUID(110L)
@@ -129,9 +149,12 @@ object Operations {
   def abs(value: Double = 0): BaseOperation = new SimpleOperation("abs", (i: RGB) => i.abs)
   def greyscale(value: Double = 0): BaseOperation =  new SimpleOperation("greyscale", (i: RGB) => i.toGrey)
   def invert(value: Double = 0): BaseOperation = Operations.invSub(1)
-
   def fill(rgb: RGB = null): BaseOperation = new FillOperation()
 
+  def median(n: Int): BaseOperation = new FilterOperation("median", n, median)
+  def ponder(n: Int): BaseOperation = new FilterOperation("ponder", n, ponder)
+
+  // todo create a map
   def call(name: String)(argument: Double): BaseOperation = name match {
     case "add" => add(argument)
     case "sub" => sub(argument)
@@ -148,6 +171,8 @@ object Operations {
 
     case "greyscale" => greyscale(argument)
     case "invert" => invert(argument)
+    case "median" => median(argument.toInt)
+    case "ponder" => ponder(argument.toInt)
 
     case _ => OperationManager.findComposite(name)
   }
@@ -157,5 +182,24 @@ object Operations {
   def needsArgument(name: String): Boolean = name match {
     case "limit" | "abs" | "greyscale" | "invert" | "fill" => true
     case _ => false
+  }
+
+  def ponder(neighborRGB:List[RGB]): RGB = {
+    val red = neighborRGB.foldLeft(0.0)((acc, rgb) => acc + rgb.red) / neighborRGB.size
+    val green = neighborRGB.foldLeft(0.0)((acc, rgb) => acc + rgb.green) / neighborRGB.size
+    val blue = neighborRGB.foldLeft(0.0)((acc, rgb) => acc + rgb.blue) / neighborRGB.size
+    new RGB(red, green, blue)
+  }
+
+  def median(neighborRGB: List[RGB]): RGB = {
+    val sorted: List[RGB] = neighborRGB.sortBy(rgb => RGB.toInt(rgb))
+    val middle = neighborRGB.size / 2
+    val left = sorted(middle)
+    if (neighborRGB.size % 2 != 0) {
+      val right: RGB = sorted(middle + 1)
+      (left + right) / 2
+    } else {
+      left
+    }
   }
 }

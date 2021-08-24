@@ -1,7 +1,7 @@
 package frontend.main
 
 import backend.engine.{BaseOperation, CompositeOperation, OperationManager, Operations, Selection, SelectionManager}
-import backend.io.{FileBrowser, FileExport, FileImport, ResourceManager}
+import backend.io.{FileExport, FileImport, ResourceManager}
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
 import frontend.layers.CardListView
@@ -53,6 +53,10 @@ trait MainInterface {
 
   def invertOp(): Unit
   def greyscaleOp(): Unit
+
+  def median(): Unit
+  def ponder(): Unit
+
   def openComposer(): Unit
   def useComposite(): Unit
   def removeComposite(): Unit
@@ -62,7 +66,7 @@ trait MainInterface {
 }
 
 @sfxml
-class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: StackPane, openOnStack: Button, layers: ListView[Image],
+class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack: Button, layers: ListView[Image],
                      selectToggleButton: ToggleButton, fillToggleButton: ToggleButton, colorBox: ColorPicker,
                      textField: TextField, compositeList: ListView[String])
   extends MainInterface {
@@ -88,6 +92,7 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
       }
     }
   })
+
   // ----------------------------------------
   // selection
   // ----------------------------------------
@@ -185,29 +190,6 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
 
   override def swap(): Unit = ImageManager.swap()
 
-  var debugMouse: Boolean = false
-  override def debugCursor(): Unit = {
-    if (debugMouse) {
-      selectPane.removeEventFilter[MouseEvent](MouseEvent.MOUSE_PRESSED, _)
-      debugMouse = false
-    } else {
-      debugMouse = true
-      selectPane.addEventFilter[MouseEvent](MouseEvent.MOUSE_PRESSED, e => {
-        val a: (Double, Double) = (e.getX, e.getY)
-        val b: (Double, Double) = (e.getSceneX, e.getSceneY)
-        val c: (Double, Double) = (e.getScreenX, e.getScreenY)
-        println(s"[click]\tregular: $a\tscene: $b\tscreen: $c")
-      })
-    }
-  }
-
-  override def refresh(): Unit = {
-    ImageManager.activated.foreach(i => i.refresh())
-    centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
-  }
-
-  override def print(): Unit = ImageManager.selected.foreach(i => println(s"${i.getPixel(20, 20)}\t${i.getPixel(200, 200)}"))
-
   // ----------------------------------------
   // right operations
   // ----------------------------------------
@@ -256,20 +238,37 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
 
   def setFillColor(): Unit = SelectionManager.fillColor = Some(colorBox.getValue)
 
+  override def median(): Unit = readTextField() match {
+    case Some(value) => ImageManager.operate(Operations.median(value.toInt), SelectionManager.buffer.toList)
+    case None => println("Enter int")
+  }
+
+  override def ponder(): Unit = readTextField() match {
+    case Some(value) => ImageManager.operate(Operations.ponder(value.toInt), SelectionManager.buffer.toList)
+    case None => println("Enter int")
+  }
+
   def operate(op: Double => BaseOperation): Unit = readTextField() match {
     case Some(value) => ImageManager.operate(op(value), SelectionManager.buffer.toList)
     case None if !Operations.needsArgument(op) => ImageManager.operate(op(0), SelectionManager.buffer.toList)
     case None => println("Please enter text field value")
   }
 
-  def readTextField(): Option[Double] = {
-    if (textField.getText.matches("\\d*(\\.\\d+|)")) Some(textField.getText.toDouble)
-    else None
-  }
+  def readTextField(): Option[Double] =
+    if (textField.getText.matches("\\d+(\\.\\d+|)")) Some(textField.getText.toDouble) else None
 
   // ----------------------------------------
   // op composer
   // ----------------------------------------
+  OperationManager.composites.addListener(new ListChangeListener[CompositeOperation] {
+    override def onChanged(change: ListChangeListener.Change[_ <: CompositeOperation]): Unit = {
+      while (change.next) {
+        if (change.wasAdded() || change.wasRemoved())
+          compositeList.items = OperationManager.composites.map(c => c.toString)
+      }
+    }
+  })
+
   override def openComposer(): Unit = {
     val loader = new FXMLLoader(getClass.getResource("../operations/resources/operations.fxml"), new DependenciesByType(Map()))
     loader.load()
@@ -283,15 +282,6 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
     dialogStage.title = "Operation Composer"
     dialogStage.showAndWait()
   }
-
-  OperationManager.composites.addListener(new ListChangeListener[CompositeOperation] {
-    override def onChanged(change: ListChangeListener.Change[_ <: CompositeOperation]): Unit = {
-      while (change.next) {
-        if (change.wasAdded() || change.wasRemoved())
-          compositeList.items = OperationManager.composites.map(c => c.toString)
-      }
-    }
-  })
 
   override def useComposite(): Unit = {
     if (compositeList.getSelectionModel.getSelectedItems.size() > 0) {
@@ -310,11 +300,37 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, mainPane: St
     }
   }
 
+  // ----------------------------------------
+  // debug
+  // ----------------------------------------
   val testFile: String = "my-test.cool"
 
   override def write(): Unit = ResourceManager().write(testFile)
 
   override def read(): Unit = ResourceManager().read(testFile)
+
+  var debugMouse: Boolean = false
+  override def debugCursor(): Unit = {
+    if (debugMouse) {
+      selectPane.removeEventFilter[MouseEvent](MouseEvent.MOUSE_PRESSED, _)
+      debugMouse = false
+    } else {
+      debugMouse = true
+      selectPane.addEventFilter[MouseEvent](MouseEvent.MOUSE_PRESSED, e => {
+        val a: (Double, Double) = (e.getX, e.getY)
+        val b: (Double, Double) = (e.getSceneX, e.getSceneY)
+        val c: (Double, Double) = (e.getScreenX, e.getScreenY)
+        println(s"[click]\tregular: $a\tscene: $b\tscreen: $c")
+      })
+    }
+  }
+
+  override def refresh(): Unit = {
+    ImageManager.activated.foreach(i => i.refresh())
+    centerPane.children = ImageManager.imageBuffer.toList.distinct.map(img => (img bindTo centerPane).imageView)
+  }
+
+  override def print(): Unit = ImageManager.selected.foreach(i => println(s"${i.getPixel(20, 20)}\t${i.getPixel(200, 200)}"))
 }
 
 object MainControllerApp extends JFXApp3 {

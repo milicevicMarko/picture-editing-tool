@@ -267,6 +267,30 @@
                                           <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                        </padding>
                                     </Button>
+                                    <Button alignment="CENTER" contentDisplay="CENTER" layoutX="339.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#median" prefHeight="25.0" prefWidth="25.0" textAlignment="JUSTIFY">
+                                       <graphic>
+                                          <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@icons/smudge.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                       <padding>
+                                          <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                       </padding>
+                                    </Button>
+                                    <Button alignment="CENTER" contentDisplay="CENTER" layoutX="322.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#ponder" prefHeight="25.0" prefWidth="25.0" textAlignment="JUSTIFY">
+                                       <graphic>
+                                          <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@icons/blur.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                       <padding>
+                                          <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                       </padding>
+                                    </Button>
                                  </children>
                               </HBox>
                            </children>
@@ -330,7 +354,7 @@
       </SplitPane>
    </right>
    <center>
-      <StackPane fx:id="mainPane" BorderPane.alignment="CENTER">
+      <StackPane BorderPane.alignment="CENTER">
          <children>
             <StackPane fx:id="centerPane" prefHeight="500.0" prefWidth="500.0" />
             <AnchorPane fx:id="selectPane" prefHeight="500.0" prefWidth="500.0">

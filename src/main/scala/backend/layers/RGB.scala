@@ -20,10 +20,13 @@ case class RGB(red: Double, green: Double, blue: Double) {
   def withOpacity(opacity: Double): RGB = this * opacity
   def blend(that: RGB): RGB = new RGB(limitColor(this.red + that.red), limitColor(this.green + that.green), limitColor(this.blue + that.blue))
 
+  def +(that: RGB) = new RGB(red + that.red, green + that.green, blue + that.blue)
+
   def +(const: Double): RGB = operation(const)((x, y) => x + y)
   def -(const: Double): RGB = operation(const)((x, y) => x - y)
   def -@(const: Double): RGB = operation(const)((x, y) => y - x)
-  def *(const: Double): RGB = operation(const)((x, y) => x * y)
+  def *(const: Double):
+  RGB = operation(const)((x, y) => x * y)
   def /(const: Double): RGB = operation(const)((x, y) => x / y)
   def /@(const: Double): RGB = operation(const)((x, y) => y / x)
 
