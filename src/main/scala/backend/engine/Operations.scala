@@ -3,6 +3,7 @@ package backend.engine
 import backend.layers.{Image, RGB}
 import scalafx.collections.ObservableBuffer
 
+import java.awt.image.BufferedImage
 import java.io.{FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
 import scala.annotation.tailrec
 import scala.language.implicitConversions
@@ -70,6 +71,34 @@ class BlendOperation() extends BaseOperation("blend") {
       img.setRGB(x, y, image1.getPixelWithOpacity(x, y) blend image2.getPixelWithOpacity(x, y))
     }
     image1.deepCopy()
+  }
+}
+
+class CropOperation() extends BaseOperation("crop") {
+  override def operate(rgb: RGB): RGB = rgb
+
+  override def apply(image: Image, selections: List[Selection]): Image = {
+    val selection = selections.head
+    val nImg = new BufferedImage(selection.width.toInt, selection.height.toInt, BufferedImage.TYPE_INT_RGB)
+
+    val img = image.getBufferedImage
+    var start: (Int, Int) = (0, 0)
+    for (x <- 0 until img.getWidth;
+         y <- 0 until img.getHeight;
+         if inSelection(image.actualCoordinates(x, y), selection)) {
+      start = (x, y)
+    }
+    var end: (Int, Int) = (0, 0)
+    for (x <- start._1 until img.getWidth;
+         y <- start._2 until img.getHeight;
+         if !inSelection(image.actualCoordinates(x, y), selection)) {
+      end = (x, y)
+    }
+    for (nx <- start._1 until end._1;
+         ny <- start._2 until end._2) {
+      nImg.setRGB(nx - start._1, ny - start._2, img.getRGB(nx, ny))
+    }
+    new Image(nImg, image.getPath, image.index)
   }
 }
 
@@ -151,7 +180,9 @@ object Operations {
   def abs(value: Double = 0): BaseOperation = new SimpleOperation("abs", (i: RGB) => i.abs)
   def greyscale(value: Double = 0): BaseOperation =  new SimpleOperation("greyscale", (i: RGB) => i.toGrey)
   def invert(value: Double = 0): BaseOperation = Operations.invSub(1)
-  def fill(rgb: RGB = null): BaseOperation = new FillOperation()
+
+  def crop(): BaseOperation = new CropOperation()
+  def fill(): BaseOperation = new FillOperation()
 
   def median(n: Int): BaseOperation = new FilterOperation("median", n, medianFilerOp)
   def ponder(n: Int): BaseOperation = new FilterOperation("ponder", n, ponderFilerOp)

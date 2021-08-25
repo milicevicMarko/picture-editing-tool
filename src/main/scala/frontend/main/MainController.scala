@@ -1,7 +1,6 @@
 package frontend.main
 
 import backend.engine.{BaseOperation, CompositeOperation, OperationManager, Operations, Selection, SelectionManager}
-import backend.io.FileBrowser.primaryStage.initOwner
 import backend.io.{FileExport, FileImport, ResourceManager}
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
@@ -62,6 +61,8 @@ trait MainInterface {
   def openComposer(): Unit
   def useComposite(): Unit
   def removeComposite(): Unit
+
+  def crop(): Unit
 
   def write(): Unit
   def read(): Unit
@@ -334,6 +335,8 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
       })
     }
   }
+
+  override def crop(): Unit = if (SelectionManager.buffer.nonEmpty) ImageManager.operate(Operations.crop(), SelectionManager.buffer.toList)
 
   override def refresh(): Unit = {
     ImageManager.activated.foreach(i => i.refresh())
