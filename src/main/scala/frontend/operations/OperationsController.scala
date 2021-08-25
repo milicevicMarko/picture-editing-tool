@@ -33,7 +33,7 @@ class OperationsController(listOfBasics: ListView[String], listOfComposites: Lis
   OperationManager.composites.map(comp => composites.add(comp.name))
 
   val functions: ObservableList[String] = new ObservableBuffer[String]()
-  functions.addAll("pow", "log", "abs", "min", "max", "greyscale", "invert") // , "median", "ponder")
+  functions.addAll("pow", "log", "abs", "min", "max", "greyscale", "invert")
 
   listOfBasics.setItems(basics)
   listOfComposites.setItems(composites)

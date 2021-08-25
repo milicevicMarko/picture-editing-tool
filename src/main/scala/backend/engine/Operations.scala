@@ -78,15 +78,31 @@ class CompositeOperation(name: String, operations: List[BaseOperation]) extends 
   override def toString: String = name
 }
 
-// todo how to put inside of operation composer
-// problem :  overridden operate does not do anything as there's a new operate
-//            operate needs neighbors, which needs border (or try catch maybe can fix that)
-//                                                    but more importantly - neighbor needs x,y of pixel :(
-// this will either change everything or skip it
-//  override def operate(rgb: RGB): RGB = filter(getNeighborRGBS(getNeighbor()))
 class FilterOperation(name: String, n: Int, filter: List[RGB] => RGB) extends BaseOperation(name) {
   override def operate(rgb: RGB): RGB = rgb
 
+  // todo less code duplication
+
+//   def medianFilerOp(neighborRGB: List[RGB], colorPick: RGB => Double): Double = {
+//    val neighborSize: Int = neighborRGB.size
+//    val sorted: List[Double] = neighborRGB.map(rgb => colorPick(rgb)).sortWith(_<_)
+//    val middle: Int = neighborSize / 2
+//    val left: Double = sorted(middle)
+//    if (neighborSize % 2 == 0) {
+//      val right: Double = sorted(middle + 1)
+//      (left + right) / 2
+//    } else {
+//      left
+//    }
+//  }
+//  def ponderFilerOp(neighborRGB: List[RGB], colorPick: RGB => Double): Double = {
+//    neighborRGB.foldLeft(0.0)((acc, color) => acc + colorPick(color)) / neighborRGB.size
+//  }
+//
+//  def filter(neighborRGB: List[RGB], filterOp: (List[RGB], RGB => Double) => Double): RGB = {
+//    new RGB(filterOp(neighborRGB, rgb => rgb.red), filterOp(neighborRGB, rgb => rgb.green), filterOp(neighborRGB, rgb => rgb.blue))
+//  }
+//
   def operate(neighbors: List[(Int, Int)], image: Image): RGB = filter(getNeighborRGBS(neighbors, image))
 
   // todo make dp
@@ -175,8 +191,6 @@ object Operations {
 
     case "greyscale" => greyscale(argument)
     case "invert" => invert(argument)
-    case "median" => median(argument.toInt)
-    case "ponder" => ponder(argument.toInt)
 
     case _ => OperationManager.findComposite(name)
   }
@@ -189,21 +203,26 @@ object Operations {
   }
 
   def ponder(neighborRGB:List[RGB]): RGB = {
-    val red = neighborRGB.foldLeft(0.0)((acc, rgb) => acc + rgb.red) / neighborRGB.size
-    val green = neighborRGB.foldLeft(0.0)((acc, rgb) => acc + rgb.green) / neighborRGB.size
-    val blue = neighborRGB.foldLeft(0.0)((acc, rgb) => acc + rgb.blue) / neighborRGB.size
-    new RGB(red, green, blue)
+    val neighborSize: Int = neighborRGB.size
+    def colorAvg(colorPick: RGB => Double): Double = neighborRGB.foldLeft(0.0)((acc, color) => acc + colorPick(color)) / neighborSize
+
+    new RGB(colorAvg(rgb => rgb.red), colorAvg(rgb => rgb.green), colorAvg(rgb => rgb.blue))
   }
 
   def median(neighborRGB: List[RGB]): RGB = {
-    val sorted: List[RGB] = neighborRGB.sortBy(rgb => RGB.toInt(rgb))
-    val middle = neighborRGB.size / 2
-    val left = sorted(middle)
-    if (neighborRGB.size % 2 != 0) {
-      val right: RGB = sorted(middle + 1)
-      (left + right) / 2
-    } else {
-      left
+    val neighborSize: Int = neighborRGB.size
+    def colorMedian(colorPick: RGB => Double): Double = {
+      val sorted: List[Double] = neighborRGB.map(rgb => colorPick(rgb)).sortWith(_<_)
+      val middle: Int = neighborSize / 2
+      val left: Double = sorted(middle)
+      if (neighborSize % 2 == 0) {
+        val right: Double = sorted(middle + 1)
+        (left + right) / 2
+      } else {
+        left
+      }
     }
+
+    new RGB(colorMedian(rgb => rgb.red), colorMedian(rgb => rgb.green), colorMedian(rgb => rgb.blue))
   }
 }
