@@ -345,7 +345,7 @@ object MainControllerApp extends JFXApp3 {
     stage = new JFXApp3.PrimaryStage() {
       title = "FPhotoshop"
       scene = new Scene(root)
-//      maximized = true
+      resizable = false
       filterEvent(WindowEvent.WindowCloseRequest) {
         event: WindowEvent => ExitController.handleExitEvent(event)
       }
