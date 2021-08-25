@@ -78,31 +78,13 @@ class CompositeOperation(name: String, operations: List[BaseOperation]) extends 
   override def toString: String = name
 }
 
-class FilterOperation(name: String, n: Int, filter: List[RGB] => RGB) extends BaseOperation(name) {
+class FilterOperation(name: String, n: Int, filterOp: (List[RGB], RGB => Double) => Double) extends BaseOperation(name) {
   override def operate(rgb: RGB): RGB = rgb
 
-  // todo less code duplication
+  def filter(neighborRGB: List[RGB]): RGB = {
+    new RGB(filterOp(neighborRGB, rgb => rgb.red), filterOp(neighborRGB, rgb => rgb.green), filterOp(neighborRGB, rgb => rgb.blue))
+  }
 
-//   def medianFilerOp(neighborRGB: List[RGB], colorPick: RGB => Double): Double = {
-//    val neighborSize: Int = neighborRGB.size
-//    val sorted: List[Double] = neighborRGB.map(rgb => colorPick(rgb)).sortWith(_<_)
-//    val middle: Int = neighborSize / 2
-//    val left: Double = sorted(middle)
-//    if (neighborSize % 2 == 0) {
-//      val right: Double = sorted(middle + 1)
-//      (left + right) / 2
-//    } else {
-//      left
-//    }
-//  }
-//  def ponderFilerOp(neighborRGB: List[RGB], colorPick: RGB => Double): Double = {
-//    neighborRGB.foldLeft(0.0)((acc, color) => acc + colorPick(color)) / neighborRGB.size
-//  }
-//
-//  def filter(neighborRGB: List[RGB], filterOp: (List[RGB], RGB => Double) => Double): RGB = {
-//    new RGB(filterOp(neighborRGB, rgb => rgb.red), filterOp(neighborRGB, rgb => rgb.green), filterOp(neighborRGB, rgb => rgb.blue))
-//  }
-//
   def operate(neighbors: List[(Int, Int)], image: Image): RGB = filter(getNeighborRGBS(neighbors, image))
 
   // todo make dp
@@ -171,8 +153,8 @@ object Operations {
   def invert(value: Double = 0): BaseOperation = Operations.invSub(1)
   def fill(rgb: RGB = null): BaseOperation = new FillOperation()
 
-  def median(n: Int): BaseOperation = new FilterOperation("median", n, median)
-  def ponder(n: Int): BaseOperation = new FilterOperation("ponder", n, ponder)
+  def median(n: Int): BaseOperation = new FilterOperation("median", n, medianFilerOp)
+  def ponder(n: Int): BaseOperation = new FilterOperation("ponder", n, ponderFilerOp)
 
   // todo create a map
   def call(name: String)(argument: Double): BaseOperation = name match {
@@ -202,27 +184,20 @@ object Operations {
     case _ => false
   }
 
-  def ponder(neighborRGB:List[RGB]): RGB = {
+  def medianFilerOp(neighborRGB: List[RGB], colorPick: RGB => Double): Double = {
     val neighborSize: Int = neighborRGB.size
-    def colorAvg(colorPick: RGB => Double): Double = neighborRGB.foldLeft(0.0)((acc, color) => acc + colorPick(color)) / neighborSize
-
-    new RGB(colorAvg(rgb => rgb.red), colorAvg(rgb => rgb.green), colorAvg(rgb => rgb.blue))
+    val sorted: List[Double] = neighborRGB.map(rgb => colorPick(rgb)).sortWith(_<_)
+    val middle: Int = neighborSize / 2
+    val left: Double = sorted(middle)
+    if (neighborSize % 2 == 0) {
+      val right: Double = sorted(middle + 1)
+      (left + right) / 2
+    } else {
+      left
+    }
   }
 
-  def median(neighborRGB: List[RGB]): RGB = {
-    val neighborSize: Int = neighborRGB.size
-    def colorMedian(colorPick: RGB => Double): Double = {
-      val sorted: List[Double] = neighborRGB.map(rgb => colorPick(rgb)).sortWith(_<_)
-      val middle: Int = neighborSize / 2
-      val left: Double = sorted(middle)
-      if (neighborSize % 2 == 0) {
-        val right: Double = sorted(middle + 1)
-        (left + right) / 2
-      } else {
-        left
-      }
-    }
-
-    new RGB(colorMedian(rgb => rgb.red), colorMedian(rgb => rgb.green), colorMedian(rgb => rgb.blue))
+  def ponderFilerOp(neighborRGB: List[RGB], colorPick: RGB => Double): Double = {
+    neighborRGB.foldLeft(0.0)((acc, color) => acc + colorPick(color)) / neighborRGB.size
   }
 }
