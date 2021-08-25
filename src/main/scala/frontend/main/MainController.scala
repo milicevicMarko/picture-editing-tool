@@ -1,6 +1,7 @@
 package frontend.main
 
 import backend.engine.{BaseOperation, CompositeOperation, OperationManager, Operations, Selection, SelectionManager}
+import backend.io.FileBrowser.primaryStage.initOwner
 import backend.io.{FileExport, FileImport, ResourceManager}
 import backend.layers.{Image, ImageManager}
 import frontend.exit.ExitController
@@ -13,7 +14,8 @@ import javafx.scene.input.MouseEvent
 import scalafx.Includes._
 import scalafx.application.JFXApp3
 import scalafx.scene.Scene
-import scalafx.scene.control.{Button, ColorPicker, ListView, TextField, ToggleButton}
+import scalafx.scene.control.Alert.AlertType
+import scalafx.scene.control.{Alert, Button, ColorPicker, ListView, TextField, ToggleButton}
 import scalafx.scene.layout.{AnchorPane, StackPane}
 import scalafx.scene.shape.Rectangle
 import scalafx.stage.{Modality, Stage, WindowEvent}
@@ -240,23 +242,31 @@ class MainController(selectPane: AnchorPane, centerPane: StackPane, openOnStack:
 
   override def median(): Unit = readTextField() match {
     case Some(value) => ImageManager.operate(Operations.median(value.toInt), SelectionManager.buffer.toList)
-    case None => println("Enter int")
+    case None =>alertArgumentError()
   }
 
   override def ponder(): Unit = readTextField() match {
     case Some(value) => ImageManager.operate(Operations.ponder(value.toInt), SelectionManager.buffer.toList)
-    case None => println("Enter int")
+    case None => alertArgumentError()
   }
 
   def operate(op: Double => BaseOperation): Unit = readTextField() match {
     case Some(value) => ImageManager.operate(op(value), SelectionManager.buffer.toList)
     case None if !Operations.needsArgument(op) => ImageManager.operate(op(0), SelectionManager.buffer.toList)
-    case None => println("Please enter text field value")
+    case None => alertArgumentError()
   }
 
   def readTextField(): Option[Double] =
     if (textField.getText.matches("\\d+(\\.\\d+|)")) Some(textField.getText.toDouble) else None
 
+  def alertArgumentError(): Unit = {
+    new Alert(AlertType.Warning) {
+      initOwner(stage)
+      title = "Invalid argument field"
+      headerText = "Operation requires a Number argument"
+      contentText = "Some arguments can be too hefty for the system. There is no undo. Think before you start."
+    }.showAndWait()
+  }
   // ----------------------------------------
   // op composer
   // ----------------------------------------
